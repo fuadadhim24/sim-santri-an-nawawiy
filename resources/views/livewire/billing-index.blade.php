@@ -74,6 +74,13 @@
                                             </svg>
                                             Receipt
                                         </a>
+                                        @if (Auth::user()->role === 'SUPER_ADMIN')
+                                            <button wire:click="cancelPayment({{ $billing->id }})"
+                                                wire:confirm="Are you sure you want to CANCEL this payment? It will revert to UNPAID."
+                                                class="px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium ml-2">
+                                                Cancel
+                                            </button>
+                                        @endif
                                     @endif
                                 </div>
                             </td>
