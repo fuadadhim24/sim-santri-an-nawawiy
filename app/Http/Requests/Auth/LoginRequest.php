@@ -41,7 +41,41 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $input = $this->all();
+        $login_type = filter_var($this->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $credentials = [
+            'email' => $this->input('email'),
+            'password' => $this->input('password')
+        ];
+
+        if ($login_type !== 'email') {
+            $username = $this->input('email');
+
+            $userEmail = null;
+            $student = \App\Models\Student::where('nis', $username)->first();
+            if ($student && $student->guardian && $student->guardian->user) {
+                $userEmail = $student->guardian->user->email;
+            }
+
+            if (!$userEmail) {
+                $guardian = \App\Models\Guardian::where('whatsapp', $username)->first();
+                if ($guardian && $guardian->user) {
+                    $userEmail = $guardian->user->email;
+                }
+            }
+
+            if (!$userEmail) {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => trans('auth.failed'),
+                ]);
+            }
+
+            $credentials['email'] = $userEmail;
+        }
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

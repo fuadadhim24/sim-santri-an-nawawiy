@@ -10,15 +10,21 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     $user = Auth::user();
     if ($user->role === 'WALI_SANTRI') {
-        return view('dashboard-wali');
+        return redirect()->route('wali.dashboard');
     }
-    return view('dashboard');
+    return view('dashboard'); // Admin dashboard
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Wali Santri Routes
+    Route::middleware(['role:WALI_SANTRI'])->group(function () {
+        Route::get('/my-dashboard', \App\Livewire\GuardianDashboard::class)->name('wali.dashboard');
+    });
+
     Route::middleware(['role:SUPER_ADMIN,ADMIN_TU'])->group(function () {
         Route::get('/admin/users', \App\Livewire\UserIndex::class)->name('admin.users');
         Route::get('/admin/users/create', \App\Livewire\UserForm::class)->name('admin.users.create');
