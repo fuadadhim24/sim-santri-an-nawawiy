@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
         Route::get('/admin/payments/create', \App\Livewire\PaymentEntry::class)->name('admin.payments.create');
         Route::get('/admin/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('admin.receipts.show');
+        Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
     });
 
     Route::middleware(['role:WALI_SANTRI'])->group(function () {

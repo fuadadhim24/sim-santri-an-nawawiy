@@ -1,0 +1,108 @@
+<div>
+    <x-slot name="header">
+        Financial Report
+    </x-slot>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <!-- Summary Cards -->
+        <div class="md:col-span-1 bg-card rounded-lg shadow-sm border border-border p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Income</h4>
+                    <div class="mt-1 text-2xl font-bold text-foreground">
+                        Rp {{ number_format($totalIncome, 0, ',', '.') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="md:col-span-1 bg-card rounded-lg shadow-sm border border-border p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Transactions</h4>
+                    <div class="mt-1 text-2xl font-bold text-foreground">
+                        {{ $totalTransactions }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="md:col-span-2 bg-card rounded-lg shadow-sm border border-border p-6 flex flex-col justify-center">
+            <h4 class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Date Range Filter</h4>
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="w-full">
+                    <input wire:model.live="startDate" type="date"
+                        class="w-full px-3 py-2 border border-input bg-background rounded-md text-foreground focus:ring-2 focus:ring-ring focus:border-input transition duration-150 ease-in-out text-sm">
+                </div>
+                <div class="flex items-center text-muted-foreground">to</div>
+                <div class="w-full">
+                    <input wire:model.live="endDate" type="date"
+                        class="w-full px-3 py-2 border border-input bg-background rounded-md text-foreground focus:ring-2 focus:ring-ring focus:border-input transition duration-150 ease-in-out text-sm">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction List -->
+    <div class="bg-card rounded-lg shadow-sm border border-border">
+        <div class="p-6 border-b border-border">
+            <h3 class="text-lg font-semibold text-card-foreground">Payment History</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-muted-foreground uppercase bg-muted">
+                    <tr>
+                        <th class="px-6 py-3">Date</th>
+                        <th class="px-6 py-3">Student</th>
+                        <th class="px-6 py-3">Description</th>
+                        <th class="px-6 py-3 text-right">Amount</th>
+                        <th class="px-6 py-3 text-center">Receipt</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                    @forelse ($paidBills as $bill)
+                        <tr class="hover:bg-muted/50">
+                            <td class="px-6 py-4 text-muted-foreground">
+                                {{ $bill->updated_at->format('d M Y H:i') }}
+                            </td>
+                            <td class="px-6 py-4 font-medium text-foreground">
+                                {{ $bill->student->full_name }}
+                            </td>
+                            <td class="px-6 py-4 text-foreground">
+                                {{ $bill->title }}
+                            </td>
+                            <td class="px-6 py-4 text-right font-mono font-medium text-foreground">
+                                Rp {{ number_format($bill->final_amount, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('admin.receipts.show', $bill->id) }}" target="_blank"
+                                    class="text-xs text-blue-600 hover:text-blue-800 underline">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-muted-foreground">
+                                No payments found in this period.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
