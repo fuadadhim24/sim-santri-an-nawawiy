@@ -12,9 +12,9 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
-                serif: ['Lora', ...defaultTheme.fontFamily.serif],
-                mono: ['IBM Plex Mono', ...defaultTheme.fontFamily.mono],
+                sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
+                serif: ['Merriweather', ...defaultTheme.fontFamily.serif],
+                mono: ['Source Code Pro', ...defaultTheme.fontFamily.mono],
             },
             colors: {
                 background: 'var(--background)',
