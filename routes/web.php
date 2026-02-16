@@ -23,6 +23,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/guardians', \App\Livewire\GuardianIndex::class)->name('admin.guardians');
     Route::get('/admin/guardians/create', \App\Livewire\GuardianForm::class)->name('admin.guardians.create');
     Route::get('/admin/guardians/{guardian}/edit', \App\Livewire\GuardianForm::class)->name('admin.guardians.edit');
+
+    Route::get('/admin/students', \App\Livewire\StudentIndex::class)->name('admin.students');
+    Route::get('/admin/students/create', \App\Livewire\StudentForm::class)->name('admin.students.create');
+    Route::get('/admin/students/{student}/edit', \App\Livewire\StudentForm::class)->name('admin.students.edit');
+    Route::get('/admin/students/{student}', \App\Livewire\StudentDetail::class)->name('admin.students.show');
 });
 
 require __DIR__.'/auth.php';
