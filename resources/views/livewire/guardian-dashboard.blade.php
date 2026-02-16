@@ -64,8 +64,15 @@
                                                 <p class="text-xs text-gray-500">
                                                     {{ $bill->created_at->format('d M Y') }}</p>
                                             </div>
-                                            <span class="text-sm font-bold text-red-600">Rp
-                                                {{ number_format($bill->final_amount, 0, ',', '.') }}</span>
+                                            <div class="flex items-center space-x-3">
+                                                <span class="text-sm font-bold text-red-600">Rp
+                                                    {{ number_format($bill->final_amount, 0, ',', '.') }}</span>
+                                                <button wire:click="pay({{ $bill->id }})"
+                                                    wire:confirm="Simulate payment for this bill?"
+                                                    class="px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition">
+                                                    Pay
+                                                </button>
+                                            </div>
                                         </li>
                                     @endforeach
                                 </ul>
