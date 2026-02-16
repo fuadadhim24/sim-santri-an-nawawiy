@@ -60,7 +60,22 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <button class="text-primary hover:text-primary/80 font-medium mr-2">Detail</button>
+                                <div class="flex items-center justify-center space-x-2">
+                                    <button
+                                        class="text-primary hover:text-primary/80 font-medium text-sm">Detail</button>
+                                    @if ($billing->status == 'PAID')
+                                        <a href="{{ route('admin.receipts.show', $billing->id) }}" target="_blank"
+                                            class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs font-medium flex items-center">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                                </path>
+                                            </svg>
+                                            Receipt
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

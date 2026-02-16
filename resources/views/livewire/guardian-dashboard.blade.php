@@ -93,11 +93,18 @@
                                             <div>
                                                 <p class="text-sm text-gray-800">{{ $bill->title }}</p>
                                             </div>
-                                            <div>
+                                            <div class="flex items-center space-x-2">
                                                 <span
                                                     class="text-xs font-medium px-2 py-0.5 rounded {{ $bill->status == 'PAID' ? 'bg-green-100 text-green-700' : 'bg-gray-100' }}">
                                                     {{ $bill->status }}
                                                 </span>
+                                                @if ($bill->status == 'PAID')
+                                                    <a href="{{ route('admin.receipts.show', $bill->id) }}"
+                                                        target="_blank"
+                                                        class="text-xs text-blue-600 hover:text-blue-800 underline">
+                                                        Receipt
+                                                    </a>
+                                                @endif
                                             </div>
                                         </li>
                                     @endforeach
