@@ -9,13 +9,16 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
-    if ($user->role === 'WALI_SANTRI') {
-        return redirect()->route('wali.dashboard');
-    }
-    return view('dashboard'); // Admin dashboard
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+        if ($user->role === 'WALI_SANTRI') {
+            return redirect()->route('wali.dashboard');
+        }
+        // For other roles (Admin, Super Admin), show the admin dashboard
+        return redirect()->route('admin.dashboard');
+    })->name('dashboard');
 
-Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -25,7 +28,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/my-dashboard', \App\Livewire\GuardianDashboard::class)->name('wali.dashboard');
     });
 
+    // Role based routes
     Route::middleware(['role:SUPER_ADMIN,ADMIN_TU'])->group(function () {
+        Route::get('/admin/dashboard', \App\Livewire\AdminDashboard::class)->name('admin.dashboard');
         Route::get('/admin/users', \App\Livewire\UserIndex::class)->name('admin.users');
         Route::get('/admin/users/create', \App\Livewire\UserForm::class)->name('admin.users.create');
         Route::get('/admin/users/{user}/edit', \App\Livewire\UserForm::class)->name('admin.users.edit');
