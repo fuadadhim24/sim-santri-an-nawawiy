@@ -4,21 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Billing extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'student_id',
+        'title',
+        'original_amount',
+        'discount_applied',
+        'final_amount',
+        'status',
+    ];
 
-    public function student(): BelongsTo
+    public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
-    public function payments(): HasMany
+    // Optional: If we want to link payments later
+    public function payments()
     {
         return $this->hasMany(Payment::class);
     }

@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/discounts', \App\Livewire\DiscountIndex::class)->name('admin.discounts');
         Route::get('/admin/discounts/create', \App\Livewire\DiscountForm::class)->name('admin.discounts.create');
         Route::get('/admin/discounts/{discount}/edit', \App\Livewire\DiscountForm::class)->name('admin.discounts.edit');
+
+        Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
+        Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
     });
 
     Route::middleware(['role:WALI_SANTRI'])->group(function () {
