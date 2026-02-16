@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->enum('unit_target', ['01', '02', '03'])->nullable();
             $table->enum('residence_target', ['MONDOK', 'NON_MONDOK'])->nullable();
-            $table->enum('category', ['DAFTAR_ULANG', 'BULANAN', 'SEMESTERAN']);
+            $table->enum('category', ['PENDAFTARAN', 'DAFTAR_ULANG', 'BULANAN', 'SEMESTERAN', 'AKHIR_SEKOLAH']);
             $table->string('item_name');
             $table->decimal('amount', 12, 2);
             $table->timestamps();
