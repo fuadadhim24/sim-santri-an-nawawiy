@@ -7,8 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    $user = Auth::user();
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user = Auth::user();
@@ -59,8 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
     });
 
-    Route::middleware(['role:WALI_SANTRI'])->group(function () {
-    });
+
 });
 
 require __DIR__.'/auth.php';
