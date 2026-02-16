@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
+        Route::get('/admin/payments/create', \App\Livewire\PaymentEntry::class)->name('admin.payments.create');
     });
 
     Route::middleware(['role:WALI_SANTRI'])->group(function () {
