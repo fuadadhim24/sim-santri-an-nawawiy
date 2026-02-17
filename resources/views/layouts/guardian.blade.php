@@ -22,10 +22,16 @@
 <body class="font-sans antialiased bg-background text-foreground">
     <div class="flex min-h-screen bg-background">
         <!-- Sidebar -->
-        <aside
-            class="w-64 bg-sidebar border-r border-sidebar-border text-sidebar-foreground hidden md:flex md:flex-col fixed h-full transition-all duration-300 z-30">
-            <div class="h-16 flex items-center justify-center border-b border-sidebar-border px-6">
+        <aside id="sidebar"
+            class="w-64 bg-sidebar border-r border-sidebar-border text-sidebar-foreground hidden md:flex md:flex-col fixed h-full transition-all duration-300 z-30 flex flex-col">
+            <div class="h-16 flex items-center justify-between px-6 border-b border-sidebar-border">
                 <h1 class="text-xl font-bold text-sidebar-primary tracking-tight">WALI SANTRI</h1>
+                <button id="mobile-sidebar-close" class="md:hidden text-sidebar-foreground hover:text-sidebar-primary">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
@@ -65,7 +71,7 @@
                 class="bg-card shadow-sm border-b border-border h-16 flex items-center justify-between px-6 sticky top-0 z-20">
                 <div class="flex items-center">
                     <!-- Mobile menu button -->
-                    <button
+                    <button id="mobile-menu-button"
                         class="md:hidden p-2 rounded-md text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -104,5 +110,25 @@
         </div>
     </div>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const button = document.getElementById('mobile-menu-button');
+        const sidebar = document.getElementById('sidebar');
+        const closeButton = document.getElementById('mobile-sidebar-close');
+
+        if (button && sidebar) {
+            button.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+            });
+        }
+
+        if (closeButton && sidebar) {
+            closeButton.addEventListener('click', () => {
+                sidebar.classList.add('hidden');
+            });
+        }
+    });
+</script>
 
 </html>

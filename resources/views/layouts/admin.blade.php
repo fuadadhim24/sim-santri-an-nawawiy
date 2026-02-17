@@ -22,10 +22,16 @@
 <body class="font-sans antialiased bg-background text-foreground">
     <div class="flex min-h-screen bg-background">
         <!-- Sidebar -->
-        <aside
-            class="w-64 bg-sidebar border-r border-sidebar-border text-sidebar-foreground hidden md:flex md:flex-col fixed h-full transition-all duration-300 z-30">
-            <div class="h-16 flex items-center justify-center border-b border-sidebar-border px-6">
+        <aside id="sidebar"
+            class="w-64 bg-sidebar border-r border-sidebar-border text-sidebar-foreground hidden md:flex md:flex-col fixed h-full transition-all duration-300 z-30 flex flex-col">
+            <div class="h-16 flex items-center justify-between px-6 border-b border-sidebar-border">
                 <h1 class="text-xl font-bold text-sidebar-primary tracking-tight">SIM-SANTRI</h1>
+                <button id="mobile-sidebar-close" class="md:hidden text-sidebar-foreground hover:text-sidebar-primary">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
@@ -41,33 +47,53 @@
                     Dashboard
                 </a>
 
+                @if (Auth::user()->role === 'SUPER_ADMIN')
+                    <div class="pt-4 pb-2">
+                        <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Master Data
+                        </p>
+                    </div>
+
+                    <a href="{{ route('admin.users') }}"
+                        class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.users*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                        <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.users*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                        </svg>
+                        Users
+                    </a>
+
+                    <a href="{{ route('admin.fee-masters') }}"
+                        class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.fee-masters*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                        <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.fee-masters*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                        </svg>
+                        Fee Masters
+                    </a>
+
+                    <a href="{{ route('admin.discounts') }}"
+                        class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.discounts*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                        <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.discounts*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+                        </svg>
+                        Discounts
+                    </a>
+                @endif
+
                 <div class="pt-4 pb-2">
                     <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        Master Data
+                        Operational
                     </p>
                 </div>
-
-                <a href="{{ route('admin.users') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.users') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
-                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.users') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                    </svg>
-                    Users
-                </a>
-
-                <a href="{{ route('admin.guardians') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.guardians') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
-                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.guardians') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                    </svg>
-                    Guardians
-                </a>
 
                 <a href="{{ route('admin.students') }}"
                     class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.students*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
@@ -80,27 +106,15 @@
                     Students
                 </a>
 
-                <a href="{{ route('admin.fee-masters') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.fee-masters*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
-                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.fee-masters*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                <a href="{{ route('admin.guardians') }}"
+                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.guardians') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.guardians') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                            d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
                     </svg>
-                    Fee Masters
-                </a>
-
-                <a href="{{ route('admin.discounts') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.discounts*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
-                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.discounts*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
-                    </svg>
-                    Discounts
+                    Guardians
                 </a>
 
                 <a href="{{ route('admin.billings') }}"
@@ -124,22 +138,26 @@
                     </svg>
                     Cash Payment
                 </a>
-                <div class="pt-4 pb-2">
-                    <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        Reports
-                    </p>
-                </div>
 
-                <a href="{{ route('admin.reports.financial') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.reports.financial') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
-                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.reports.financial') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
-                    </svg>
-                    Financial Report
-                </a>
+                @if (Auth::user()->role === 'SUPER_ADMIN')
+                    <div class="pt-4 pb-2">
+                        <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Reports
+                        </p>
+                    </div>
+
+                    <a href="{{ route('admin.reports.financial') }}"
+                        class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.reports.financial') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                        <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.reports.financial') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+                        </svg>
+                        Financial Report
+                    </a>
+                @endif
+            </nav>
             </nav>
 
             <div class="border-t border-sidebar-border p-4">
@@ -165,7 +183,7 @@
                 class="bg-card shadow-sm border-b border-border h-16 flex items-center justify-between px-6 sticky top-0 z-20">
                 <div class="flex items-center">
                     <!-- Mobile menu button -->
-                    <button
+                    <button id="mobile-menu-button"
                         class="md:hidden p-2 rounded-md text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -204,5 +222,25 @@
         </div>
     </div>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const button = document.getElementById('mobile-menu-button');
+        const sidebar = document.getElementById('sidebar');
+        const closeButton = document.getElementById('mobile-sidebar-close');
+
+        if (button && sidebar) {
+            button.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+            });
+        }
+
+        if (closeButton && sidebar) {
+            closeButton.addEventListener('click', () => {
+                sidebar.classList.add('hidden');
+            });
+        }
+    });
+</script>
 
 </html>
