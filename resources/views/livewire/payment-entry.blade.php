@@ -1,16 +1,16 @@
 <div>
     <x-slot name="header">
-        Cash Payment Entry
+        Entri Pembayaran Tunai
     </x-slot>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Search Section -->
         <div class="lg:col-span-1">
             <div class="bg-card rounded-lg shadow-sm border border-border p-6">
-                <h3 class="text-lg font-semibold text-foreground mb-4">Find Student</h3>
+                <h3 class="text-lg font-semibold text-foreground mb-4">Cari Santri</h3>
 
                 <div class="relative">
-                    <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search by Name or NIS..."
+                    <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari Nama atau NIS..."
                         class="w-full px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
 
                     @if (strlen($search) >= 3)
@@ -32,7 +32,7 @@
                         @else
                             <div
                                 class="absolute z-10 w-full mt-1 bg-popover border border-border rounded-md shadow-lg p-4 text-center text-sm text-muted-foreground">
-                                No students found.
+                                Santri tidak ditemukan.
                             </div>
                         @endif
                     @endif
@@ -54,7 +54,7 @@
         <!-- Unpaid Bills Section -->
         <div class="lg:col-span-2">
             <div class="bg-card rounded-lg shadow-sm border border-border p-6 h-full">
-                <h3 class="text-lg font-semibold text-foreground mb-4">Unpaid Invoices</h3>
+                <h3 class="text-lg font-semibold text-foreground mb-4">Tagihan Belum Lunas</h3>
 
                 @if ($selectedStudent)
                     @if (count($unpaidBills) > 0)
@@ -62,9 +62,9 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-muted-foreground uppercase bg-muted">
                                     <tr>
-                                        <th class="px-4 py-3">Invoice</th>
-                                        <th class="px-4 py-3">Amount</th>
-                                        <th class="px-4 py-3 text-center">Action</th>
+                                        <th class="px-4 py-3">Tagihan</th>
+                                        <th class="px-4 py-3">Jumlah</th>
+                                        <th class="px-4 py-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-border">
@@ -73,17 +73,16 @@
                                             <td class="px-4 py-3">
                                                 <span
                                                     class="font-medium block text-foreground">{{ $bill->title }}</span>
-                                                <span
-                                                    class="text-xs text-muted-foreground">{{ $bill->created_at->format('d M Y') }}</span>
+                                                class="text-xs text-muted-foreground">{{ $bill->created_at->locale('id')->isoFormat('D MMMM Y') }}</span>
                                             </td>
                                             <td class="px-4 py-3 font-mono">
                                                 Rp {{ number_format($bill->final_amount, 0, ',', '.') }}
                                             </td>
                                             <td class="px-4 py-3 text-center">
                                                 <button wire:click="processPayment({{ $bill->id }})"
-                                                    wire:confirm="Confirm cash payment for {{ $bill->title }}?"
+                                                    wire:confirm="Konfirmasi pembayaran tunai untuk {{ $bill->title }}?"
                                                     class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium">
-                                                    Record Payment
+                                                    Catat Pembayaran
                                                 </button>
                                             </td>
                                         </tr>
@@ -98,7 +97,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <p>No unpaid invoices for this student.</p>
+                            <p>Tidak ada tagihan belum lunas untuk santri ini.</p>
                         </div>
                     @endif
                 @else
@@ -107,7 +106,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <p>Search and select a student to view invoices.</p>
+                        <p>Cari dan pilih santri untuk melihat tagihan.</p>
                     </div>
                 @endif
             </div>

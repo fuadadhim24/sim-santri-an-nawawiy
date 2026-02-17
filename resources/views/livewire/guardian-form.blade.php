@@ -1,6 +1,6 @@
 <div>
     <x-slot name="header">
-        {{ $isEdit ? 'Edit Guardian' : 'Create Guardian' }}
+        {{ $isEdit ? 'Ubah Data Wali' : 'Tambah Wali Baru' }}
     </x-slot>
 
     <div class="max-w-3xl mx-auto">
@@ -9,7 +9,7 @@
 
                 <!-- Full Name -->
                 <div>
-                    <label for="full_name" class="block text-sm font-medium text-foreground">Full Name</label>
+                    <label for="full_name" class="block text-sm font-medium text-foreground">Nama Lengkap</label>
                     <input wire:model="full_name" type="text" id="full_name"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('full_name')
@@ -19,7 +19,7 @@
 
                 <!-- WhatsApp -->
                 <div>
-                    <label for="whatsapp" class="block text-sm font-medium text-foreground">WhatsApp Number</label>
+                    <label for="whatsapp" class="block text-sm font-medium text-foreground">Nomor WhatsApp</label>
                     <input wire:model="whatsapp" type="text" id="whatsapp"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('whatsapp')
@@ -29,7 +29,7 @@
 
                 <!-- Email -->
                 <div>
-                    <label for="email" class="block text-sm font-medium text-foreground">Email Address</label>
+                    <label for="email" class="block text-sm font-medium text-foreground">Alamat Email</label>
                     <input wire:model="email" type="email" id="email"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('email')
@@ -40,7 +40,7 @@
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-foreground">
-                        Password {{ $isEdit ? '(Leave blank to keep current)' : '' }}
+                        Kata Sandi {{ $isEdit ? '(Kosongkan jika tidak ingin mengubah)' : '' }}
                     </label>
                     <input wire:model="password" type="password" id="password"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
@@ -52,11 +52,11 @@
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.guardians') }}"
                         class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
-                        Cancel
+                        Batal
                     </a>
                     <button type="submit"
                         class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
-                        {{ $isEdit ? 'Update Guardian' : 'Create Guardian' }}
+                        {{ $isEdit ? 'Simpan Perubahan' : 'Buat Wali' }}
                     </button>
                 </div>
             </form>

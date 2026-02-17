@@ -1,6 +1,6 @@
 <div>
     <x-slot name="header">
-        Student Detail
+        Detail Santri
     </x-slot>
 
     <div class="space-y-6">
@@ -9,10 +9,10 @@
             <!-- Student Info -->
             <div class="bg-card rounded-lg shadow-sm border border-border p-6">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-lg font-semibold text-card-foreground">Student Information</h3>
+                    <h3 class="text-lg font-semibold text-card-foreground">Informasi Santri</h3>
                     <span
                         class="px-2 py-1 rounded-full text-xs font-medium {{ $student->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                        {{ $student->is_active ? 'Active' : 'Inactive' }}
+                        {{ $student->is_active ? 'Aktif' : 'Tidak Aktif' }}
                     </span>
                 </div>
                 <div class="space-y-3 text-sm">
@@ -21,7 +21,7 @@
                         <span class="col-span-2 font-mono text-foreground">{{ $student->nis }}</span>
                     </div>
                     <div class="grid grid-cols-3">
-                        <span class="text-muted-foreground">Full Name</span>
+                        <span class="text-muted-foreground">Nama Lengkap</span>
                         <span class="col-span-2 font-medium text-foreground">{{ $student->full_name }}</span>
                     </div>
                     <div class="grid grid-cols-3">
@@ -31,36 +31,36 @@
                         </span>
                     </div>
                     <div class="grid grid-cols-3">
-                        <span class="text-muted-foreground">Class</span>
+                        <span class="text-muted-foreground">Kelas</span>
                         <span class="col-span-2 text-foreground">{{ $student->class_name ?? '-' }}</span>
                     </div>
                     <div class="grid grid-cols-3">
-                        <span class="text-muted-foreground">Residence</span>
+                        <span class="text-muted-foreground">Tempat Tinggal</span>
                         <span class="col-span-2 text-foreground">{{ $student->residence_status }}</span>
                     </div>
                     <div class="grid grid-cols-3">
-                        <span class="text-muted-foreground">Special Status</span>
+                        <span class="text-muted-foreground">Status Khusus</span>
                         <span class="col-span-2 text-foreground">{{ $student->special_status }}</span>
                     </div>
                     <div class="grid grid-cols-3">
-                        <span class="text-muted-foreground">Address</span>
+                        <span class="text-muted-foreground">Alamat</span>
                         <span class="col-span-2 text-foreground">{{ $student->address ?? '-' }}</span>
                     </div>
                 </div>
                 <div class="mt-6">
                     <a href="{{ route('admin.students.edit', $student) }}"
-                        class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80">
-                        Edit Student
+                        class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">
+                        Ubah Santri
                     </a>
                 </div>
             </div>
 
             <!-- Guardian Info -->
             <div class="bg-card rounded-lg shadow-sm border border-border p-6">
-                <h3 class="text-lg font-semibold text-card-foreground mb-4">Guardian Information</h3>
+                <h3 class="text-lg font-semibold text-card-foreground mb-4">Informasi Wali</h3>
                 <div class="space-y-3 text-sm">
                     <div class="grid grid-cols-3">
-                        <span class="text-muted-foreground">Name</span>
+                        <span class="text-muted-foreground">Nama</span>
                         <span class="col-span-2 font-medium text-foreground">{{ $student->guardian->full_name }}</span>
                     </div>
                     <div class="grid grid-cols-3">
@@ -74,8 +74,8 @@
                 </div>
                 <div class="mt-6">
                     <a href="{{ route('admin.guardians.edit', $student->guardian) }}"
-                        class="text-primary hover:text-primary/80 font-medium text-sm">
-                        View Guardian Details &rarr;
+                        class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">
+                        Ubah Wali
                     </a>
                 </div>
             </div>
@@ -84,17 +84,17 @@
         <!-- Billing History -->
         <div class="bg-card rounded-lg shadow-sm border border-border">
             <div class="p-6 border-b border-border">
-                <h3 class="text-lg font-semibold text-card-foreground">Billing History</h3>
+                <h3 class="text-lg font-semibold text-card-foreground">Riwayat Tagihan</h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left">
                     <thead class="text-xs text-muted-foreground uppercase bg-muted">
                         <tr>
-                            <th class="px-6 py-3">Title</th>
-                            <th class="px-6 py-3">Amount</th>
+                            <th class="px-6 py-3">Judul</th>
+                            <th class="px-6 py-3">Jumlah</th>
                             <th class="px-6 py-3">Status</th>
-                            <th class="px-6 py-3">Created At</th>
-                            <th class="px-6 py-3">Action</th>
+                            <th class="px-6 py-3">Dibuat Pada</th>
+                            <th class="px-6 py-3">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
@@ -107,19 +107,25 @@
                                     <span
                                         class="px-2 py-1 rounded-full text-xs font-medium
                                         {{ $billing->status == 'PAID' ? 'bg-green-100 text-green-700' : ($billing->status == 'PENDING' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
-                                        {{ $billing->status }}
+                                        {{ $billing->status == 'PAID' ? 'LUNAS' : ($billing->status == 'UNPAID' ? 'BELUM LUNAS' : $billing->status) }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-muted-foreground">{{ $billing->created_at->format('d M Y') }}
+                                <td class="px-6 py-4 text-muted-foreground">
+                                    {{ $billing->created_at->locale('id')->isoFormat('D MMMM Y') }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <button class="text-primary hover:text-primary/80 font-medium">Detail</button>
+                                    @if ($billing->status == 'PAID')
+                                        <a href="{{ route('admin.receipts.show', $billing->id) }}" target="_blank"
+                                            class="text-primary hover:text-primary/80 font-medium">Kwitansi</a>
+                                    @else
+                                        <span class="text-gray-400 text-xs">-</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="5" class="px-6 py-8 text-center text-muted-foreground">
-                                    No billing history found.
+                                    Tidak ada riwayat tagihan.
                                 </td>
                             </tr>
                         @endforelse

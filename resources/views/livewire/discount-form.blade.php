@@ -1,6 +1,6 @@
 <div>
     <x-slot name="header">
-        {{ $isEdit ? 'Edit Discount' : 'Create Discount' }}
+        {{ $isEdit ? 'Ubah DIskon' : 'Buat Diskon' }}
     </x-slot>
 
     <div class="max-w-3xl mx-auto">
@@ -9,10 +9,10 @@
 
                 <!-- Fee Master -->
                 <div>
-                    <label for="fee_master_id" class="block text-sm font-medium text-foreground">Fee Item</label>
+                    <label for="fee_master_id" class="block text-sm font-medium text-foreground">Nama Biaya</label>
                     <select wire:model="fee_master_id" id="fee_master_id"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                        <option value="">Select Fee Item...</option>
+                        <option value="">Pilih Nama Biaya...</option>
                         @foreach ($this->feeMasters as $fee)
                             <option value="{{ $fee->id }}">
                                 {{ $fee->item_name }} - {{ $fee->category }} (Rp
@@ -27,8 +27,8 @@
 
                 <!-- Target Status -->
                 <div>
-                    <label for="target_status" class="block text-sm font-medium text-foreground">Target Status
-                        (Beneficiary)</label>
+                    <label for="target_status" class="block text-sm font-medium text-foreground">Status Target
+                        (Penerima)</label>
                     <select wire:model="target_status" id="target_status"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         <option value="ANAK_GURU">Anak Guru</option>
@@ -41,11 +41,11 @@
 
                 <!-- Discount Amount -->
                 <div>
-                    <label for="discount_amount" class="block text-sm font-medium text-foreground">Discount Amount
+                    <label for="discount_amount" class="block text-sm font-medium text-foreground">Jumlah Diskon
                         (Rp)</label>
                     <input wire:model="discount_amount" type="number" id="discount_amount" placeholder="e.g. 50000"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                    <p class="mt-1 text-xs text-muted-foreground">The amount to be deducted from the original fee.</p>
+                    <p class="mt-1 text-xs text-muted-foreground">Jumlah yang akan dipotong dari biaya asli.</p>
                     @error('discount_amount')
                         <span class="text-destructive text-sm">{{ $message }}</span>
                     @enderror
@@ -54,11 +54,11 @@
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.discounts') }}"
                         class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
-                        Cancel
+                        Batal
                     </a>
                     <button type="submit"
                         class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
-                        {{ $isEdit ? 'Update Discount' : 'Create Discount' }}
+                        {{ $isEdit ? 'Simpan Diskon' : 'Buat Diskon' }}
                     </button>
                 </div>
             </form>

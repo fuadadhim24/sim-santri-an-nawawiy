@@ -1,17 +1,17 @@
 <div>
     <x-slot name="header">
-        Student Management
+        Manajemen Santri
     </x-slot>
 
     <div class="bg-card rounded-lg shadow-sm border border-border">
         <div class="p-6 border-b border-border flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-card-foreground">Student List</h3>
+            <h3 class="text-lg font-semibold text-card-foreground">Daftar Santri</h3>
             <div class="flex space-x-4">
-                <input wire:model.live="search" type="text" placeholder="Search students..."
+                <input wire:model.live="search" type="text" placeholder="Cari santri..."
                     class="px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
                 <a href="{{ route('admin.students.create') }}"
                     class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium">
-                    + Add Student
+                    + Tambah Santri
                 </a>
             </div>
         </div>
@@ -20,12 +20,12 @@
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">
                     <tr>
                         <th class="px-6 py-3">NIS</th>
-                        <th class="px-6 py-3">Full Name</th>
+                        <th class="px-6 py-3">Nama Lengkap</th>
                         <th class="px-6 py-3">Unit</th>
-                        <th class="px-6 py-3">Residence</th>
-                        <th class="px-6 py-3">Class</th>
+                        <th class="px-6 py-3">Tempat Tinggal</th>
+                        <th class="px-6 py-3">Kelas</th>
                         <th class="px-6 py-3">Status</th>
-                        <th class="px-6 py-3">Actions</th>
+                        <th class="px-6 py-3">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
@@ -44,14 +44,14 @@
                             <td class="px-6 py-4">
                                 <span
                                     class="px-2 py-1 rounded-full text-xs font-medium {{ $student->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                                    {{ $student->is_active ? 'Active' : 'Inactive' }}
+                                    {{ $student->is_active ? 'Aktif' : 'Tidak Aktif' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">
                                 <a href="{{ route('admin.students.edit', $student) }}"
-                                    class="text-primary hover:text-primary/80 font-medium mr-2">Edit</a>
+                                    class="text-primary hover:text-primary/80 font-medium mr-2">Ubah</a>
                                 <a href="#"
-                                    class="text-muted-foreground hover:text-foreground font-medium">View</a>
+                                    class="text-muted-foreground hover:text-foreground font-medium">Lihat</a>
                             </td>
                         </tr>
                     @endforeach

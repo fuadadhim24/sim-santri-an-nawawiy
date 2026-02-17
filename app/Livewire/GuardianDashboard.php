@@ -41,7 +41,7 @@ class GuardianDashboard extends Component
             abort(403, 'Guardian data not found for this user.');
         }
 
-        $guardian->load(['students.billings' => function ($query) {
+        $guardian->load(['user', 'students.billings' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 

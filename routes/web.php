@@ -3,8 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', function() {
+    return redirect()->route('login');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -39,9 +39,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
         Route::get('/admin/payments/create', \App\Livewire\PaymentEntry::class)->name('admin.payments.create');
-        Route::get('/admin/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('admin.receipts.show');
-
     });
+
+    Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('admin.receipts.show');
 
     Route::middleware(['role:SUPER_ADMIN'])->group(function () {
         Route::get('/admin/users', \App\Livewire\UserIndex::class)->name('admin.users');

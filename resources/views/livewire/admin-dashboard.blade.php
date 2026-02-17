@@ -1,6 +1,6 @@
 <div>
     <x-slot name="header">
-        Overview Dashboard
+        Ringkasan Dasbor
     </x-slot>
 
     <!-- Summary Cards -->

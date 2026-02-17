@@ -1,142 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt - {{ $billing->title }}</title>
+    <title>Kwitansi #{{ str_pad($billing->id, 6, '0', STR_PAD_LEFT) }} - {{ $billing->student->full_name }}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        background: '#f8f5f0',
+                        foreground: '#3e2723',
+                        primary: {
+                            DEFAULT: '#2e7d32',
+                            foreground: '#ffffff',
+                        },
+                        secondary: {
+                            DEFAULT: '#e8f5e9',
+                            foreground: '#1b5e20',
+                        },
+                        muted: {
+                            DEFAULT: '#f0e9e0',
+                            foreground: '#6d4c41',
+                        },
+                        border: '#e0d6c9',
+                        destructive: '#c62828',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            line-height: 1.4;
-            max-width: 300px;
-            /* Thermal printer width approx */
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
-        }
-
-        .header {
-            text-align: center;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-
-        .school-name {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .details {
-            margin-bottom: 10px;
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .divider {
-            border-top: 1px dashed #000;
-            margin: 10px 0;
-        }
-
-        .total {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            margin-top: 20px;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f5f0;
+            /* var(--background) */
+            color: #3e2723;
+            /* var(--foreground) */
         }
 
         @media print {
             body {
-                margin: 0;
-                padding: 0;
+                background-color: white !important;
+                color: black !important;
             }
 
             .no-print {
-                display: none;
+                display: none !important;
+            }
+
+            .print-border {
+                border: 1px solid #e0d6c9 !important;
             }
         }
     </style>
 </head>
 
-<body>
-    <div class="header">
-        <div class="school-name">SIM-SANTRI</div>
-        <div>An-Nawawiy</div>
-        <div>Receipt / Bukti Pembayaran</div>
+<body class="p-4 md:p-10">
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden print-border">
+        <!-- Header -->
+        <div class="bg-primary p-8 text-white flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight">KWITANSI PEMBAYARAN</h1>
+                <p class="text-white/70 mt-1">Nomor: #{{ str_pad($billing->id, 6, '0', STR_PAD_LEFT) }}</p>
+            </div>
+            <div class="text-right">
+                <h2 class="text-xl font-bold text-white leading-tight">PP. AN-NAWAWIY</h2>
+                <p class="text-sm text-white/70">Sistem Informasi Manajemen Santri</p>
+            </div>
+        </div>
+
+        <div class="p-8">
+            <!-- Info Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                <div>
+                    <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Informasi Santri
+                    </h3>
+                    <p class="text-lg font-bold text-foreground">{{ $billing->student->full_name }}</p>
+                    <p class="text-muted-foreground">NIS: {{ $billing->student->nis }}</p>
+                    <p class="text-muted-foreground">Unit:
+                        {{ $billing->student->unit_code == '01' ? 'SMP' : ($billing->student->unit_code == '02' ? 'SMA' : 'PPTQ') }}
+                    </p>
+                </div>
+                <div class="md:text-right">
+                    <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Rincian Pembayaran
+                    </h3>
+                    <p class="text-muted-foreground">Tanggal Tagihan:
+                        {{ $billing->created_at->locale('id')->isoFormat('D MMMM Y') }}</p>
+                    <p class="text-muted-foreground">Metode:
+                        @if ($billing->payments->isNotEmpty())
+                            {{ $billing->payments->first()->payment_method }}
+                        @else
+                            -
+                        @endif
+                    </p>
+                    <p class="mt-1 font-bold {{ $billing->status == 'PAID' ? 'text-primary' : 'text-destructive' }}">
+                        STATUS: {{ $billing->status == 'PAID' ? 'LUNAS' : 'BELUM LUNAS' }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="border border-border rounded-lg overflow-hidden mb-8">
+                <table class="w-full text-left">
+                    <thead class="bg-muted border-b border-border">
+                        <tr>
+                            <th class="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Deskripsi Tagihan
+                            </th>
+                            <th class="px-6 py-4 text-right text-xs font-bold text-muted-foreground uppercase">Jumlah
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border">
+                        <tr>
+                            <td class="px-6 py-4">
+                                <p class="font-medium text-foreground">{{ $billing->title }}</p>
+                            </td>
+                            <td class="px-6 py-4 text-right text-foreground font-semibold">
+                                Rp {{ number_format($billing->original_amount, 0, ',', '.') }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Calculation -->
+            <div class="flex justify-end list-none">
+                <div class="w-full md:w-64 space-y-3">
+                    <div class="flex justify-between text-muted-foreground">
+                        <span>Subtotal</span>
+                        <span>Rp {{ number_format($billing->original_amount, 0, ',', '.') }}</span>
+                    </div>
+                    @if ($billing->discount_applied > 0)
+                        <div class="flex justify-between text-destructive">
+                            <span>Diskon</span>
+                            <span>- Rp {{ number_format($billing->discount_applied, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
+                    <div class="flex justify-between text-xl font-bold text-foreground pt-3 border-t border-border">
+                        <span>TOTAL</span>
+                        <span>Rp {{ number_format($billing->final_amount, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Info -->
+            <div class="mt-16 pt-8 border-t border-border text-center text-muted-foreground text-sm">
+                <p class="font-bold text-foreground mb-1 font-sans">Terima Kasih Atas Pembayaran Anda</p>
+                <p>Kwitansi ini adalah bukti pembayaran yang sah yang dihasilkan secara elektronik oleh sistem.</p>
+                <p class="mt-4">Jl. Pesantren No. 123 | admin@an-nawawiy.sch.id | +62 812-3456-7890</p>
+            </div>
+        </div>
     </div>
 
-    <div class="details">
-        <div class="row">
-            <span>Date:</span>
-            <span>{{ now()->format('d/m/Y H:i') }}</span>
-        </div>
-        <div class="row">
-            <span>Invoice:</span>
-            <span>#{{ str_pad($billing->id, 6, '0', STR_PAD_LEFT) }}</span>
-        </div>
-        <div class="row">
-            <span>Student:</span>
-            <span>{{ $billing->student->full_name }}</span>
-        </div>
-        <div class="row">
-            <span>NIS:</span>
-            <span>{{ $billing->student->nis }}</span>
-        </div>
+    <!-- Actions -->
+    <div class="max-w-4xl mx-auto mt-8 flex justify-center gap-4 no-print print:hidden font-medium">
+        <a href="{{ route('wali.dashboard') }}"
+            class="px-6 py-3 bg-white text-foreground border border-border rounded-lg hover:bg-muted transition shadow-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+            Kembali ke Dasbor
+        </a>
+        <button onclick="window.print()"
+            class="px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition shadow-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
+                    clip-rule="evenodd" />
+            </svg>
+            Cetak Struk Bukti
+        </button>
     </div>
-
-    <div class="divider"></div>
-
-    <div class="items">
-        <div>{{ $billing->title }}</div>
-        <div class="row">
-            <span>Status:</span>
-            <span>{{ $billing->status }}</span>
-        </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="row">
-        <span>Amount:</span>
-        <span>Rp {{ number_format($billing->original_amount, 0, ',', '.') }}</span>
-    </div>
-    @if ($billing->discount_applied > 0)
-        <div class="row">
-            <span>Discount:</span>
-            <span>- Rp {{ number_format($billing->discount_applied, 0, ',', '.') }}</span>
-        </div>
-    @endif
-
-    <div class="divider"></div>
-
-    <div class="row total">
-        <span>TOTAL:</span>
-        <span>Rp {{ number_format($billing->final_amount, 0, ',', '.') }}</span>
-    </div>
-
-    <div class="footer">
-        <p>Thank you for your payment.</p>
-        <p>Simpan resi ini sebagai bukti pembayaran yang sah.</p>
-    </div>
-
-    <div class="no-print" style="margin-top: 20px; text-align: center;">
-        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer;">Print Receipt</button>
-    </div>
-
-    @if ($billing->status == 'UNPAID')
-        <div class="no-print" style="margin-top: 10px; text-align: center; color: red; font-weight: bold;">
-            WARNING: THIS INVOICE IS UNPAID
-        </div>
-    @endif
 </body>
 
 </html>

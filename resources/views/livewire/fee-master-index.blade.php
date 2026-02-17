@@ -1,26 +1,26 @@
 <div>
     <x-slot name="header">
-        Fee Master Management
+        Manajemen Data Biaya
     </x-slot>
 
     <div class="bg-card rounded-lg shadow-sm border border-border">
         <div class="p-6 border-b border-border flex flex-col md:flex-row justify-between items-center gap-4">
-            <h3 class="text-lg font-semibold text-card-foreground">Fee List</h3>
+            <h3 class="text-lg font-semibold text-card-foreground">Daftar Biaya</h3>
             <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
                 <select wire:model.live="categoryFilter"
                     class="px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
-                    <option value="">All Categories</option>
+                    <option value="">Semua Kategori</option>
                     <option value="PENDAFTARAN">Pendaftaran</option>
                     <option value="DAFTAR_ULANG">Daftar Ulang</option>
                     <option value="BULANAN">Bulanan (SPP)</option>
                     <option value="SEMESTERAN">Semesteran</option>
                     <option value="AKHIR_SEKOLAH">Akhir Sekolah</option>
                 </select>
-                <input wire:model.live="search" type="text" placeholder="Search fees..."
+                <input wire:model.live="search" type="text" placeholder="Cari biaya..."
                     class="px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
                 <a href="{{ route('admin.fee-masters.create') }}"
                     class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium text-center">
-                    + Add Fee
+                    + Tambah Biaya
                 </a>
             </div>
         </div>
@@ -28,12 +28,12 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">
                     <tr>
-                        <th class="px-6 py-3">Category</th>
-                        <th class="px-6 py-3">Item Name</th>
-                        <th class="px-6 py-3">Unit Target</th>
-                        <th class="px-6 py-3">Residence Target</th>
-                        <th class="px-6 py-3 text-right">Amount</th>
-                        <th class="px-6 py-3 text-center">Actions</th>
+                        <th class="px-6 py-3">Kategori</th>
+                        <th class="px-6 py-3">Nama Biaya</th>
+                        <th class="px-6 py-3">Target Unit</th>
+                        <th class="px-6 py-3">Target Tempat Tinggal</th>
+                        <th class="px-6 py-3 text-right">Jumlah</th>
+                        <th class="px-6 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
@@ -46,23 +46,23 @@
                             </td>
                             <td class="px-6 py-4 font-medium text-foreground">{{ $fee->item_name }}</td>
                             <td class="px-6 py-4 text-muted-foreground">
-                                {{ $fee->unit_target ? ($fee->unit_target == '01' ? 'SMP' : ($fee->unit_target == '02' ? 'SMA' : 'PPTQ')) : 'All Units' }}
+                                {{ $fee->unit_target ? ($fee->unit_target == '01' ? 'SMP' : ($fee->unit_target == '02' ? 'SMA' : 'PPTQ')) : 'Semua Unit' }}
                             </td>
                             <td class="px-6 py-4 text-muted-foreground">
-                                {{ $fee->residence_target ? str_replace('_', ' ', $fee->residence_target) : 'All Residence' }}
+                                {{ $fee->residence_target ? str_replace('_', ' ', $fee->residence_target) : 'Semua Tempat Tinggal' }}
                             </td>
                             <td class="px-6 py-4 text-right font-mono font-medium text-foreground">
                                 Rp {{ number_format($fee->amount, 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <a href="{{ route('admin.fee-masters.edit', $fee) }}"
-                                    class="text-primary hover:text-primary/80 font-medium mr-2">Edit</a>
+                                    class="text-primary hover:text-primary/80 font-medium mr-2">Ubah</a>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="6" class="px-6 py-8 text-center text-muted-foreground">
-                                No fees found.
+                                Tidak ada data biaya ditemukan.
                             </td>
                         </tr>
                     @endforelse

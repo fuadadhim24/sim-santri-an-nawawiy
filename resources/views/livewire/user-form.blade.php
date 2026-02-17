@@ -1,6 +1,6 @@
 <div>
     <x-slot name="header">
-        {{ $isEdit ? 'Edit User' : 'Create User' }}
+        {{ $isEdit ? 'Ubah Pengguna' : 'Buat Pengguna' }}
     </x-slot>
 
     <div class="max-w-3xl mx-auto">
@@ -9,7 +9,7 @@
 
                 <!-- Name -->
                 <div>
-                    <label for="name" class="block text-sm font-medium text-foreground">Name</label>
+                    <label for="name" class="block text-sm font-medium text-foreground">Nama</label>
                     <input wire:model="name" type="text" id="name"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('name')
@@ -19,7 +19,7 @@
 
                 <!-- Email -->
                 <div>
-                    <label for="email" class="block text-sm font-medium text-foreground">Email Address</label>
+                    <label for="email" class="block text-sm font-medium text-foreground">Alamat Email</label>
                     <input wire:model="email" type="email" id="email"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('email')
@@ -30,7 +30,7 @@
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-foreground">
-                        Password {{ $isEdit ? '(Leave blank to keep current)' : '' }}
+                        Kata Sandi {{ $isEdit ? '(Kosongkan jika tidak ingin mengubah)' : '' }}
                     </label>
                     <input wire:model="password" type="password" id="password"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
@@ -41,7 +41,7 @@
 
                 <!-- Role -->
                 <div>
-                    <label for="role" class="block text-sm font-medium text-foreground">Role</label>
+                    <label for="role" class="block text-sm font-medium text-foreground">Peran</label>
                     <select wire:model="role" id="role"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         <option value="ADMIN_TU">Admin TU</option>
@@ -56,11 +56,11 @@
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.users') }}"
                         class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
-                        Cancel
+                        Batal
                     </a>
                     <button type="submit"
                         class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
-                        {{ $isEdit ? 'Update User' : 'Create User' }}
+                        {{ $isEdit ? 'Simpan Pengguna' : 'Buat Pengguna' }}
                     </button>
                 </div>
             </form>

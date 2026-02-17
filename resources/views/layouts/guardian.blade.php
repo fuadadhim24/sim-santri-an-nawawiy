@@ -44,7 +44,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                     </svg>
-                    Dashboard
+                    Dasbor
                 </a>
             </nav>
 
@@ -58,56 +58,48 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                         </svg>
-                        Logout
+                        Keluar
                     </button>
                 </form>
             </div>
         </aside>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col md:ml-64 transition-all duration-300">
-            <!-- Top Navbar -->
-            <header
-                class="bg-card shadow-sm border-b border-border h-16 flex items-center justify-between px-6 sticky top-0 z-20">
-                <div class="flex items-center">
-                    <!-- Mobile menu button -->
-                    <button id="mobile-menu-button"
-                        class="md:hidden p-2 rounded-md text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                    <h2 class="ml-4 text-xl font-semibold text-foreground leading-tight">
-                        @if (isset($header))
-                            {{ $header }}
-                        @else
-                            My Dashboard
-                        @endif
-                    </h2>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <!-- Notification Icon Placeholder -->
-                    <button class="p-2 rounded-full text-foreground hover:bg-muted relative">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                        </svg>
-                        <span
-                            class="absolute top-2 right-2 block h-2 w-2 rounded-full bg-destructive ring-2 ring-card"></span>
-                    </button>
+        <div class="flex-1 flex flex-col md:ml-64 transition-all duration-300 h-screen p-3 md:p-4 bg-sidebar">
+            <div class="flex-1 flex flex-col bg-background rounded-lg shadow-sm border border-border overflow-hidden">
+                <!-- Top Navbar -->
+                <header
+                    class="bg-card border-b border-border h-16 flex items-center justify-between px-6 flex-shrink-0">
+                    <div class="flex items-center">
+                        <!-- Mobile menu button -->
+                        <button id="mobile-menu-button"
+                            class="md:hidden p-2 rounded-md text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <h2 class="ml-4 text-xl font-semibold text-foreground leading-tight">
+                            @if (isset($header))
+                                {{ $header }}
+                            @else
+                                Dasbor Saya
+                            @endif
+                        </h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- User Dropdown Placeholder -->
+                        <span class="text-sm font-medium text-foreground">{{ Auth::user()->name }}</span>
+                    </div>
+                </header>
 
-                    <!-- User Dropdown Placeholder -->
-                    <span class="text-sm font-medium text-foreground">{{ Auth::user()->name }}</span>
-                </div>
-            </header>
-
-            <!-- Page Content -->
-            <main class="flex-1 p-6 overflow-y-auto bg-muted/30">
-                {{ $slot }}
-            </main>
+                <!-- Page Content -->
+                <main class="flex-1 p-6 overflow-y-auto bg-background/50">
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
+    </div>
     </div>
 </body>
 
