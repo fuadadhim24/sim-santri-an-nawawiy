@@ -59,8 +59,12 @@
 
     <!-- Transaction List -->
     <div class="bg-card rounded-lg shadow-sm border border-border">
-        <div class="p-6 border-b border-border">
+        <div class="p-6 border-b border-border flex flex-col md:flex-row justify-between items-center gap-4">
             <h3 class="text-lg font-semibold text-card-foreground">Riwayat Pembayaran</h3>
+            <div class="w-full md:w-64">
+                <input wire:model.live="search" type="text" placeholder="Cari santri..."
+                    class="w-full px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-sm text-foreground">
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
@@ -104,6 +108,9 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="p-4 border-t border-border">
+            {{ $paidBills->links() }}
         </div>
     </div>
 </div>

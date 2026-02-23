@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Monthly Income Chart -->
         <div class="bg-card rounded-lg shadow-sm border border-border p-6">
             <h3 class="text-lg font-semibold text-foreground mb-4">Grafik Pemasukan (12 Bulan Terakhir)</h3>
@@ -71,6 +71,61 @@
         <div class="bg-card rounded-lg shadow-sm border border-border p-6">
             <h3 class="text-lg font-semibold text-foreground mb-4">Distribusi Status Pembayaran</h3>
             <div id="statusChart" style="min-height: 350px;"></div>
+        </div>
+    </div>
+
+    <!-- Recent Payments Table -->
+    <div class="bg-card rounded-lg shadow-sm border border-border overflow-hidden mb-8">
+        <div class="p-6 border-b border-border flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-foreground">Riwayat Pembayaran Terbaru</h3>
+            <a href="{{ route('admin.billings') }}" class="text-sm font-medium text-primary hover:underline">
+                Lihat Semua &rarr;
+            </a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-muted text-muted-foreground uppercase text-xs font-semibold">
+                    <tr>
+                        <th class="px-6 py-3">Tanggal Lunas</th>
+                        <th class="px-6 py-3">Santri</th>
+                        <th class="px-6 py-3">Tagihan</th>
+                        <th class="px-6 py-3 text-right">Jumlah</th>
+                        <th class="px-6 py-3 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                    @forelse ($recentPayments as $payment)
+                        <tr class="hover:bg-muted/50 transition-colors">
+                            <td class="px-6 py-4 text-muted-foreground">
+                                {{ $payment->updated_at->locale('id')->isoFormat('D MMMM Y HH:mm') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-foreground">{{ $payment->student->full_name }}</span>
+                                <span class="block text-xs text-muted-foreground">{{ $payment->student->nis }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-foreground">
+                                {{ $payment->title }}
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="font-mono font-bold text-primary">Rp
+                                    {{ number_format($payment->final_amount, 0, ',', '.') }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('admin.receipts.show', $payment->id) }}" target="_blank"
+                                    class="text-xs font-medium text-primary hover:underline">
+                                    Kwitansi
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-muted-foreground">
+                                Belum ada riwayat pembayaran terbaru.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 

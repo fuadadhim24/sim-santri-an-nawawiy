@@ -4,15 +4,14 @@
     </x-slot>
 
     <div class="bg-card rounded-lg shadow-sm border border-border">
-        <div class="p-6 border-b border-border flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-card-foreground">Daftar Santri</h3>
-            <div class="flex space-x-4">
+        <div class="p-6 border-b border-border flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+            <h3 class="text-lg font-semibold text-card-foreground whitespace-nowrap">Daftar Santri</h3>
+            <div class="flex items-center space-x-2">
                 <input wire:model.live="search" type="text" placeholder="Cari santri..."
-                    class="px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
+                    class="py-2 px-4 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
                 <a href="{{ route('admin.students.create') }}"
-                    class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium">
-                    + Tambah Santri
-                </a>
+                    class="inline-flex items-center justify-center py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium whitespace-nowrap flex-shrink-0">+
+                    Tambah Santri</a>
             </div>
         </div>
         <div class="overflow-x-auto">

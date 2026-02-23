@@ -12,13 +12,11 @@ class AdminDashboard extends Component
 {
     public function render()
     {
-        // Summary Cards
         $totalStudents = Student::count();
         $totalGuardians = Guardian::count();
         $unpaidInvoices = Billing::where('status', 'UNPAID')->count();
         $totalIncome = Billing::where('status', 'PAID')->sum('final_amount');
 
-        // Chart Data: Monthly Income (Last 12 Months)
         $incomeData = [];
         $months = [];
         for ($i = 11; $i >= 0; $i--) {
@@ -33,19 +31,25 @@ class AdminDashboard extends Component
             $months[] = $monthName;
         }
 
-        // Chart Data: Payment Status
         $paidCount = Billing::where('status', 'PAID')->count();
         $unpaidCount = Billing::where('status', 'UNPAID')->count();
+
+        $recentPayments = Billing::with('student')
+            ->where('status', 'PAID')
+            ->orderBy('updated_at', 'desc')
+            ->take(5)
+            ->get();
 
         return view('livewire.admin-dashboard', [
             'totalStudents' => $totalStudents,
             'totalGuardians' => $totalGuardians,
             'unpaidInvoices' => $unpaidInvoices,
             'totalIncome' => $totalIncome,
-            'incomeData' => $incomeData, // Array of income values
-            'months' => $months,       // Array of month labels
+            'incomeData' => $incomeData,
+            'months' => $months,
             'paidCount' => $paidCount,
             'unpaidCount' => $unpaidCount,
+            'recentPayments' => $recentPayments,
         ])->layout('layouts.admin');
     }
 }

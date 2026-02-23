@@ -4,11 +4,11 @@
     </x-slot>
 
     <div class="bg-card rounded-lg shadow-sm border border-border">
-        <div class="p-6 border-b border-border flex flex-col md:flex-row justify-between items-center gap-4">
-            <h3 class="text-lg font-semibold text-card-foreground">Daftar Tagihan</h3>
-            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
+        <div class="p-6 border-b border-border flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+            <h3 class="text-lg font-semibold text-card-foreground whitespace-nowrap">Daftar Tagihan</h3>
+            <div class="flex items-center space-x-2">
                 <select wire:model.live="statusFilter"
-                    class="px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
+                    class="w-full md:w-56 py-2 px-8 pr-10 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.75rem_center] bg-no-repeat transition-all">
                     <option value="">Semua Status</option>
                     <option value="UNPAID">Belum Lunas</option>
                     <option value="PAID">Lunas</option>
@@ -16,11 +16,10 @@
                     <option value="VOID">Dibatalkan</option>
                 </select>
                 <input wire:model.live="search" type="text" placeholder="Cari tagihan..."
-                    class="px-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
+                    class="w-full md:w-64 py-2 px-4 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
                 <a href="{{ route('admin.billings.create') }}"
-                    class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium text-center">
-                    + Buat Tagihan
-                </a>
+                    class="inline-flex items-center justify-center py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 font-semibold whitespace-nowrap flex-none shrink-0">+
+                    Buat Tagihan</a>
             </div>
         </div>
         <div class="overflow-x-auto">
