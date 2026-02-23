@@ -62,7 +62,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-// Duitku Callback & Return URLs (Must be outside auth middleware so Duitku servers can reach them)
 Route::post('/payment/callback', [\App\Http\Controllers\DuitkuController::class, 'callback'])->name('duitku.callback');
 Route::get('/payment/return', [\App\Http\Controllers\DuitkuController::class, 'returnUrl'])->name('duitku.return');
 

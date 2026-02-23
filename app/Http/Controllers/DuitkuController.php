@@ -14,9 +14,12 @@ class DuitkuController extends Controller
 
     public function __construct()
     {
-        $merchantCode = env('DUITKU_MERCHANT_CODE', 'D15509');
-        $apiKey = env('DUITKU_API_KEY', '840303915a2f1f5eec74f3fdd6ee769c');
+        $merchantCode = env('DUITKU_MERCHANT_CODE');
+        $apiKey = env('DUITKU_API_KEY');
+        $isProduction = env('APP_ENV') === 'production';
+
         $this->duitkuConfig = new Config($apiKey, $merchantCode);
+        // $this->duitkuConfig->setSandboxMode(!$isProduction);
         $this->duitkuConfig->setSandboxMode(true);
         $this->duitkuConfig->setSanitizedMode(false);
         $this->duitkuConfig->setDuitkuLogs(false);
