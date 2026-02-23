@@ -16,6 +16,8 @@ class Billing extends Model
         'discount_applied',
         'final_amount',
         'status',
+        'payment_url',
+        'payment_reference',
     ];
 
     public function student()

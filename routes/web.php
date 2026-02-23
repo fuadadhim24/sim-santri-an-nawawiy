@@ -43,6 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('admin.receipts.show');
 
+    Route::get('/payment/pay/{billingId}', [\App\Http\Controllers\DuitkuController::class, 'createInvoice'])->name('duitku.pay');
+
     Route::middleware(['role:SUPER_ADMIN'])->group(function () {
         Route::get('/admin/users', \App\Livewire\UserIndex::class)->name('admin.users');
         Route::get('/admin/users/create', \App\Livewire\UserForm::class)->name('admin.users.create');
@@ -58,7 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
     });
 
-
 });
+
+// Duitku Callback & Return URLs (Must be outside auth middleware so Duitku servers can reach them)
+Route::post('/payment/callback', [\App\Http\Controllers\DuitkuController::class, 'callback'])->name('duitku.callback');
+Route::get('/payment/return', [\App\Http\Controllers\DuitkuController::class, 'returnUrl'])->name('duitku.return');
 
 require __DIR__.'/auth.php';

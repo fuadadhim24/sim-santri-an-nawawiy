@@ -63,6 +63,14 @@
                                 <div class="flex items-center justify-center space-x-2">
                                     <a href="{{ route('admin.students.show', $billing->student_id) }}"
                                         class="text-primary hover:text-primary/80 font-medium text-sm">Detail</a>
+
+                                    @if ($billing->status == 'UNPAID')
+                                        <a href="{{ route('duitku.pay', $billing->id) }}"
+                                            class="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-xs font-medium ml-2">
+                                            Bayar
+                                        </a>
+                                    @endif
+
                                     @if ($billing->status == 'PAID')
                                         <a href="{{ route('admin.receipts.show', $billing->id) }}" target="_blank"
                                             class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs font-medium flex items-center">

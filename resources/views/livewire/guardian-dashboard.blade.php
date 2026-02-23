@@ -9,6 +9,18 @@
                 </h2>
                 <p class="text-gray-600 mt-1">Berikut adalah ringkasan data santri Anda.</p>
 
+                @if (session('error'))
+                    <div class="mt-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if (session('message'))
+                    <div class="mt-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+                        {{ session('message') }}
+                    </div>
+                @endif
+
                 @if ($totalUnpaid > 0)
                     <div
                         class="mt-6 bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-center justify-between">
@@ -65,11 +77,10 @@
                                             <div class="flex items-center space-x-3">
                                                 <span class="text-sm font-bold text-destructive">Rp
                                                     {{ number_format($bill->final_amount, 0, ',', '.') }}</span>
-                                                <button wire:click="pay({{ $bill->id }})"
-                                                    wire:confirm="Lakukan pembayaran untuk tagihan ini?"
-                                                    class="px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition">
+                                                <a href="{{ route('duitku.pay', $bill->id) }}"
+                                                    class="px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition inline-block">
                                                     Bayar
-                                                </button>
+                                                </a>
                                             </div>
                                         </li>
                                     @endforeach
