@@ -4,8 +4,26 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function() {
-    return redirect()->route('login');
+    return view('welcome'); // Landing page untuk verifikasi Duitku
 });
+
+Route::get('/checkout-test/{package}/{price}', function($package, $price) {
+    $student = \App\Models\Student::first();
+    if (!$student) {
+        return "Tolong tambahkan minimal 1 siswa di database untuk test Duitku.";
+    }
+
+    $billing = \App\Models\Billing::create([
+        'student_id' => $student->id,
+        'title' => 'Paket: ' . urldecode($package) . ' (Duitku Test)',
+        'original_amount' => $price,
+        'discount_applied' => 0,
+        'final_amount' => $price,
+        'status' => 'UNPAID',
+    ]);
+
+    return redirect()->route('duitku.pay', ['billingId' => $billing->id]);
+})->name('checkout.test');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {

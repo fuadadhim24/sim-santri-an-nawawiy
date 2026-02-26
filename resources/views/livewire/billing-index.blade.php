@@ -65,7 +65,7 @@
                                         class="text-primary hover:text-primary/80 font-medium text-sm">Detail</a>
 
                                     @if ($billing->status == 'UNPAID')
-                                        <a href="{{ route('duitku.pay', $billing->id) }}"
+                                        <a href="{{ route('duitku.pay', [$billing->id, 'force' => 1]) }}"
                                             class="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-xs font-medium ml-2">
                                             Bayar
                                         </a>

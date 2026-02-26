@@ -25,20 +25,24 @@ class DuitkuController extends Controller
         $this->duitkuConfig->setDuitkuLogs(false);
     }
 
-    public function createInvoice($billingId)
+    public function createInvoice($billingId, Request $request = null)
     {
         $billing = Billing::findOrFail($billingId);
+
+        if ($request && $request->has('force')) {
+            $billing->update(['payment_url' => null, 'payment_reference' => null]);
+        }
 
         if ($billing->payment_url) {
             return redirect($billing->payment_url);
         }
 
         $paymentAmount      = $billing->final_amount;
-        $email              = $billing->student->guardian->user->email ?? 'no-email@example.com';
-        $phoneNumber        = $billing->student->guardian->whatsapp ?? '081234567890';
+        $email              = $billing->student->guardian?->user?->email ?? 'no-email@example.com';
+        $phoneNumber        = $billing->student->guardian?->whatsapp ?? '081234567890';
         $productDetails     = "Pembayaran " . $billing->title;
         $merchantOrderId    = $billing->id . '-' . time();
-        $customerVaName     = $billing->student->guardian->full_name ?? $billing->student->full_name;
+        $customerVaName     = $billing->student->guardian?->full_name ?? $billing->student->full_name;
         $callbackUrl        = route('duitku.callback');
         $returnUrl          = route('duitku.return');
         $expiryPeriod       = 1440; // 24 hours

@@ -77,7 +77,7 @@
                                             <div class="flex items-center space-x-3">
                                                 <span class="text-sm font-bold text-destructive">Rp
                                                     {{ number_format($bill->final_amount, 0, ',', '.') }}</span>
-                                                <a href="{{ route('duitku.pay', $bill->id) }}"
+                                                <a href="{{ route('duitku.pay', [$bill->id, 'force' => 1]) }}"
                                                     class="px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition inline-block">
                                                     Bayar
                                                 </a>
