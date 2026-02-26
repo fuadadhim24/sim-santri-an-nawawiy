@@ -1,7 +1,4 @@
 import './bootstrap';
 
-import Alpine from 'alpinejs';
-
-window.Alpine = Alpine;
-
-Alpine.start();
+// Livewire 3 handles Alpine initialization automatically.
+// Manual initialization can cause "Multiple instances of Alpine" errors.

@@ -25,7 +25,7 @@ class DiscountForm extends Component
     // Computed property for fee masters
     public function getFeeMastersProperty()
     {
-        return FeeMaster::orderBy('category')->orderBy('item_name')->get();
+        return FeeMaster::with('category')->orderBy('fee_category_id')->orderBy('item_name')->get();
     }
 
     public function mount(Discount $discount = null)

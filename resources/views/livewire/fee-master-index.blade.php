@@ -10,11 +10,9 @@
                 <select wire:model.live="categoryFilter"
                     class="w-40 md:w-48 py-2 px-8 pr-10 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.75rem_center] bg-no-repeat transition-all">
                     <option value="">Semua Kategori</option>
-                    <option value="PENDAFTARAN">Pendaftaran</option>
-                    <option value="DAFTAR_ULANG">Daftar Ulang</option>
-                    <option value="BULANAN">Bulanan (SPP)</option>
-                    <option value="SEMESTERAN">Semesteran</option>
-                    <option value="AKHIR_SEKOLAH">Akhir Sekolah</option>
+                    @foreach ($this->feeCategories as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
                 </select>
                 <input wire:model.live="search" type="text" placeholder="Cari biaya..."
                     class="w-40 md:w-48 py-2 px-4 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
@@ -29,6 +27,7 @@
                     <tr>
                         <th class="px-6 py-3">Kategori</th>
                         <th class="px-6 py-3">Nama Biaya</th>
+                        <th class="px-6 py-3">Interval</th>
                         <th class="px-6 py-3">Target Unit</th>
                         <th class="px-6 py-3">Target Tempat Tinggal</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
@@ -39,11 +38,18 @@
                     @forelse ($fees as $fee)
                         <tr class="hover:bg-muted/50 transition-colors">
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                                    {{ str_replace('_', ' ', $fee->category) }}
+                                <span
+                                    class="text-xs font-semibold px-2 py-1 rounded bg-primary/10 text-primary uppercase">
+                                    {{ $fee->category->name ?? 'N/A' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 font-medium text-foreground">{{ $fee->item_name }}</td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="text-xs font-semibold px-2 py-1 rounded bg-secondary text-secondary-foreground">
+                                    {{ $fee->billing_interval }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 text-muted-foreground">
                                 {{ $fee->unit_target ? ($fee->unit_target == '01' ? 'SMP' : ($fee->unit_target == '02' ? 'SMA' : 'PPTQ')) : 'Semua Unit' }}
                             </td>

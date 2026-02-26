@@ -62,7 +62,7 @@ class StudentForm extends Component
         }
     }
 
-    public function save(NisGeneratorService $nisService)
+    public function save(NisGeneratorService $nisService, \App\Services\BillingService $billingService)
     {
         $this->validate();
 
@@ -81,16 +81,15 @@ class StudentForm extends Component
             $this->student->update($data);
             session()->flash('message', 'Student updated successfully.');
         } else {
-            // Generate NIS
-            // Year based on current year for now, or could be input. Assuming 2026 as per examples.
-            // In a real app, this might come from an academic year setting.
-            // Using current year for simplicity or 2026 if hardcoded in examples.
-            // Let's use current year or 2026. user prompt used 2026.
-            $year = 2026;
+            $year = date('Y');
             $nis = $nisService->generate($this->unit_code, $year);
             $data['nis'] = $nis;
 
-            Student::create($data);
+            $newStudent = Student::create($data);
+
+            // AUTO-GENERATE ONCE BILLINGS (Registration, etc)
+            $billingService->generateOnceBills($newStudent);
+
             session()->flash('message', 'Student created successfully with NIS: ' . $nis);
         }
 

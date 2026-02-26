@@ -46,7 +46,6 @@
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         <option value="ADMIN_TU">Admin TU</option>
                         <option value="SUPER_ADMIN">Super Admin</option>
-                        <option value="WALI_SANTRI">Wali Santri</option>
                     </select>
                     @error('role')
                         <span class="text-destructive text-sm">{{ $message }}</span>

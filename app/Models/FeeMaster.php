@@ -12,8 +12,20 @@ class FeeMaster extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'amount' => 'integer',
+        'billing_day' => 'integer',
+    ];
+
     public function discounts(): HasMany
     {
         return $this->hasMany(Discount::class);
+    }
+
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(FeeCategory::class, 'fee_category_id');
     }
 }

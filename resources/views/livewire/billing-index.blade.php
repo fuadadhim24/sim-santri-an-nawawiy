@@ -17,9 +17,6 @@
                 </select>
                 <input wire:model.live="search" type="text" placeholder="Cari tagihan..."
                     class="w-full md:w-64 py-2 px-4 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
-                <a href="{{ route('admin.billings.create') }}"
-                    class="inline-flex items-center justify-center py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 font-semibold whitespace-nowrap flex-none shrink-0">+
-                    Buat Tagihan</a>
             </div>
         </div>
         <div class="overflow-x-auto">

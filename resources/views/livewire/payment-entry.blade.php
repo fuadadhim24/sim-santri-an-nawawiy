@@ -73,7 +73,8 @@
                                             <td class="px-4 py-3">
                                                 <span
                                                     class="font-medium block text-foreground">{{ $bill->title }}</span>
-                                                class="text-xs text-muted-foreground">{{ $bill->created_at->locale('id')->isoFormat('D MMMM Y') }}</span>
+                                                <span
+                                                    class="text-xs text-muted-foreground">{{ $bill->created_at->locale('id')->isoFormat('D MMMM Y') }}</span>
                                             </td>
                                             <td class="px-4 py-3 font-mono">
                                                 Rp {{ number_format($bill->final_amount, 0, ',', '.') }}

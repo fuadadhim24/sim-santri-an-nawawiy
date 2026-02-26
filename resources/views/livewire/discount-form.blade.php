@@ -15,7 +15,7 @@
                         <option value="">Pilih Nama Biaya...</option>
                         @foreach ($this->feeMasters as $fee)
                             <option value="{{ $fee->id }}">
-                                {{ $fee->item_name }} - {{ $fee->category }} (Rp
+                                {{ $fee->item_name }} - {{ $fee->category->name ?? 'N/A' }} (Rp
                                 {{ number_format($fee->amount, 0, ',', '.') }})
                             </option>
                         @endforeach

@@ -20,7 +20,7 @@ class UserForm extends Component
     #[Rule('nullable|min:6')]
     public $password = '';
 
-    #[Rule('required|in:SUPER_ADMIN,ADMIN_TU,WALI_SANTRI')]
+    #[Rule('required|in:SUPER_ADMIN,ADMIN_TU')]
     public $role = 'ADMIN_TU';
 
     public $isEdit = false;
@@ -42,7 +42,7 @@ class UserForm extends Component
             'email' => 'required|email|unique:users,email,' . ($this->user ? $this->user->id : 'NULL'),
             'name' => 'required|min:3',
             'password' => $this->isEdit ? 'nullable|min:6' : 'required|min:6',
-            'role' => 'required|in:SUPER_ADMIN,ADMIN_TU,WALI_SANTRI',
+            'role' => 'required|in:SUPER_ADMIN,ADMIN_TU',
         ]);
 
         $data = [

@@ -11,9 +11,13 @@ class BillingForm extends Component
 {
     #[Rule('required|integer|min:1|max:12')]
     public $month;
-
-    #[Rule('required|integer|min:2025|max:2030')]
+    #[Rule('required|integer|min:2025|max:2035')]
     public $year;
+
+    public $genOnce = false;
+    public $genMonthly = true;
+    public $genYearly = false;
+    public $onlyDue = true;
 
     public function mount()
     {
@@ -25,27 +29,45 @@ class BillingForm extends Component
     {
         $this->validate();
 
-        // fetch all active students who are BILLABLE
-        // Exclude NGAJI_ONLY based on requirement?
-        // Plan said: "Explicitly exclude NGAJI_ONLY students from billing generation."
-
         $students = Student::where('is_active', true)
             ->where('residence_status', '!=', 'NGAJI_ONLY')
             ->get();
 
-        $count = 0;
-        $skipped = 0;
+        $totalGenerated = 0;
 
         foreach ($students as $student) {
-            $bill = $billingService->generateMonthlySPP($student, $this->month, $this->year);
-            if ($bill) {
-                $count++;
-            } else {
-                $skipped++;
+            if ($this->genOnce) {
+                $totalGenerated += $billingService->generateOnceBills($student);
+            }
+            if ($this->genMonthly) {
+                // If onlyDue is true, we logic this in BillingService or here?
+                // Let's pass a flag to BillingService soon, but for now,
+                // let's do a simple check here if onlyDue is true.
+                if ($this->onlyDue) {
+                    $dayToday = date('j');
+                    // We need to check if ANY applicable fee for this student has billing_day == today
+                    $hasDueFee = \App\Models\FeeMaster::whereHas('category', function ($q) {
+                            $q->where('billing_interval', 'MONTHLY');
+                        })
+                        ->where('billing_day', $dayToday)
+                        ->where(function ($q) use ($student) {
+                            $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
+                        })
+                        ->exists();
+
+                    if ($hasDueFee) {
+                        $totalGenerated += $billingService->generateMonthlySPP($student, $this->month, $this->year);
+                    }
+                } else {
+                    $totalGenerated += $billingService->generateMonthlySPP($student, $this->month, $this->year);
+                }
+            }
+            if ($this->genYearly) {
+                $totalGenerated += $billingService->generateYearlyBills($student, $this->year);
             }
         }
 
-        session()->flash('message', "Generated $count bills. Skipped $skipped (already exists or no fee found).");
+        session()->flash('message', "Berhasil menerbitkan $totalGenerated tagihan baru.");
         return redirect()->route('admin.billings');
     }
 

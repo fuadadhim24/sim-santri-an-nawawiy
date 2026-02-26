@@ -60,6 +60,12 @@
 </head>
 
 <body class="antialiased min-h-screen flex flex-col bg-background text-foreground font-sans">
+    @php
+        $spmbTotal =
+            (\App\Models\FeeMaster::find(1)->amount ?? 150000) + (\App\Models\FeeMaster::find(2)->amount ?? 1250000);
+        $sppMondok = \App\Models\FeeMaster::find(5)->amount ?? 450000;
+        $sppLaju = \App\Models\FeeMaster::find(4)->amount ?? 200000;
+    @endphp
 
     <!-- Navbar -->
     <nav class="fixed w-full z-50 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
@@ -186,7 +192,8 @@
                             dan daftar ulang untuk hak asrama serta fasilitas madrasah.</p>
 
                         <div class="mb-8 pb-8 border-b border-border">
-                            <span class="text-4xl font-extrabold text-foreground">Rp 1.400.000</span>
+                            <span class="text-4xl font-extrabold text-foreground">Rp
+                                {{ number_format($spmbTotal, 0, ',', '.') }}</span>
                         </div>
 
                         <ul class="space-y-4 text-sm text-foreground mb-8">
@@ -217,7 +224,7 @@
                         </ul>
                     </div>
                     <div class="p-8 pt-0 mt-auto">
-                        <a href="{{ route('checkout.test', ['package' => 'SPMB (Pendaftaran Santri Baru)', 'price' => 1400000]) }}"
+                        <a href="{{ route('checkout.test', ['package' => 'SPMB (Pendaftaran Santri Baru)', 'price' => $spmbTotal]) }}"
                             class="w-full py-3 rounded-md bg-secondary text-secondary-foreground text-center font-bold transition-all flex justify-center items-center shadow-sm hover:brightness-110 border border-secondary/50">
                             Simulasi Checkout
                         </a>
@@ -235,7 +242,8 @@
                             mendukung seluruh fasilitas asrama, konsumsi, dan operasional mengaji santri mukim.</p>
 
                         <div class="mb-8 pb-8 border-b border-border text-primary">
-                            <span class="text-4xl font-extrabold text-primary">Rp 500.000</span><span
+                            <span class="text-4xl font-extrabold text-primary">Rp
+                                {{ number_format($sppMondok, 0, ',', '.') }}</span><span
                                 class="text-muted-foreground text-lg ml-1 font-normal">/bulan</span>
                         </div>
 
@@ -267,7 +275,7 @@
                         </ul>
                     </div>
                     <div class="p-8 pt-0 mt-auto bg-primary/5">
-                        <a href="{{ route('checkout.test', ['package' => 'SPP Bulanan (Mondok)', 'price' => 500000]) }}"
+                        <a href="{{ route('checkout.test', ['package' => 'SPP Bulanan (Mondok)', 'price' => $sppMondok]) }}"
                             class="w-full py-3 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground text-center font-bold transition-all flex justify-center items-center shadow-md border border-transparent">
                             Simulasi Checkout
                         </a>
@@ -283,7 +291,8 @@
                             untuk santri non-mukim (laju) guna menunjang fasilitas belajar madrasah diniyah.</p>
 
                         <div class="mb-8 pb-8 border-b border-border">
-                            <span class="text-4xl font-extrabold text-foreground">Rp 200.000</span><span
+                            <span class="text-4xl font-extrabold text-foreground">Rp
+                                {{ number_format($sppLaju, 0, ',', '.') }}</span><span
                                 class="text-muted-foreground text-lg ml-1 font-normal">/bulan</span>
                         </div>
 
@@ -315,7 +324,7 @@
                         </ul>
                     </div>
                     <div class="p-8 pt-0 mt-auto">
-                        <a href="{{ route('checkout.test', ['package' => 'SPP Bulanan (Laju)', 'price' => 200000]) }}"
+                        <a href="{{ route('checkout.test', ['package' => 'SPP Bulanan (Laju)', 'price' => $sppLaju]) }}"
                             class="w-full py-3 rounded-md bg-card hover:bg-muted text-card-foreground text-center font-bold transition-all flex justify-center items-center shadow-sm border border-border">
                             Simulasi Checkout
                         </a>

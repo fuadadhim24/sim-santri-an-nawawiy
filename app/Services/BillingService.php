@@ -15,7 +15,7 @@ class BillingService
      * Generate a bill for a student based on a specific fee category and item name.
      * This handles finding the correct fee for the student's unit/residence and applying discounts.
      */
-    public function generateBill(Student $student, string $category, string $title, ?string $feeItemName = null)
+    public function generateBill(Student $student, int $feeCategoryId, string $title, ?string $feeItemName = null)
     {
         // 1. Find the applicable Fee Master
         // We look for a fee that matches the category, and optionally the specific item name.
@@ -27,7 +27,7 @@ class BillingService
         // - Unit target: Matches student's unit OR is null
         // - Residence target: Matches student's residence OR is null
 
-        $query = FeeMaster::where('category', $category)
+        $query = FeeMaster::where('fee_category_id', $feeCategoryId)
             ->where(function ($q) use ($student) {
                 $q->where('unit_target', $student->unit_code)
                   ->orWhereNull('unit_target');
@@ -97,22 +97,142 @@ class BillingService
     }
 
     /**
-     * Generate monthly SPP bill for a student.
+     * Generate bills that occur only once (e.g. registration).
+     */
+    public function generateOnceBills(Student $student)
+    {
+        $fees = FeeMaster::whereHas('category', function ($q) {
+                $q->where('billing_interval', 'ONCE');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
+            })
+            ->where(function ($q) {
+                $now = now()->toDateString();
+                $q->where('start_date', '<=', $now)->orWhereNull('start_date');
+            })
+            ->where(function ($q) {
+                $now = now()->toDateString();
+                $q->where('end_date', '>=', $now)->orWhereNull('end_date');
+            })
+            ->get();
+
+        $count = 0;
+        foreach ($fees as $fee) {
+            $title = $fee->item_name;
+            $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
+            if (!$exists) {
+                $this->createBillFromFee($student, $fee, $title);
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Generate bills that occur once a year (e.g. re-registration).
+     */
+    public function generateYearlyBills(Student $student, $year)
+    {
+        $fees = FeeMaster::whereHas('category', function ($q) {
+                $q->where('billing_interval', 'YEARLY');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
+            })
+            ->where(function ($q) use ($year) {
+                $targetDate = Carbon::create($year, 1, 1)->toDateString();
+                $q->where('start_date', '<=', $targetDate)->orWhereNull('start_date');
+            })
+            ->where(function ($q) use ($year) {
+                $targetDate = Carbon::create($year, 12, 31)->toDateString();
+                $q->where('end_date', '>=', $targetDate)->orWhereNull('end_date');
+            })
+            ->get();
+
+        $count = 0;
+        foreach ($fees as $fee) {
+            $title = $fee->item_name . " " . $year;
+            $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
+            if (!$exists) {
+                $this->createBillFromFee($student, $fee, $title);
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Generate monthly bills (e.g. SPP).
      */
     public function generateMonthlySPP(Student $student, $month, $year)
     {
-        $monthName = Carbon::create()->month($month)->locale('id')->monthName;
-        $title = "SPP " . $monthName . " " . $year;
+        $monthName = Carbon::create()->month((int)$month)->locale('id')->monthName;
 
-        // Ensure we don't generate duplicate SPP for same month?
-        $exists = Billing::where('student_id', $student->id)
-            ->where('title', $title)
-            ->exists();
+        $fees = FeeMaster::whereHas('category', function ($q) {
+                $q->where('billing_interval', 'MONTHLY');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
+            })
+            ->where(function ($q) use ($month, $year) {
+                $targetDate = Carbon::create($year, (int)$month, 1)->toDateString();
+                $q->where('start_date', '<=', $targetDate)->orWhereNull('start_date');
+            })
+            ->where(function ($q) use ($month, $year) {
+                $targetDate = Carbon::create($year, (int)$month, 1)->endOfMonth()->toDateString();
+                $q->where('end_date', '>=', $targetDate)->orWhereNull('end_date');
+            })
+            ->get();
 
-        if ($exists) {
-            return null;
+        $count = 0;
+        foreach ($fees as $fee) {
+            $title = $fee->item_name . " " . $monthName . " " . $year;
+            $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
+            if (!$exists) {
+                $this->createBillFromFee($student, $fee, $title);
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Helper to create a billing record from a FeeMaster item.
+     */
+    private function createBillFromFee(Student $student, FeeMaster $fee, string $title)
+    {
+        $amount = $fee->amount;
+        $discountAmount = 0;
+
+        if ($student->special_status !== 'UMUM') {
+            $discount = Discount::where('fee_master_id', $fee->id)
+                ->where('target_status', $student->special_status)
+                ->first();
+
+            if ($discount) {
+                $discountAmount = $discount->discount_amount;
+            }
         }
 
-        return $this->generateBill($student, 'BULANAN', $title);
+        $finalAmount = max(0, $amount - $discountAmount);
+
+        return Billing::create([
+            'student_id' => $student->id,
+            'title' => $title,
+            'original_amount' => $amount,
+            'discount_applied' => $discountAmount,
+            'final_amount' => $finalAmount,
+            'status' => 'UNPAID',
+        ]);
     }
 }

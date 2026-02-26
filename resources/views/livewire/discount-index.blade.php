@@ -30,7 +30,7 @@
                             <td class="px-6 py-4 font-medium text-foreground">
                                 {{ $discount->feeMaster->item_name }}
                                 <span class="text-xs text-muted-foreground block">
-                                    {{ $discount->feeMaster->category }}
+                                    {{ $discount->feeMaster->category->name ?? 'N/A' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">

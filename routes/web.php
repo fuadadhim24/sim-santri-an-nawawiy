@@ -71,6 +71,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/fee-masters/create', \App\Livewire\FeeMasterForm::class)->name('admin.fee-masters.create');
         Route::get('/admin/fee-masters/{feeMaster}/edit', \App\Livewire\FeeMasterForm::class)->name('admin.fee-masters.edit');
 
+        Route::get('/admin/fee-categories', \App\Livewire\FeeCategoryIndex::class)->name('admin.fee-categories');
+        Route::get('/admin/fee-categories/create', \App\Livewire\FeeCategoryForm::class)->name('admin.fee-categories.create');
+        Route::get('/admin/fee-categories/{feeCategory}/edit', \App\Livewire\FeeCategoryForm::class)->name('admin.fee-categories.edit');
+
         Route::get('/admin/discounts', \App\Livewire\DiscountIndex::class)->name('admin.discounts');
         Route::get('/admin/discounts/create', \App\Livewire\DiscountForm::class)->name('admin.discounts.create');
         Route::get('/admin/discounts/{discount}/edit', \App\Livewire\DiscountForm::class)->name('admin.discounts.edit');
