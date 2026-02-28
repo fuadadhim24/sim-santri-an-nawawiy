@@ -9,10 +9,10 @@ class FeeCategorySeeder extends Seeder
 {
     public function run(): void
     {
-        FeeCategory::create(['name' => 'SPP', 'code' => 'SPP', 'billing_interval' => 'MONTHLY']);
-        FeeCategory::create(['name' => 'Pendaftaran', 'code' => 'REG', 'billing_interval' => 'ONCE']);
-        FeeCategory::create(['name' => 'Daftar Ulang', 'code' => 'RE_REG', 'billing_interval' => 'YEARLY']);
-        FeeCategory::create(['name' => 'Uang Saku', 'code' => 'POCKET', 'billing_interval' => 'MONTHLY']);
-        FeeCategory::create(['name' => 'Lain-lain', 'code' => 'OTHER', 'billing_interval' => 'ONCE']);
+        FeeCategory::create(['name' => 'SPP', 'code' => 'SPP']);
+        FeeCategory::create(['name' => 'Pendaftaran', 'code' => 'REG']);
+        FeeCategory::create(['name' => 'Daftar Ulang', 'code' => 'RE_REG']);
+        FeeCategory::create(['name' => 'Uang Saku', 'code' => 'POCKET']);
+        FeeCategory::create(['name' => 'Lain-lain', 'code' => 'OTHER']);
     }
 }

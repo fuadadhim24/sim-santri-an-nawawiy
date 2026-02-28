@@ -63,66 +63,6 @@
                     @enderror
                 </div>
 
-                <!-- Group 2: Interval Selection (Standard Card Style) -->
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-foreground">Interval Tagihan</label>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Once -->
-                        <label
-                            class="relative flex items-start p-4 border rounded-lg cursor-pointer transition-colors {{ $billing_interval === 'ONCE' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-input bg-background hover:bg-muted/50' }}">
-                            <div class="flex items-center h-5">
-                                <input wire:model.live="billing_interval" type="radio" value="ONCE" disabled
-                                    class="h-4 w-4 text-primary border-input focus:ring-ring opacity-50 cursor-not-allowed">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <span class="font-medium text-foreground block opacity-50">Sekali Saja</span>
-                                <span class="text-muted-foreground text-xs opacity-50">One-time payment</span>
-                            </div>
-                        </label>
-
-                        <!-- Monthly -->
-                        <label
-                            class="relative flex items-start p-4 border rounded-lg cursor-not-allowed transition-colors {{ $billing_interval === 'MONTHLY' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-input bg-background' }}">
-                            <div class="flex items-center h-5">
-                                <input wire:model.live="billing_interval" type="radio" value="MONTHLY" disabled
-                                    class="h-4 w-4 text-primary border-input focus:ring-ring opacity-50 cursor-not-allowed">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <span class="font-medium text-foreground block opacity-50">Bulanan</span>
-                                <span class="text-muted-foreground text-xs opacity-50">Tagihan rutin bulanan</span>
-                            </div>
-                        </label>
-
-                        <!-- Yearly -->
-                        <label
-                            class="relative flex items-start p-4 border rounded-lg cursor-not-allowed transition-colors {{ $billing_interval === 'YEARLY' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-input bg-background' }}">
-                            <div class="flex items-center h-5">
-                                <input wire:model.live="billing_interval" type="radio" value="YEARLY" disabled
-                                    class="h-4 w-4 text-primary border-input focus:ring-ring opacity-50 cursor-not-allowed">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <span class="font-medium text-foreground block">Tahunan</span>
-                                <span class="text-muted-foreground text-xs">Tagihan rutin tahunan</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                @if ($billing_interval === 'MONTHLY')
-                    <div class="bg-muted/30 p-4 rounded-lg border border-border flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-semibold text-foreground">Tanggal Terbit Tagihan Otomatis</h4>
-                            <p class="text-xs text-muted-foreground">Tagihan akan terbit setiap bulannya pada tanggal
-                                yang dipilih.</p>
-                        </div>
-                        <div class="w-24">
-                            <input wire:model="billing_day" type="number" id="billing_day" min="1"
-                                max="28"
-                                class="block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                        </div>
-                    </div>
-                @endif
-
                 <!-- Validity Dates -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>

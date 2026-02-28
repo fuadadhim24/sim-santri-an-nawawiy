@@ -2,73 +2,97 @@
 
 namespace App\Livewire;
 
+use App\Models\Billing;
+use App\Models\FeeMaster;
 use App\Models\Student;
-use App\Services\BillingService;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 
 class BillingForm extends Component
 {
-    #[Rule('required|integer|min:1|max:12')]
-    public $month;
-    #[Rule('required|integer|min:2025|max:2035')]
-    public $year;
+    #[Rule('required|exists:students,id')]
+    public $student_id = '';
 
-    public $genOnce = false;
-    public $genMonthly = true;
-    public $genYearly = false;
-    public $onlyDue = true;
+    #[Rule('required|exists:fee_masters,id')]
+    public $fee_master_id = '';
 
-    public function mount()
+    #[Rule('required|string|max:255')]
+    public $title = '';
+
+    #[Rule('required|numeric|min:0')]
+    public $original_amount = '';
+
+    #[Rule('nullable|numeric|min:0')]
+    public $discount_applied = 0;
+
+    #[Rule('required|numeric|min:0')]
+    public $final_amount = '';
+
+    public $isEdit = false;
+
+    public function mount($billing = null)
     {
-        $this->month = date('n');
-        $this->year = date('Y');
+        if ($billing && $billing->exists) {
+            $this->isEdit = true;
+            $this->student_id = $billing->student_id;
+            $this->fee_master_id = $billing->fee_master_id;
+            $this->title = $billing->title;
+            $this->original_amount = $billing->original_amount;
+            $this->discount_applied = $billing->discount_applied;
+            $this->final_amount = $billing->final_amount;
+        }
     }
 
-    public function generate(BillingService $billingService)
+    public function updatedFeeMasterId($value)
+    {
+        if ($value) {
+            $fee = FeeMaster::find($value);
+            if ($fee) {
+                $this->original_amount = $fee->amount;
+                $this->title = $fee->item_name;
+                $this->calculateFinalAmount();
+            }
+        }
+    }
+
+    public function updatedDiscountApplied()
+    {
+        $this->calculateFinalAmount();
+    }
+
+    private function calculateFinalAmount()
+    {
+        $this->final_amount = max(0, (float)$this->original_amount - (float)$this->discount_applied);
+    }
+
+    public function save()
     {
         $this->validate();
 
-        $students = Student::where('is_active', true)
-            ->where('residence_status', '!=', 'NGAJI_ONLY')
-            ->get();
+        $data = [
+            'student_id' => $this->student_id,
+            'fee_master_id' => $this->fee_master_id ?: null,
+            'title' => $this->title,
+            'original_amount' => $this->original_amount,
+            'discount_applied' => $this->discount_applied ?: 0,
+            'final_amount' => $this->final_amount,
+            'status' => 'UNPAID',
+        ];
 
-        $totalGenerated = 0;
+        Billing::create($data);
 
-        foreach ($students as $student) {
-            if ($this->genOnce) {
-                $totalGenerated += $billingService->generateOnceBills($student);
-            }
-            if ($this->genMonthly) {
-                // If onlyDue is true, we logic this in BillingService or here?
-                // Let's pass a flag to BillingService soon, but for now,
-                // let's do a simple check here if onlyDue is true.
-                if ($this->onlyDue) {
-                    $dayToday = date('j');
-                    // We need to check if ANY applicable fee for this student has billing_day == today
-                    $hasDueFee = \App\Models\FeeMaster::whereHas('category', function ($q) {
-                            $q->where('billing_interval', 'MONTHLY');
-                        })
-                        ->where('billing_day', $dayToday)
-                        ->where(function ($q) use ($student) {
-                            $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
-                        })
-                        ->exists();
-
-                    if ($hasDueFee) {
-                        $totalGenerated += $billingService->generateMonthlySPP($student, $this->month, $this->year);
-                    }
-                } else {
-                    $totalGenerated += $billingService->generateMonthlySPP($student, $this->month, $this->year);
-                }
-            }
-            if ($this->genYearly) {
-                $totalGenerated += $billingService->generateYearlyBills($student, $this->year);
-            }
-        }
-
-        session()->flash('message', "Berhasil menerbitkan $totalGenerated tagihan baru.");
+        session()->flash('message', 'Tagihan berhasil dibuat.');
         return redirect()->route('admin.billings');
+    }
+
+    public function getStudentsProperty()
+    {
+        return Student::where('is_active', true)->orderBy('full_name')->get();
+    }
+
+    public function getFeeMastersProperty()
+    {
+        return FeeMaster::with('category')->orderBy('item_name')->get();
     }
 
     public function render()

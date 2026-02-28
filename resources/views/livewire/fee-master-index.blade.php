@@ -27,7 +27,6 @@
                     <tr>
                         <th class="px-6 py-3">Kategori</th>
                         <th class="px-6 py-3">Nama Biaya</th>
-                        <th class="px-6 py-3">Interval</th>
                         <th class="px-6 py-3">Target Unit</th>
                         <th class="px-6 py-3">Target Tempat Tinggal</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
@@ -44,12 +43,6 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 font-medium text-foreground">{{ $fee->item_name }}</td>
-                            <td class="px-6 py-4">
-                                <span
-                                    class="text-xs font-semibold px-2 py-1 rounded bg-secondary text-secondary-foreground">
-                                    {{ $fee->billing_interval }}
-                                </span>
-                            </td>
                             <td class="px-6 py-4 text-muted-foreground">
                                 {{ $fee->unit_target ? ($fee->unit_target == '01' ? 'SMP' : ($fee->unit_target == '02' ? 'SMA' : 'PPTQ')) : 'Semua Unit' }}
                             </td>

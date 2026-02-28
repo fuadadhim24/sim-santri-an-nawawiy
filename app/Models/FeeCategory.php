@@ -10,7 +10,7 @@ class FeeCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'code', 'billing_interval'];
+    protected $fillable = ['name', 'code'];
 
     public function fees(): HasMany
     {

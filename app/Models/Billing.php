@@ -14,6 +14,7 @@ class Billing extends Model
 
     protected $fillable = [
         'student_id',
+        'fee_master_id',
         'title',
         'original_amount',
         'discount_applied',
@@ -50,6 +51,11 @@ class Billing extends Model
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function feeMaster()
+    {
+        return $this->belongsTo(FeeMaster::class);
     }
 
     public function payments()

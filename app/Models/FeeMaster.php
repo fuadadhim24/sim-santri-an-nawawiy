@@ -16,7 +16,6 @@ class FeeMaster extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'amount' => 'integer',
-        'billing_day' => 'integer',
     ];
 
     public function discounts(): HasMany

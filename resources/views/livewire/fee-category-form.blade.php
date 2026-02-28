@@ -27,48 +27,6 @@
                     @enderror
                 </div>
 
-                <!-- Interval Selection -->
-                <div class="space-y-4">
-                    <label class="block text-sm font-medium text-foreground">Interval Tagihan</label>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <label
-                            class="relative flex items-start p-4 border rounded-lg cursor-pointer transition-colors {{ $billing_interval === 'ONCE' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-input bg-background hover:bg-muted/50' }}">
-                            <div class="flex items-center h-5">
-                                <input wire:model.live="billing_interval" type="radio" value="ONCE"
-                                    class="h-4 w-4 text-primary border-input focus:ring-ring">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <span class="font-medium text-foreground block">Sekali Saja</span>
-                            </div>
-                        </label>
-
-                        <label
-                            class="relative flex items-start p-4 border rounded-lg cursor-pointer transition-colors {{ $billing_interval === 'MONTHLY' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-input bg-background hover:bg-muted/50' }}">
-                            <div class="flex items-center h-5">
-                                <input wire:model.live="billing_interval" type="radio" value="MONTHLY"
-                                    class="h-4 w-4 text-primary border-input focus:ring-ring">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <span class="font-medium text-foreground block">Bulanan</span>
-                            </div>
-                        </label>
-
-                        <label
-                            class="relative flex items-start p-4 border rounded-lg cursor-pointer transition-colors {{ $billing_interval === 'YEARLY' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-input bg-background hover:bg-muted/50' }}">
-                            <div class="flex items-center h-5">
-                                <input wire:model.live="billing_interval" type="radio" value="YEARLY"
-                                    class="h-4 w-4 text-primary border-input focus:ring-ring">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <span class="font-medium text-foreground block">Tahunan</span>
-                            </div>
-                        </label>
-                    </div>
-                    @error('billing_interval')
-                        <span class="text-destructive text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
-
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.fee-categories') }}"
                         class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">

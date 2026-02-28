@@ -28,7 +28,6 @@
                     <tr>
                         <th class="px-6 py-3">Kode</th>
                         <th class="px-6 py-3">Nama Kategori</th>
-                        <th class="px-6 py-3">Interval</th>
                         <th class="px-6 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -37,7 +36,6 @@
                         <tr class="hover:bg-muted/50 transition-colors">
                             <td class="px-6 py-4 font-mono font-bold text-primary">{{ $category->code }}</td>
                             <td class="px-6 py-4 font-medium text-foreground">{{ $category->name }}</td>
-                            <td class="px-6 py-4 text-center">{{ $category->billing_interval }}</td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center space-x-3">
                                     <a href="{{ route('admin.fee-categories.edit', $category->id) }}"

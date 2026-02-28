@@ -3,41 +3,40 @@
 namespace App\Livewire;
 
 use App\Models\FeeMaster;
-use Livewire\Attributes\Rule;
 use Livewire\Component;
 
 class FeeMasterForm extends Component
 {
     public ?FeeMaster $feeMaster = null;
 
-    #[Rule('required|string|min:3')]
     public $item_name = '';
 
-    #[Rule('required|numeric|min:0')]
     public $amount = '';
 
-    #[Rule('required|exists:fee_categories,id')]
     public $fee_category_id = '';
 
-    #[Rule('nullable|in:01,02,03')]
     public $unit_target = '';
 
-    #[Rule('nullable|in:MONDOK,NON_MONDOK')]
     public $residence_target = '';
 
-    #[Rule('required|in:ONCE,MONTHLY,YEARLY')]
-    public $billing_interval = 'MONTHLY';
-
-    #[Rule('nullable|date')]
     public $start_date = '';
 
-    #[Rule('nullable|date|after_or_equal:start_date')]
     public $end_date = '';
 
-    #[Rule('nullable|integer|min:1|max:28')]
-    public $billing_day = 10;
-
     public $isEdit = false;
+
+    protected function rules(): array
+    {
+        return [
+            'item_name' => 'required|string|min:3',
+            'amount' => 'required|numeric|min:0',
+            'fee_category_id' => 'required|exists:fee_categories,id',
+            'unit_target' => 'nullable|in:01,02,03',
+            'residence_target' => 'nullable|in:MONDOK,NON_MONDOK',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ];
+    }
 
     public function mount(FeeMaster $feeMaster = null)
     {
@@ -48,21 +47,9 @@ class FeeMasterForm extends Component
             $this->fee_category_id = $feeMaster->fee_category_id;
             $this->unit_target = $feeMaster->unit_target;
             $this->residence_target = $feeMaster->residence_target;
-            $this->billing_interval = $feeMaster->category?->billing_interval ?? 'MONTHLY';
             $this->start_date = $feeMaster->start_date ? $feeMaster->start_date->format('Y-m-d') : '';
             $this->end_date = $feeMaster->end_date ? $feeMaster->end_date->format('Y-m-d') : '';
-            $this->billing_day = $feeMaster->billing_day;
             $this->isEdit = true;
-        }
-    }
-
-    public function updatedFeeCategoryId($value)
-    {
-        if ($value) {
-            $category = \App\Models\FeeCategory::find($value);
-            if ($category) {
-                $this->billing_interval = $category->billing_interval;
-            }
         }
     }
 
@@ -78,7 +65,6 @@ class FeeMasterForm extends Component
             'residence_target' => $this->residence_target ?: null,
             'start_date' => $this->start_date ?: null,
             'end_date' => $this->end_date ?: null,
-            'billing_day' => $this->billing_day ?: null,
         ];
 
         if ($this->isEdit) {

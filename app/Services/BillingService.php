@@ -6,8 +6,8 @@ use App\Models\Billing;
 use App\Models\Discount;
 use App\Models\FeeMaster;
 use App\Models\Student;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BillingService
 {
@@ -17,16 +17,6 @@ class BillingService
      */
     public function generateBill(Student $student, int $feeCategoryId, string $title, ?string $feeItemName = null)
     {
-        // 1. Find the applicable Fee Master
-        // We look for a fee that matches the category, and optionally the specific item name.
-        // We also check if the fee is targeted towards the student's unit or residence.
-        // If unit_target is null, it applies to all using 'where(function...)' logic?
-        // Actually, let's keep it simple: Exact match or specific target matching.
-        // FeeMaster logic:
-        // - Category matches
-        // - Unit target: Matches student's unit OR is null
-        // - Residence target: Matches student's residence OR is null
-
         $query = FeeMaster::where('fee_category_id', $feeCategoryId)
             ->where(function ($q) use ($student) {
                 $q->where('unit_target', $student->unit_code)
@@ -44,15 +34,8 @@ class BillingService
         $fees = $query->get();
 
         if ($fees->isEmpty()) {
-            return null; // No applicable fee found
+            return null;
         }
-
-        // For now, let's assume we sum up all applicable fees if there are multiple matches?
-        // Or pick the most specific one?
-        // Let's assume for a category like 'BULANAN' (SPP), there's ideally only one matching fee per student.
-        // But if we have multiple items (e.g. SPP + Makan), we might want to generate separate bills or one combined bill.
-        // With current schema, Billing has 'title' and 'final_amount', suggesting one bill per "Transaction".
-        // Let's sum them up for this bill.
 
         $totalOriginalAmount = 0;
         $totalDiscount = 0;
@@ -81,138 +64,23 @@ class BillingService
             $totalDiscount += $discountAmount;
         }
 
-        // Ensure we don't discount more than the amount (just in case)
         if ($totalDiscount > $totalOriginalAmount) {
             $totalDiscount = $totalOriginalAmount;
         }
 
         $finalAmount = $totalOriginalAmount - $totalDiscount;
 
-        // 3. Create Billing Record
+        $firstFee = $fees->first();
+
         return Billing::create([
             'student_id' => $student->id,
+            'fee_master_id' => $firstFee?->id,
             'title' => $title,
             'original_amount' => $totalOriginalAmount,
             'discount_applied' => $totalDiscount,
             'final_amount' => $finalAmount,
-            'status' => 'UNPAID', // Default
+            'status' => 'UNPAID',
         ]);
-    }
-
-    /**
-     * Generate bills that occur only once (e.g. registration).
-     */
-    public function generateOnceBills(Student $student)
-    {
-        $fees = FeeMaster::whereHas('category', function ($q) {
-                $q->where('billing_interval', 'ONCE');
-            })
-            ->where(function ($q) use ($student) {
-                $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
-            })
-            ->where(function ($q) use ($student) {
-                $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
-            })
-            ->where(function ($q) {
-                $now = now()->toDateString();
-                $q->where('start_date', '<=', $now)->orWhereNull('start_date');
-            })
-            ->where(function ($q) {
-                $now = now()->toDateString();
-                $q->where('end_date', '>=', $now)->orWhereNull('end_date');
-            })
-            ->get();
-
-        $discounts = $this->loadDiscountsForFees($fees, $student);
-
-        $count = 0;
-        foreach ($fees as $fee) {
-            $title = $fee->item_name;
-            $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
-            if (!$exists) {
-                $this->createBillFromFee($student, $fee, $title, $discounts);
-                $count++;
-            }
-        }
-        return $count;
-    }
-
-    /**
-     * Generate bills that occur once a year (e.g. re-registration).
-     */
-    public function generateYearlyBills(Student $student, $year)
-    {
-        $fees = FeeMaster::whereHas('category', function ($q) {
-                $q->where('billing_interval', 'YEARLY');
-            })
-            ->where(function ($q) use ($student) {
-                $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
-            })
-            ->where(function ($q) use ($student) {
-                $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
-            })
-            ->where(function ($q) use ($year) {
-                $targetDate = Carbon::create($year, 1, 1)->toDateString();
-                $q->where('start_date', '<=', $targetDate)->orWhereNull('start_date');
-            })
-            ->where(function ($q) use ($year) {
-                $targetDate = Carbon::create($year, 12, 31)->toDateString();
-                $q->where('end_date', '>=', $targetDate)->orWhereNull('end_date');
-            })
-            ->get();
-
-        $discounts = $this->loadDiscountsForFees($fees, $student);
-
-        $count = 0;
-        foreach ($fees as $fee) {
-            $title = $fee->item_name . " " . $year;
-            $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
-            if (!$exists) {
-                $this->createBillFromFee($student, $fee, $title, $discounts);
-                $count++;
-            }
-        }
-        return $count;
-    }
-
-    /**
-     * Generate monthly bills (e.g. SPP).
-     */
-    public function generateMonthlySPP(Student $student, $month, $year)
-    {
-        $monthName = Carbon::create()->month((int)$month)->locale('id')->monthName;
-
-        $fees = FeeMaster::whereHas('category', function ($q) {
-                $q->where('billing_interval', 'MONTHLY');
-            })
-            ->where(function ($q) use ($student) {
-                $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
-            })
-            ->where(function ($q) use ($student) {
-                $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
-            })
-            ->where(function ($q) use ($month, $year) {
-                $targetDate = Carbon::create($year, (int)$month, 1)->toDateString();
-                $q->where('start_date', '<=', $targetDate)->orWhereNull('start_date');
-            })
-            ->where(function ($q) use ($month, $year) {
-                $targetDate = Carbon::create($year, (int)$month, 1)->endOfMonth()->toDateString();
-                $q->where('end_date', '>=', $targetDate)->orWhereNull('end_date');
-            })
-            ->get();
-
-        $discounts = $this->loadDiscountsForFees($fees, $student);
-
-        $count = 0;
-        foreach ($fees as $fee) {
-            $title = $fee->item_name . " " . $monthName . " " . $year;
-            $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
-            if (!$exists) {
-                $this->createBillFromFee($student, $fee, $title, $discounts);
-                $count++;
-            }
-        }
-        return $count;
     }
 
     /**
@@ -257,11 +125,147 @@ class BillingService
 
         return Billing::create([
             'student_id' => $student->id,
+            'fee_master_id' => $fee->id,
             'title' => $title,
             'original_amount' => $amount,
             'discount_applied' => $discountAmount,
             'final_amount' => $finalAmount,
             'status' => 'UNPAID',
         ]);
+    }
+
+    /**
+     * Recalculate unpaid billings for a specific FeeMaster.
+     * Called when discount is added/updated/deleted or when FeeMaster amount changes.
+     */
+    public function recalculateBillingsForFeeMaster(FeeMaster $feeMaster): int
+    {
+        $count = 0;
+
+        DB::transaction(function () use ($feeMaster, &$count) {
+            $billings = Billing::where('status', 'UNPAID')
+                ->where('fee_master_id', $feeMaster->id)
+                ->with('student')
+                ->get();
+
+            foreach ($billings as $billing) {
+                $this->recalculateBilling($billing, $feeMaster);
+                $count++;
+            }
+        });
+
+        return $count;
+    }
+
+    /**
+     * Recalculate a single billing based on current FeeMaster amount and discounts.
+     */
+    public function recalculateBilling(Billing $billing, ?FeeMaster $feeMaster = null): void
+    {
+        if ($billing->status !== 'UNPAID') {
+            return;
+        }
+
+        $billing->loadMissing('student');
+        $student = $billing->student;
+
+        if (!$student) {
+            return;
+        }
+
+        if (!$feeMaster) {
+            $feeMaster = $billing->feeMaster ?? $this->findFeeMasterForBilling($billing, $student);
+        }
+
+        if (!$feeMaster) {
+            Log::warning('recalculateBilling: Could not find FeeMaster for billing', [
+                'billing_id' => $billing->id,
+                'billing_title' => $billing->title,
+                'student_id' => $student->id,
+            ]);
+            return;
+        }
+
+        $totalAmount = $feeMaster->amount;
+        $totalDiscount = 0;
+
+        if ($student->special_status !== 'UMUM') {
+            $discount = Discount::where('fee_master_id', $feeMaster->id)
+                ->where('target_status', $student->special_status)
+                ->first();
+
+            if ($discount) {
+                $totalDiscount = $discount->discount_amount;
+            }
+        }
+
+        $finalAmount = max(0, $totalAmount - $totalDiscount);
+
+        $updateData = [
+            'original_amount' => $totalAmount,
+            'discount_applied' => $totalDiscount,
+            'final_amount' => $finalAmount,
+        ];
+
+        if ($billing->fee_master_id === null) {
+            Log::info('Backfilling fee_master_id for billing', [
+                'billing_id' => $billing->id,
+                'fee_master_id' => $feeMaster->id,
+            ]);
+            $updateData['fee_master_id'] = $feeMaster->id;
+        }
+
+        $billing->update($updateData);
+    }
+
+    /**
+     * Find the FeeMaster that corresponds to a billing based on title matching.
+     */
+    private function findFeeMasterForBilling(Billing $billing, Student $student): ?FeeMaster
+    {
+        $baseTitle = $this->extractBaseTitle($billing->title);
+
+        return FeeMaster::where('item_name', $baseTitle)
+            ->where(function ($q) use ($student) {
+                $q->where('unit_target', $student->unit_code)->orWhereNull('unit_target');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
+            })
+            ->first();
+    }
+
+    /**
+     * Extract the base title from a billing title by removing year and month suffixes.
+     */
+    private function extractBaseTitle(string $title): string
+    {
+        $baseTitle = preg_replace('/[-_\s]+\d{4}$/', '', $title);
+        $baseTitle = preg_replace('/[-_\s]+(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember)[-_\s]+\d{4}$/i', '', $baseTitle);
+
+        return trim($baseTitle);
+    }
+
+    /**
+     * Recalculate all unpaid billings for a student.
+     * Called when student's special_status changes.
+     */
+    public function recalculateStudentBillings(Student $student): int
+    {
+        $count = 0;
+
+        DB::transaction(function () use ($student, &$count) {
+            $billings = Billing::where('student_id', $student->id)
+                ->where('status', 'UNPAID')
+                ->with('feeMaster')
+                ->get();
+
+            foreach ($billings as $billing) {
+                $this->recalculateBilling($billing);
+                $count++;
+            }
+        });
+
+        return $count;
     }
 }

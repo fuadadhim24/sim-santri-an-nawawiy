@@ -16,9 +16,6 @@ class FeeCategoryForm extends Component
     #[Rule('required|alpha_dash')]
     public $code = '';
 
-    #[Rule('required|in:ONCE,MONTHLY,YEARLY')]
-    public $billing_interval = 'MONTHLY';
-
     public $isEdit = false;
 
     public function mount(FeeCategory $feeCategory = null)
@@ -27,26 +24,22 @@ class FeeCategoryForm extends Component
             $this->feeCategory = $feeCategory;
             $this->name = $feeCategory->name;
             $this->code = $feeCategory->code;
-            $this->billing_interval = $feeCategory->billing_interval;
             $this->isEdit = true;
         }
     }
 
     public function save()
     {
-        // Adjust unique rule for edit
         $codeRule = 'required|alpha_dash|unique:fee_categories,code' . ($this->isEdit ? ',' . $this->feeCategory->id : '');
 
         $this->validate([
             'name' => 'required|min:3',
             'code' => $codeRule,
-            'billing_interval' => 'required|in:ONCE,MONTHLY,YEARLY',
         ]);
 
         $data = [
             'name' => $this->name,
             'code' => strtoupper($this->code),
-            'billing_interval' => $this->billing_interval,
         ];
 
         if ($this->isEdit) {

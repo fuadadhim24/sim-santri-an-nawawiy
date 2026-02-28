@@ -86,13 +86,7 @@
                                 class="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">Dashboard</a>
                         @else
                             <a href="{{ route('login') }}"
-                                class="text-sm font-semibold px-5 py-2.5 rounded-md text-foreground hover:bg-muted transition-all mr-2">Login
-                                Wali Santri</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}"
-                                    class="text-sm font-semibold px-5 py-2.5 rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-all">Pendaftaran
-                                    Baru</a>
-                            @endif
+                                class="text-sm font-semibold px-5 py-2.5 rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-all">Login</a>
                         @endauth
                     @endif
                 </div>
