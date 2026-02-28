@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->foreignId('guardian_id')->constrained('guardians')->onDelete('cascade');
-            $table->string('nis', 20)->unique(); // YYYY.UU.NNNN
+            $table->string('nis', 20)->unique();
             $table->string('full_name');
             $table->enum('unit_code', ['01', '02', '03']); // 01=SMP, 02=SMA, 03=PPTQ
             $table->enum('residence_status', ['MONDOK', 'NON_MONDOK', 'NGAJI_ONLY']);

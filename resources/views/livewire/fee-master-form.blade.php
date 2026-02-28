@@ -16,7 +16,7 @@
                             <a href="{{ route('admin.fee-categories.create') }}"
                                 class="text-xs text-primary hover:underline">+ Kategori Baru</a>
                         </div>
-                        <select wire:model="fee_category_id" id="fee_category_id"
+                        <select wire:model.live="fee_category_id" id="fee_category_id"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Pilih Kategori</option>
                             @foreach ($this->feeCategories as $cat)
@@ -33,7 +33,7 @@
                         <label for="item_name" class="block text-sm font-medium text-foreground mb-1">Nama Item
                             Biaya</label>
                         <input wire:model="item_name" type="text" id="item_name"
-                            placeholder="contoh: SPP Januari 2026"
+                            placeholder="contoh: SPP 2026"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('item_name')
                             <span class="text-destructive text-sm">{{ $message }}</span>

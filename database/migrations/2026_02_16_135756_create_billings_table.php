@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('billings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
-            $table->string('title'); // "SPP Maret 2026"
+            $table->string('title');
             $table->decimal('original_amount', 12, 2);
             $table->decimal('discount_applied', 12, 2)->default(0);
             $table->decimal('final_amount', 12, 2);

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('billing_id')->constrained('billings')->onDelete('cascade');
-            $table->string('payment_method'); // 'CASH', 'VA', etc.
+            $table->string('payment_method');
             $table->decimal('amount', 12, 2);
             $table->timestamp('paid_at');
             $table->timestamps();

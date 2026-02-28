@@ -56,19 +56,22 @@ class BillingService
 
         $totalOriginalAmount = 0;
         $totalDiscount = 0;
+        $discounts = collect();
+
+        if ($student->special_status !== 'UMUM') {
+            $feeIds = $fees->pluck('id');
+            $discounts = Discount::whereIn('fee_master_id', $feeIds)
+                ->where('target_status', $student->special_status)
+                ->get()
+                ->keyBy('fee_master_id');
+        }
 
         foreach ($fees as $fee) {
             $amount = $fee->amount;
             $discountAmount = 0;
 
-            // 2. Check for Discounts
-            // Discount links to a FeeMaster and a Target Status.
-            // If student has a special_status (YATIM, ANAK_GURU), check for discounts.
             if ($student->special_status !== 'UMUM') {
-                $discount = Discount::where('fee_master_id', $fee->id)
-                    ->where('target_status', $student->special_status)
-                    ->first();
-
+                $discount = $discounts[$fee->id] ?? null;
                 if ($discount) {
                     $discountAmount = $discount->discount_amount;
                 }
@@ -120,12 +123,14 @@ class BillingService
             })
             ->get();
 
+        $discounts = $this->loadDiscountsForFees($fees, $student);
+
         $count = 0;
         foreach ($fees as $fee) {
             $title = $fee->item_name;
             $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
             if (!$exists) {
-                $this->createBillFromFee($student, $fee, $title);
+                $this->createBillFromFee($student, $fee, $title, $discounts);
                 $count++;
             }
         }
@@ -156,12 +161,14 @@ class BillingService
             })
             ->get();
 
+        $discounts = $this->loadDiscountsForFees($fees, $student);
+
         $count = 0;
         foreach ($fees as $fee) {
             $title = $fee->item_name . " " . $year;
             $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
             if (!$exists) {
-                $this->createBillFromFee($student, $fee, $title);
+                $this->createBillFromFee($student, $fee, $title, $discounts);
                 $count++;
             }
         }
@@ -194,12 +201,14 @@ class BillingService
             })
             ->get();
 
+        $discounts = $this->loadDiscountsForFees($fees, $student);
+
         $count = 0;
         foreach ($fees as $fee) {
             $title = $fee->item_name . " " . $monthName . " " . $year;
             $exists = Billing::where('student_id', $student->id)->where('title', $title)->exists();
             if (!$exists) {
-                $this->createBillFromFee($student, $fee, $title);
+                $this->createBillFromFee($student, $fee, $title, $discounts);
                 $count++;
             }
         }
@@ -207,20 +216,40 @@ class BillingService
     }
 
     /**
+     * Eager load discounts for a collection of fees based on student's special status.
+     */
+    private function loadDiscountsForFees($fees, Student $student)
+    {
+        if ($student->special_status === 'UMUM' || $fees->isEmpty()) {
+            return collect();
+        }
+
+        $feeIds = $fees->pluck('id');
+        return Discount::whereIn('fee_master_id', $feeIds)
+            ->where('target_status', $student->special_status)
+            ->get()
+            ->keyBy('fee_master_id');
+    }
+
+    /**
      * Helper to create a billing record from a FeeMaster item.
      */
-    private function createBillFromFee(Student $student, FeeMaster $fee, string $title)
+    private function createBillFromFee(Student $student, FeeMaster $fee, string $title, $discounts = null)
     {
         $amount = $fee->amount;
         $discountAmount = 0;
 
         if ($student->special_status !== 'UMUM') {
-            $discount = Discount::where('fee_master_id', $fee->id)
-                ->where('target_status', $student->special_status)
-                ->first();
+            if ($discounts && isset($discounts[$fee->id])) {
+                $discountAmount = $discounts[$fee->id]->discount_amount;
+            } elseif ($discounts === null) {
+                $discount = Discount::where('fee_master_id', $fee->id)
+                    ->where('target_status', $student->special_status)
+                    ->first();
 
-            if ($discount) {
-                $discountAmount = $discount->discount_amount;
+                if ($discount) {
+                    $discountAmount = $discount->discount_amount;
+                }
             }
         }
 

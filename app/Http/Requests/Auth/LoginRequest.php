@@ -11,9 +11,6 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
@@ -27,7 +24,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'identifier' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -41,45 +38,47 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $input = $this->all();
-        $login_type = filter_var($this->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
+        $identifier = $this->input('identifier');
+        $password = $this->input('password');
         $credentials = [
-            'email' => $this->input('email'),
-            'password' => $this->input('password')
+            'email' => $identifier,
+            'password' => $password,
         ];
 
-        if ($login_type !== 'email') {
-            $username = $this->input('email');
+        // Resolve input to a real user email. Accepts direct email, student NIS, or guardian whatsapp.
+        $userEmail = null;
 
-            $userEmail = null;
-            $student = \App\Models\Student::where('nis', $username)->first();
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $userEmail = $identifier;
+        } else {
+            $student = \App\Models\Student::where('nis', $identifier)->first();
             if ($student && $student->guardian && $student->guardian->user) {
                 $userEmail = $student->guardian->user->email;
             }
 
-            if (!$userEmail) {
-                $guardian = \App\Models\Guardian::where('whatsapp', $username)->first();
+            if (! $userEmail) {
+                $guardian = \App\Models\Guardian::where('whatsapp', $identifier)->first();
                 if ($guardian && $guardian->user) {
                     $userEmail = $guardian->user->email;
                 }
             }
-
-            if (!$userEmail) {
-                RateLimiter::hit($this->throttleKey());
-                throw ValidationException::withMessages([
-                    'email' => trans('auth.failed'),
-                ]);
-            }
-
-            $credentials['email'] = $userEmail;
         }
+
+        if (! $userEmail) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'identifier' => trans('auth.failed'),
+            ]);
+        }
+
+        $credentials['email'] = $userEmail;
 
         if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'identifier' => trans('auth.failed'),
             ]);
         }
 
@@ -114,6 +113,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('identifier')).'|'.$this->ip());
     }
 }

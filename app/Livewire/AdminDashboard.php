@@ -19,14 +19,23 @@ class AdminDashboard extends Component
 
         $incomeData = [];
         $months = [];
+        $startDate = Carbon::now()->subMonths(11)->startOfMonth();
+        $endDate = Carbon::now()->endOfMonth();
+
+        $monthlyIncomes = Billing::where('status', 'PAID')
+            ->whereBetween('updated_at', [$startDate, $endDate])
+            ->get(['final_amount', 'updated_at'])
+            ->groupBy(function ($date) {
+                return Carbon::parse($date->updated_at)->format('m Y');
+            });
+
         for ($i = 11; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
             $monthName = $date->format('M Y');
-            $monthlyIncome = Billing::where('status', 'PAID')
-                ->whereYear('updated_at', $date->year)
-                ->whereMonth('updated_at', $date->month)
-                ->sum('final_amount');
-
+            $monthKey = $date->format('m Y');
+            $monthlyIncome = isset($monthlyIncomes[$monthKey])
+                ? $monthlyIncomes[$monthKey]->sum('final_amount')
+                : 0;
             $incomeData[] = $monthlyIncome;
             $months[] = $monthName;
         }

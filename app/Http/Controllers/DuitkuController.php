@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Duitku\Config;
 use Duitku\Pop;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class DuitkuController extends Controller
 {
@@ -19,8 +20,7 @@ class DuitkuController extends Controller
         $isProduction = env('APP_ENV') === 'production';
 
         $this->duitkuConfig = new Config($apiKey, $merchantCode);
-        // $this->duitkuConfig->setSandboxMode(!$isProduction);
-        $this->duitkuConfig->setSandboxMode(true);
+        $this->duitkuConfig->setSandboxMode(!$isProduction);
         $this->duitkuConfig->setSanitizedMode(false);
         $this->duitkuConfig->setDuitkuLogs(false);
     }
@@ -45,7 +45,7 @@ class DuitkuController extends Controller
         $customerVaName     = $billing->student->guardian?->full_name ?? $billing->student->full_name;
         $callbackUrl        = route('duitku.callback');
         $returnUrl          = route('duitku.return');
-        $expiryPeriod       = 1440; // 24 hours
+        $expiryPeriod = 1440;
 
         $customerDetail = array(
             'firstName'         => $customerVaName,
@@ -92,15 +92,24 @@ class DuitkuController extends Controller
             return back()->with('error', 'Gagal membuat invoice pembayaran: ' . ($response->statusMessage ?? 'Unknown error'));
 
         } catch (Exception $e) {
-            return back()->with('error', 'Error dari Duitku: ' . $e->getMessage());
+            Log::error('Duitku error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Terjadi kesalahan dalam memproses pembayaran');
         }
     }
 
     public function callback(Request $request)
     {
+        Log::info('Duitku callback received', ['payload' => $request->all()]);
+
         try {
             $callback = Pop::callback($this->duitkuConfig);
             $notif = json_decode($callback);
+
+            Log::info('Duitku callback processed', [
+                'resultCode' => $notif->resultCode ?? null,
+                'merchantOrderId' => $notif->merchantOrderId ?? null,
+                'amount' => $notif->amount ?? null,
+            ]);
 
             if ($notif->resultCode == "00") {
                 $merchantOrderId = $notif->merchantOrderId;
@@ -116,10 +125,20 @@ class DuitkuController extends Controller
                         'amount' => $notif->amount,
                         'paid_at' => now(),
                     ]);
+
+                    Log::info('Payment recorded via callback', [
+                        'billing_id' => $billing->id,
+                        'amount' => $notif->amount,
+                        'payment_method' => $notif->paymentCode ?? 'DUITKU',
+                    ]);
                 }
             }
             return response()->json(['success' => true]);
         } catch (Exception $e) {
+            Log::error('Duitku callback error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
