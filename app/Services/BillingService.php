@@ -268,4 +268,27 @@ class BillingService
 
         return $count;
     }
+
+    public function generateOnceBillsForSelectedFees(Student $student, array $feeMasterIds): int
+    {
+        $count = 0;
+
+        DB::transaction(function () use ($student, $feeMasterIds, &$count) {
+            $fees = FeeMaster::whereIn('id', $feeMasterIds)->get();
+            $discounts = $this->loadDiscountsForFees($fees, $student);
+
+            foreach ($fees as $fee) {
+                $this->createBillFromFee($student, $fee, $fee->item_name, $discounts);
+                $count++;
+            }
+        });
+
+        Log::info('Generated once bills for new student', [
+            'student_id' => $student->id,
+            'fee_master_ids' => $feeMasterIds,
+            'count' => $count,
+        ]);
+
+        return $count;
+    }
 }

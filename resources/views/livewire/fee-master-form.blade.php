@@ -32,8 +32,7 @@
                     <div>
                         <label for="item_name" class="block text-sm font-medium text-foreground mb-1">Nama Item
                             Biaya</label>
-                        <input wire:model="item_name" type="text" id="item_name"
-                            placeholder="contoh: SPP 2026"
+                        <input wire:model="item_name" type="text" id="item_name" placeholder="contoh: SPP 2026"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('item_name')
                             <span class="text-destructive text-sm">{{ $message }}</span>
@@ -123,4 +122,55 @@
             </form>
         </div>
     </div>
+
+    @script
+        <script>
+            $wire.on('confirm-fee-creation', (event) => {
+                const data = event[0] || event; // handle array wrapper in different livewire versions
+
+                window.Swal.fire({
+                    title: 'Konfirmasi Tambah Data Biaya',
+                    html: `
+                    <div class="space-y-3 text-left">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Nama Item:</span>
+                            <span class="text-sm font-semibold">${data.itemName}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Jumlah:</span>
+                            <span class="text-sm font-semibold">Rp ${data.amount}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Kategori:</span>
+                            <span class="text-sm font-semibold">${data.category}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Target Unit:</span>
+                            <span class="text-sm font-semibold">${data.unitTarget}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Target Domisili:</span>
+                            <span class="text-sm font-semibold">${data.residenceTarget}</span>
+                        </div>
+                        <div class="flex justify-between border-t border-gray-200 pt-2 mt-2">
+                            <span class="text-sm font-semibold text-gray-800">Total Tagihan Dibuat:</span>
+                            <span class="text-sm font-bold text-blue-600">Akan membuat ${data.studentCount} tagihan</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2 text-center">Lanjutkan?</p>
+                    </div>
+                `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Buat Tagihan',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $wire.dispatch('confirmedSave');
+                    }
+                });
+            });
+        </script>
+    @endscript
 </div>

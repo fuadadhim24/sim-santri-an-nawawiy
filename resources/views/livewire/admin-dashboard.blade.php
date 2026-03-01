@@ -78,9 +78,14 @@
     <div class="bg-card rounded-lg shadow-sm border border-border overflow-hidden mb-8">
         <div class="p-6 border-b border-border flex justify-between items-center">
             <h3 class="text-lg font-semibold text-foreground">Riwayat Pembayaran Terbaru</h3>
-            <a href="{{ route('admin.billings') }}" class="text-sm font-medium text-primary hover:underline">
-                Lihat Semua &rarr;
-            </a>
+            <div class="flex gap-4">
+                <a href="{{ route('admin.billings') }}" class="text-sm font-medium text-primary hover:underline">
+                    Lihat Semua &rarr;
+                </a>
+                <a href="{{ route('admin.fee-masters.archive') }}" class="text-sm font-medium text-primary hover:underline">
+                    Archive Master Biaya
+                </a>
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">

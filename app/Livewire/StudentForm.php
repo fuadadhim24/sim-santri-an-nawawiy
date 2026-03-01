@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\FeeMaster;
 use App\Models\Guardian;
 use App\Models\Student;
 use App\Services\NisGeneratorService;
@@ -33,16 +34,36 @@ class StudentForm extends Component
     #[Rule('nullable|string')]
     public $address = '';
 
-    #[Rule('boolean')]
-    public $is_active = true;
-
+    public $selectedFeeMasters = [];
     public $generatedNis = null;
     public $isEdit = false;
+    public $is_active = true;
+    public $autoGenerateBillings = true;
 
-    // Computed property for guardians to avoid passing it to view every time
     public function getGuardiansProperty()
     {
         return Guardian::orderBy('full_name')->get();
+    }
+
+    public function getFeeMastersProperty()
+    {
+        return FeeMaster::with('category')
+            ->where('is_active', true)
+            ->orderBy('item_name')
+            ->get();
+    }
+
+    public function getMatchingFeeMastersProperty()
+    {
+        if ($this->isEdit) {
+            return collect();
+        }
+
+        return $this->feeMasters->filter(function ($fee) {
+            $unitMatch = empty($fee->unit_target) || str_contains($fee->unit_target, $this->unit_code);
+            $residenceMatch = empty($fee->residence_target) || str_contains($fee->residence_target, $this->residence_status);
+            return $unitMatch && $residenceMatch;
+        });
     }
 
     public function mount(Student $student = null)
@@ -56,9 +77,33 @@ class StudentForm extends Component
             $this->special_status = $student->special_status;
             $this->class_name = $student->class_name;
             $this->address = $student->address;
-            $this->is_active = $student->is_active;
             $this->generatedNis = $student->nis;
             $this->isEdit = true;
+        } else {
+            $this->selectedFeeMasters = [];
+        }
+    }
+
+    public function updatedUnitCode()
+    {
+        if (!$this->isEdit) {
+            $this->selectedFeeMasters = [];
+        }
+    }
+
+    public function updatedResidenceStatus()
+    {
+        if (!$this->isEdit) {
+            $this->selectedFeeMasters = [];
+        }
+    }
+
+    public function updatedAutoGenerateBillings()
+    {
+        if (!$this->isEdit) {
+            if (!$this->autoGenerateBillings) {
+                $this->selectedFeeMasters = [];
+            }
         }
     }
 
@@ -87,8 +132,10 @@ class StudentForm extends Component
 
             $newStudent = Student::create($data);
 
-            // AUTO-GENERATE ONCE BILLINGS (Registration, etc)
-            $billingService->generateOnceBills($newStudent);
+            $selectedFeeMasterIds = array_map('intval', $this->selectedFeeMasters);
+            if (!empty($selectedFeeMasterIds)) {
+                $billingService->generateOnceBillsForSelectedFees($newStudent, $selectedFeeMasterIds);
+            }
 
             session()->flash('message', 'Student created successfully with NIS: ' . $nis);
         }

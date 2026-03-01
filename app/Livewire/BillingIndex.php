@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Billing;
+use App\Services\PaymentService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,30 +14,56 @@ class BillingIndex extends Component
 
     public $search = '';
     public $statusFilter = '';
+    public $showPaymentModal = false;
+    public $selectedBilling = null;
 
-    public function cancelPayment($billingId)
+    protected $listeners = ['openPaymentModal'];
+
+    public function openPaymentModal($billingId)
     {
-        $bill = \App\Models\Billing::find($billingId);
+        $this->selectedBilling = Billing::with('student')->find($billingId);
+        $this->showPaymentModal = true;
+    }
 
-        // Only SUPER_ADMIN can cancel/void payments
-        if (\Illuminate\Support\Facades\Auth::user()->role !== 'SUPER_ADMIN') {
-             return;
+    public function processCashPayment($billingId)
+    {
+        if (!Auth::check() || !in_array(Auth::user()->role, ['ADMIN', 'SUPER_ADMIN'])) {
+            session()->flash('error', 'Unauthorized action.');
+            $this->showPaymentModal = false;
+            return;
         }
 
-        if ($bill && $bill->status == 'PAID') {
-            $bill->update(['status' => 'UNPAID']);
-            session()->flash('message', 'Payment cancelled. Invoice ' . $bill->title . ' reverted to UNPAID.');
+        $billing = Billing::find($billingId);
+
+        if (!$billing || $billing->status !== 'UNPAID') {
+            session()->flash('error', 'Tagihan tidak valid untuk dibayar.');
+            $this->showPaymentModal = false;
+            return;
         }
+
+        try {
+            $paymentService = new PaymentService();
+            $paymentService->processCashPayment($billing, Auth::id());
+
+            session()->flash('message', 'Pembayaran berhasil diproses.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
+        }
+
+        $this->showPaymentModal = false;
+        $this->selectedBilling = null;
     }
 
     public function render()
     {
-        $query = \App\Models\Billing::with('student');
+        $query = Billing::with(['student', 'feeMaster', 'payments'])->where('visible_to_wali', true);
 
         if ($this->search) {
-            $query->whereHas('student', function ($q) {
-                $q->where('full_name', 'like', '%' . $this->search . '%')
-                  ->orWhere('nis', 'like', '%' . $this->search . '%');
+            $query->where(function ($q) {
+                $q->whereHas('student', function ($sq) {
+                    $sq->where('full_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('nis', 'like', '%' . $this->search . '%');
+                })->orWhere('title', 'like', '%' . $this->search . '%');
             });
         }
 

@@ -16,6 +16,13 @@ class PaymentEntry extends Component
     {
         $this->selectedStudent = null;
         $this->unpaidBills = [];
+        $this->selectAll = false;
+        $this->totalAmount = 0;
+    }
+
+    public function toggleSelectAll()
+    {
+        $this->selectAll = !$this->selectAll;
     }
 
     public function selectStudent($studentId)
@@ -27,7 +34,13 @@ class PaymentEntry extends Component
                 ->orderBy('created_at', 'desc')
                 ->get();
             $this->search = '';
+            $this->calculateTotal();
         }
+    }
+
+    public function calculateTotal()
+    {
+        $this->totalAmount = collect($this->unpaidBills)->sum('final_amount');
     }
 
     public function processPayment($billingId)

@@ -56,7 +56,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
-        Route::get('/admin/payments/create', \App\Livewire\PaymentEntry::class)->name('admin.payments.create');
     });
 
     Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('admin.receipts.show');
@@ -70,6 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/fee-masters', \App\Livewire\FeeMasterIndex::class)->name('admin.fee-masters');
         Route::get('/admin/fee-masters/create', \App\Livewire\FeeMasterForm::class)->name('admin.fee-masters.create');
         Route::get('/admin/fee-masters/{feeMaster}/edit', \App\Livewire\FeeMasterForm::class)->name('admin.fee-masters.edit');
+        Route::get('/admin/fee-masters/archive', \App\Livewire\FeeMasterArchive::class)->name('admin.fee-masters.archive');
 
         Route::get('/admin/fee-categories', \App\Livewire\FeeCategoryIndex::class)->name('admin.fee-categories');
         Route::get('/admin/fee-categories/create', \App\Livewire\FeeCategoryForm::class)->name('admin.fee-categories.create');

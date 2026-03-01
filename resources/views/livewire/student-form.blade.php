@@ -47,7 +47,7 @@
                     <!-- Unit -->
                     <div>
                         <label for="unit_code" class="block text-sm font-medium text-foreground">Unit Sekolah</label>
-                        <select wire:model="unit_code" id="unit_code"
+                        <select wire:model.live="unit_code" id="unit_code"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="01">SMP (01)</option>
                             <option value="02">SMA (02)</option>
@@ -60,9 +60,8 @@
 
                     <!-- Residence Status -->
                     <div>
-                        <label for="residence_status" class="block text-sm font-medium text-foreground">Status Tempat
-                            Tinggal</label>
-                        <select wire:model="residence_status" id="residence_status"
+                        <label for="residence_status" class="block text-sm font-medium text-foreground">Status Domisili</label>
+                        <select wire:model.live="residence_status" id="residence_status"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="MONDOK">Mondok</option>
                             <option value="NON_MONDOK">Non Mondok</option>
@@ -111,14 +110,110 @@
                     @enderror
                 </div>
 
-                <!-- Active Status -->
-                <div class="flex items-center">
-                    <input wire:model="is_active" type="checkbox" id="is_active"
-                        class="h-4 w-4 text-primary focus:ring-primary border-input rounded">
-                    <label for="is_active" class="ml-2 block text-sm text-foreground">
-                        Santri Aktif
-                    </label>
-                </div>
+                @if (!$isEdit && $this->matchingFeeMasters->isNotEmpty())
+                    <!-- Auto-generate Billings Checkbox -->
+                    <div class="border-t border-border pt-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <input type="checkbox" wire:model.live="autoGenerateBillings"
+                                class="h-4 w-4 text-primary focus:ring-primary border-input rounded">
+                            <label for="autoGenerateBillings" class="text-sm font-medium text-foreground cursor-pointer">
+                                Generate tagihan otomatis untuk santri baru
+                            </label>
+                        </div>
+
+                        @if ($autoGenerateBillings)
+                            <!-- Fee Master Selection -->
+                            <div>
+                                <h4 class="text-md font-medium text-foreground mb-3">Pilih Tagihan yang Akan Dibuat</h4>
+                                <p class="text-sm text-muted-foreground mb-4">
+                                    Tagihan yang tersedia berdasarkan:
+                                    <span class="font-medium text-foreground">Unit {{ $unit_code == '01' ? 'SMP' : ($unit_code == '02' ? 'SMA' : 'PPTQ') }}</span> •
+                                    <span class="font-medium text-foreground">{{ $residence_status == 'MONDOK' ? 'Mondok' : ($residence_status == 'NON_MONDOK' ? 'Non Mondok' : 'Ngaji Only') }}</span>
+                                </p>
+
+                                <!-- List of billings with checkboxes -->
+                                <div class="space-y-2 max-h-64 overflow-y-auto border border-border rounded-md p-3 bg-muted/30 mb-4">
+                                    @foreach ($this->matchingFeeMasters as $fee)
+                                        <label class="flex items-start space-x-3 p-2 hover:bg-muted rounded cursor-pointer">
+                                            <input type="checkbox" wire:model.live="selectedFeeMasters" value="{{ $fee->id }}"
+                                                class="mt-1 h-4 w-4 text-primary focus:ring-primary border-input rounded">
+                                            <div class="flex-1">
+                                                <span class="text-sm font-medium text-foreground">{{ $fee->item_name }}</span>
+                                                <span class="text-xs text-muted-foreground block">
+                                                    {{ $fee->category->name ?? 'Tanpa Kategori' }} • Rp {{ number_format($fee->amount, 0, ',', '.') }}
+                                                </span>
+                                                <span class="text-xs text-muted-foreground block">
+                                                    @if ($fee->start_date)
+                                                        Mulai: {{ $fee->start_date->format('d M Y') }}
+                                                    @endif
+                                                    @if ($fee->end_date)
+                                                        {{ $fee->start_date ? ' • ' : '' }}Berakhir: {{ $fee->end_date->format('d M Y') }}
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <p class="text-xs text-muted-foreground mb-4">
+                                    Total {{ count($selectedFeeMasters) }} tagihan dipilih dari {{ count($this->matchingFeeMasters) }} yang tersedia.
+                                </p>
+
+                                @if (count($selectedFeeMasters) > 0)
+                                    <!-- Summary table of selected billings -->
+                                    <div>
+                                        <h5 class="text-sm font-medium text-foreground mb-2">Ringkasan Tagihan yang Akan Dibuat:</h5>
+                                        <div class="overflow-x-auto border border-border rounded-md">
+                                            <table class="min-w-full divide-y divide-border">
+                                                <thead class="bg-muted">
+                                                    <tr>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                                            Nama Tagihan
+                                                        </th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                                            Kategori
+                                                        </th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                                            Jumlah
+                                                        </th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                                            Mulai Berlaku
+                                                        </th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                                            Berakhir Pada
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="bg-background divide-y divide-border">
+                                                    @foreach ($this->matchingFeeMasters as $fee)
+                                                        @if (in_array((string) $fee->id, $selectedFeeMasters))
+                                                            <tr class="hover:bg-muted/50">
+                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-foreground">
+                                                                    {{ $fee->item_name }}
+                                                                </td>
+                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-muted-foreground">
+                                                                    {{ $fee->category->name ?? 'Tanpa Kategori' }}
+                                                                </td>
+                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-foreground font-medium">
+                                                                    Rp {{ number_format($fee->amount, 0, ',', '.') }}
+                                                                </td>
+                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-muted-foreground">
+                                                                    {{ $fee->start_date ? $fee->start_date->format('d M Y') : '-' }}
+                                                                </td>
+                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-muted-foreground">
+                                                                    {{ $fee->end_date ? $fee->end_date->format('d M Y') : '-' }}
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                @endif
 
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.students') }}"

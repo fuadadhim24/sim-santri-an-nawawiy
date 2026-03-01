@@ -3,7 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\FeeMaster;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use SweetAlert2\Laravel\Swal;
 
 class FeeMasterForm extends Component
 {
@@ -32,7 +34,7 @@ class FeeMasterForm extends Component
             'amount' => 'required|numeric|min:0',
             'fee_category_id' => 'required|exists:fee_categories,id',
             'unit_target' => 'nullable|in:01,02,03',
-            'residence_target' => 'nullable|in:MONDOK,NON_MONDOK',
+            'residence_target' => 'nullable|in:MONDOK,NON_MONDOK,NGAJI_ONLY',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ];
@@ -57,6 +59,49 @@ class FeeMasterForm extends Component
     {
         $this->validate();
 
+        if (!$this->isEdit) {
+            $query = \App\Models\Student::where('is_active', true);
+            if ($this->unit_target) {
+                $query->where('unit_code', $this->unit_target);
+            }
+            if ($this->residence_target) {
+                $query->where('residence_status', $this->residence_target);
+            }
+            $studentCount = $query->count();
+
+            $feeCategoryName = $this->feeCategories->find($this->fee_category_id)?->name ?? '';
+
+            $this->dispatch('confirm-fee-creation',
+                studentCount: $studentCount,
+                itemName: $this->item_name,
+                amount: number_format($this->amount, 0, ',', '.'),
+                category: $feeCategoryName,
+                unitTarget: $this->unit_target ?? 'Semua Unit',
+                residenceTarget: $this->residence_target ?? 'Semua Status Domisili',
+                startDate: $this->start_date ?: '-',
+                endDate: $this->end_date ?: '-'
+            );
+            return;
+        }
+
+        $this->processSave();
+    }
+
+    #[\Livewire\Attributes\On('confirmedSave')]
+    public function processSave()
+    {
+        $this->validate();
+
+        if ($this->isEdit && (!$this->feeMaster || !$this->feeMaster->exists)) {
+            session()->flash('error', 'Invalid fee master data.');
+            return redirect()->route('admin.fee-masters');
+        }
+
+        if (!$this->isEdit && $this->feeMaster) {
+            session()->flash('error', 'Invalid state for creating new fee master.');
+            return redirect()->route('admin.fee-masters');
+        }
+
         $data = [
             'item_name' => $this->item_name,
             'amount' => $this->amount,
@@ -67,12 +112,81 @@ class FeeMasterForm extends Component
             'end_date' => $this->end_date ?: null,
         ];
 
-        if ($this->isEdit) {
-            $this->feeMaster->update($data);
-            session()->flash('message', 'Fee Master updated successfully.');
+        if (!$this->isEdit) {
+            DB::transaction(function () use ($data) {
+                $feeMaster = FeeMaster::create($data);
+
+                $query = \App\Models\Student::where('is_active', true);
+                if ($this->unit_target) {
+                    $query->where('unit_code', $this->unit_target);
+                }
+                if ($this->residence_target) {
+                    $query->where('residence_status', $this->residence_target);
+                }
+
+                $students = $query->get();
+                foreach ($students as $student) {
+                    \App\Models\Billing::create([
+                        'student_id' => $student->id,
+                        'fee_master_id' => $feeMaster->id,
+                        'title' => $this->item_name,
+                        'original_amount' => $this->amount,
+                        'discount_applied' => 0,
+                        'final_amount' => $this->amount,
+                        'status' => 'UNPAID',
+                        'version' => 1,
+                        'visible_to_wali' => true,
+                    ]);
+                }
+
+                Swal::success([
+                    'title' => 'Data Master Biaya dan ' . $students->count() . ' Tagihan berhasil dibuat.',
+                ]);
+            });
         } else {
-            FeeMaster::create($data);
-            session()->flash('message', 'Fee Master created successfully.');
+            $oldAmount = $this->feeMaster->amount;
+            $oldItemName = $this->feeMaster->item_name;
+
+            if ($oldAmount != $this->amount || $oldItemName != $this->item_name) {
+                DB::transaction(function () use ($data) {
+                    $unpaidBillings = \App\Models\Billing::where('fee_master_id', $this->feeMaster->id)
+                        ->where('status', 'UNPAID')
+                        ->get();
+
+                    foreach ($unpaidBillings as $billing) {
+                        $billing->archive(auth()->id() ?? 1, 'Perubahan Master Biaya');
+
+                        \App\Models\Billing::create([
+                            'student_id' => $billing->student_id,
+                            'fee_master_id' => $this->feeMaster->id,
+                            'title' => $this->item_name,
+                            'original_amount' => $this->amount,
+                            'discount_applied' => $billing->discount_applied,
+                            'final_amount' => max(0, $this->amount - $billing->discount_applied),
+                            'status' => 'UNPAID',
+                            'version_of' => $billing->version_of ?? $billing->id,
+                            'version' => $billing->version + 1,
+                            'visible_to_wali' => true,
+                        ]);
+                    }
+
+                    $this->feeMaster->archive($this->feeMaster->id);
+
+                    FeeMaster::create(array_merge($data, [
+                        'replaced_by' => $this->feeMaster->id,
+                    ]));
+
+                    Swal::success([
+                        'title' => 'Fee Master updated successfully.',
+                    ]);
+                });
+            } else {
+                $this->feeMaster->update($data);
+
+                Swal::success([
+                    'title' => 'Fee Master updated successfully.',
+                ]);
+            }
         }
 
         return redirect()->route('admin.fee-masters');
