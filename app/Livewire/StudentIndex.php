@@ -19,7 +19,7 @@ class StudentIndex extends Component
                 ->where('full_name', 'like', '%' . $this->search . '%')
                 ->orWhere('nis', 'like', '%' . $this->search . '%')
                 ->latest()
-                ->paginate(10),
+                ->paginate(5),
         ])->layout('layouts.admin');
     }
 }

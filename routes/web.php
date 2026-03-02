@@ -54,6 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/students/{student}/edit', \App\Livewire\StudentForm::class)->name('admin.students.edit');
         Route::get('/admin/students/{student}', \App\Livewire\StudentDetail::class)->name('admin.students.show');
 
+        Route::get('/admin/billings/archive', \App\Livewire\BillingArchive::class)->name('admin.billings.archive');
         Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
     });

@@ -5,24 +5,19 @@ namespace App\Livewire;
 use App\Models\Billing;
 use App\Models\Student;
 use Livewire\Component;
+use SweetAlert2\Laravel\Swal;
 
 class PaymentEntry extends Component
 {
     public $search = '';
     public $selectedStudent = null;
     public $unpaidBills = [];
+    public $billingIdToProcess = null;
 
     public function updatedSearch()
     {
         $this->selectedStudent = null;
         $this->unpaidBills = [];
-        $this->selectAll = false;
-        $this->totalAmount = 0;
-    }
-
-    public function toggleSelectAll()
-    {
-        $this->selectAll = !$this->selectAll;
     }
 
     public function selectStudent($studentId)
@@ -43,20 +38,46 @@ class PaymentEntry extends Component
         $this->totalAmount = collect($this->unpaidBills)->sum('final_amount');
     }
 
-    public function processPayment($billingId)
+    public function confirmPayment($billingId)
     {
         $bill = Billing::find($billingId);
+        log('confirming payment for billing ID: ' . $billingId);
+
+        if ($bill && $bill->status == 'UNPAID') {
+            $this->billingIdToProcess = $billingId;
+
+            $this->dispatch('confirm-payment',
+                billingId: $bill->id,
+                title: $bill->title,
+                amount: number_format($bill->final_amount, 0, ',', '.'),
+                date: $bill->created_at->locale('id')->isoFormat('D MMMM Y'),
+                studentName: $this->selectedStudent->full_name
+            );
+        }
+    }
+
+    #[\Livewire\Attributes\On('confirmed-payment')]
+    public function processPayment()
+    {
+        if (!$this->billingIdToProcess) {
+            return;
+        }
+
+        $bill = Billing::find($this->billingIdToProcess);
 
         if ($bill && $bill->status == 'UNPAID') {
             $bill->update(['status' => 'PAID']);
 
-            // Refresh the list
             $this->unpaidBills = $this->selectedStudent->billings()
                 ->where('status', 'UNPAID')
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            session()->flash('message', 'Payment recorded successfully for: ' . $bill->title);
+            Swal::success([
+                'title' => 'Pembayaran berhasil dicatat untuk: ' . $bill->title,
+            ]);
+
+            $this->billingIdToProcess = null;
         }
     }
 

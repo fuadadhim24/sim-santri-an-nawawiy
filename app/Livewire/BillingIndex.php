@@ -14,16 +14,6 @@ class BillingIndex extends Component
 
     public $search = '';
     public $statusFilter = '';
-    public $showPaymentModal = false;
-    public $selectedBilling = null;
-
-    protected $listeners = ['openPaymentModal'];
-
-    public function openPaymentModal($billingId)
-    {
-        $this->selectedBilling = Billing::with('student')->find($billingId);
-        $this->showPaymentModal = true;
-    }
 
     public function processCashPayment($billingId)
     {
@@ -76,5 +66,19 @@ class BillingIndex extends Component
         return view('livewire.billing-index', [
             'billings' => $billings
         ])->layout('layouts.admin');
+    }
+
+    public function delete($id)
+    {
+        $billing = Billing::find($id);
+        if ($billing) {
+            try {
+                $billing->delete();
+                session()->flash('message', 'Tagihan berhasil diarsipkan secara sementara (soft delete).');
+            } catch (\Exception $e) {
+                // To catch errors like trying to delete paid billing
+                session()->flash('error', $e->getMessage());
+            }
+        }
     }
 }

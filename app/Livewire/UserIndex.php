@@ -20,7 +20,7 @@ class UserIndex extends Component
                     $query->where('name', 'like', '%' . $this->search . '%')
                           ->orWhere('email', 'like', '%' . $this->search . '%');
                 })
-                ->paginate(10),
+                ->paginate(5),
         ])->layout('layouts.admin');
     }
 }

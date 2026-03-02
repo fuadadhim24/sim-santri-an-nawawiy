@@ -35,4 +35,13 @@ class FeeMasterIndex extends Component
             'fees' => $query->orderBy('fee_category_id')->orderBy('unit_target')->paginate(10),
         ])->layout('layouts.admin');
     }
+
+    public function delete($id)
+    {
+        $feeMaster = FeeMaster::find($id);
+        if ($feeMaster) {
+            $feeMaster->delete();
+            session()->flash('message', 'Master biaya berhasil diarsipkan secara sementara (soft delete).');
+        }
+    }
 }

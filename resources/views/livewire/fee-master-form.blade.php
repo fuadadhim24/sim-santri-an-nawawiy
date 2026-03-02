@@ -126,7 +126,7 @@
     @script
         <script>
             $wire.on('confirm-fee-creation', (event) => {
-                const data = event[0] || event; // handle array wrapper in different livewire versions
+                const data = event[0] || event;
 
                 window.Swal.fire({
                     title: 'Konfirmasi Tambah Data Biaya',

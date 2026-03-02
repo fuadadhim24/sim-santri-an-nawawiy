@@ -80,8 +80,7 @@
                                                 Rp {{ number_format($bill->final_amount, 0, ',', '.') }}
                                             </td>
                                             <td class="px-4 py-3 text-center">
-                                                <button wire:click="processPayment({{ $bill->id }})"
-                                                    wire:confirm="Konfirmasi pembayaran tunai untuk {{ $bill->title }}?"
+                                                <button wire:click="confirmPayment({{ $bill->id }})"
                                                     class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium">
                                                     Catat Pembayaran
                                                 </button>
@@ -113,4 +112,48 @@
             </div>
         </div>
     </div>
+
+
+    @script
+        <script>
+            $wire.on('confirm-payment', (event) => {
+                const data = event[0] || event;
+
+                window.Swal.fire({
+                    title: 'Konfirmasi Pembayaran Tunai',
+                    html: `
+                    <div class="space-y-3 text-left">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Nama Santri:</span>
+                            <span class="text-sm font-semibold">${data.studentName}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Tagihan:</span>
+                            <span class="text-sm font-semibold">${data.title}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Tanggal Tagihan:</span>
+                            <span class="text-sm font-semibold">${data.date}</span>
+                        </div>
+                        <div class="flex justify-between border-t border-gray-200 pt-2 mt-2">
+                            <span class="text-sm font-semibold text-gray-800">Jumlah:</span>
+                            <span class="text-sm font-bold text-blue-600">Rp ${data.amount}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2 text-center">Lanjutkan mencatat pembayaran tunai?</p>
+                    </div>
+                `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Catat Pembayaran',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#16a34a',
+                    cancelButtonColor: '#6b7280',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $wire.dispatch('confirmed-payment');
+                    }
+                });
+            });
+        </script>
+    @endscript
 </div>

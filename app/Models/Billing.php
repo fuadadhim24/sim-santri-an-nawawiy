@@ -41,7 +41,7 @@ class Billing extends Model
     protected static function booted(): void
     {
         static::updating(function (Billing $billing) {
-            if ($billing->isPaid() && $billing->isDirty()) {
+            if ($billing->getOriginal('status') === 'PAID' && $billing->isDirty()) {
                 throw new Exception('Tagihan yang sudah dibayar tidak dapat diubah. Data bersifat read-only.');
             }
         });

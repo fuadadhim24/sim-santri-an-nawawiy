@@ -16,6 +16,9 @@
                 </select>
                 <input wire:model.live="search" type="text" placeholder="Cari biaya..."
                     class="w-40 md:w-48 py-2 px-4 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
+                <a href="{{ route('admin.fee-masters.archive') }}"
+                    class="inline-flex items-center justify-center py-2 px-4 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 font-semibold whitespace-nowrap flex-none shrink-0">
+                    Arsip Biaya</a>
                 <a href="{{ route('admin.fee-masters.create') }}"
                     class="inline-flex items-center justify-center py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 font-semibold whitespace-nowrap flex-none shrink-0">+
                     Tambah Biaya</a>
@@ -55,6 +58,9 @@
                             <td class="px-6 py-4 text-center">
                                 <a href="{{ route('admin.fee-masters.edit', $fee) }}"
                                     class="text-primary hover:text-primary/80 font-medium mr-2">Ubah</a>
+                                <button type="button" wire:confirm="Apakah Anda yakin ingin mengarsipkan data ini?"
+                                    wire:click="delete({{ $fee->id }})"
+                                    class="text-destructive hover:text-destructive/80 font-medium">Hapus/Arsip</button>
                             </td>
                         </tr>
                     @empty

@@ -78,6 +78,7 @@
                                                 <span class="text-sm font-bold text-destructive">Rp
                                                     {{ number_format($bill->final_amount, 0, ',', '.') }}</span>
                                                 <a href="{{ route('duitku.pay', [$bill->id, 'force' => 1]) }}"
+                                                    onclick="return confirm('Anda akan diarahkan ke halaman pembayaran otomatis Duitku. Lanjutkan?')"
                                                     class="px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition inline-block">
                                                     Bayar
                                                 </a>
@@ -195,4 +196,6 @@
         </div>
 
     </div>
+
+
 </div>

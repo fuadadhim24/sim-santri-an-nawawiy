@@ -18,7 +18,7 @@ class GuardianIndex extends Component
             'guardians' => Guardian::with('user')
                 ->where('full_name', 'like', '%' . $this->search . '%')
                 ->orWhere('whatsapp', 'like', '%' . $this->search . '%')
-                ->paginate(10),
+                ->paginate(5),
         ])->layout('layouts.admin');
     }
 }
