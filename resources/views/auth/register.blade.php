@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="flex justify-center mb-8">
+        <div class="w-20 h-20 rounded-xl bg-primary/10 border-2 border-dashed border-primary/30 flex items-center justify-center">
+            <span class="text-primary/50 text-xs font-medium">Logo</span>
+        </div>
+    </div>
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -16,6 +21,17 @@
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
                 required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <!-- WhatsApp Number -->
+        <div class="mt-4">
+            <x-input-label for="whatsapp" :value="__('Nomor WhatsApp')" />
+            <x-text-input id="whatsapp" class="block mt-1 w-full" type="tel" name="whatsapp" :value="old('whatsapp')"
+                required autocomplete="tel" />
+            <p class="mt-1 text-sm text-muted-foreground">
+                {{ __('Masukkan nomor WhatsApp aktif untuk komunikasi') }}
+            </p>
+            <x-input-error :messages="$errors->get('whatsapp')" class="mt-2" />
         </div>
 
         <!-- Password -->

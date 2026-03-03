@@ -15,6 +15,9 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Livewire styles (for pages that use Livewire) --}}
+    @livewireStyles
 </head>
 
 <body class="font-sans antialiased">
@@ -36,6 +39,9 @@
         </main>
     </div>
     @include('sweetalert2::alert')
+
+    {{-- Include Livewire scripts at the end of body --}}
+    @livewireScripts
 </body>
 
 </html>

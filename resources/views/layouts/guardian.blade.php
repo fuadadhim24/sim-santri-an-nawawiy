@@ -46,6 +46,17 @@
                     </svg>
                     Dasbor
                 </a>
+
+                <a href="{{ route('wali.spmb-schedules') }}"
+                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('wali.spmb-schedules*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('wali.spmb-schedules*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                    </svg>
+                    Pendaftaran SPMB
+                </a>
             </nav>
 
             <div class="border-t border-sidebar-border p-4">

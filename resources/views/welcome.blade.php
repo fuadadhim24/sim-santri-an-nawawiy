@@ -87,6 +87,8 @@
                         @else
                             <a href="{{ route('login') }}"
                                 class="text-sm font-semibold px-5 py-2.5 rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-all">Login</a>
+                            <a href="{{ route('register') }}"
+                                class="text-sm ml-2 font-semibold px-5 py-2.5 rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90 transition-all">Daftar Wali Santri</a>
                         @endauth
                     @endif
                 </div>

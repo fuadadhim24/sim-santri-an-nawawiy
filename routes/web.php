@@ -40,6 +40,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['role:WALI_SANTRI'])->group(function () {
         Route::get('/my-dashboard', \App\Livewire\GuardianDashboard::class)->name('wali.dashboard');
+        Route::get('/spmb-schedules', \App\Livewire\SpmbScheduleSelection::class)->name('wali.spmb-schedules');
+        Route::get('/spmb/register', \App\Livewire\SpmbStudentRegistration::class)->name('wali.spmb.register');
+        Route::get('/students/{student}', \App\Livewire\StudentDetail::class)->name('wali.students.show');
     });
 
     Route::middleware(['role:SUPER_ADMIN,ADMIN_TU'])->group(function () {
@@ -53,10 +56,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/students/create', \App\Livewire\StudentForm::class)->name('admin.students.create');
         Route::get('/admin/students/{student}/edit', \App\Livewire\StudentForm::class)->name('admin.students.edit');
         Route::get('/admin/students/{student}', \App\Livewire\StudentDetail::class)->name('admin.students.show');
+        Route::get('/admin/student-acceptance', \App\Livewire\StudentAcceptance::class)->name('admin.student-acceptance');
 
         Route::get('/admin/billings/archive', \App\Livewire\BillingArchive::class)->name('admin.billings.archive');
         Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
+
+        Route::get('/admin/spmb-schedules', \App\Livewire\SpmbScheduleIndex::class)->name('admin.spmb-schedules');
+        Route::get('/admin/spmb-schedules/create', \App\Livewire\SpmbScheduleForm::class)->name('admin.spmb-schedules.create');
+        Route::get('/admin/spmb-schedules/{id}/edit', \App\Livewire\SpmbScheduleForm::class)->name('admin.spmb-schedules.edit');
     });
 
     Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('admin.receipts.show');

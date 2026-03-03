@@ -28,6 +28,9 @@
                     <tr>
                         <th class="px-6 py-3">Kode</th>
                         <th class="px-6 py-3">Nama Kategori</th>
+                        <th class="px-6 py-3">Mode Aktivasi</th>
+                        <th class="px-6 py-3 text-center">Kunci</th>
+                        <th class="px-6 py-3 text-center">Sebelum Diterima</th>
                         <th class="px-6 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -36,19 +39,60 @@
                         <tr class="hover:bg-muted/50 transition-colors">
                             <td class="px-6 py-4 font-mono font-bold text-primary">{{ $category->code }}</td>
                             <td class="px-6 py-4 font-medium text-foreground">{{ $category->name }}</td>
+                            <td class="px-6 py-4">
+                                @if($category->activation_mode === 'single_active_per_key')
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Single Active Per Key
+                                    </span>
+                                @elseif($category->activation_mode === 'multi_active')
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Multi Active
+                                    </span>
+                                @elseif($category->activation_mode === 'manual_only')
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Manual Only
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($category->is_locked)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Terkunci
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        Terbuka
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($category->can_generate_before_acceptance)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Ya
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Tidak
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center space-x-3">
                                     <a href="{{ route('admin.fee-categories.edit', $category->id) }}"
                                         class="text-primary hover:text-primary/80 font-medium">Edit</a>
-                                    <button wire:click="delete({{ $category->id }})"
-                                        wire:confirm="Hapus kategori ini? Biaya yang terkait mungkin akan kehilangan kategorinya."
-                                        class="text-destructive hover:text-destructive/80 font-medium">Hapus</button>
+                                    @if(!$category->is_locked)
+                                        <button wire:click="delete({{ $category->id }})"
+                                            wire:confirm="Hapus kategori ini? Biaya yang terkait mungkin akan kehilangan kategorinya."
+                                            class="text-destructive hover:text-destructive/80 font-medium">Hapus</button>
+                                    @else
+                                        <span class="text-muted-foreground text-xs">Terkunci</span>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-muted-foreground">
+                            <td colspan="6" class="px-6 py-8 text-center text-muted-foreground">
                                 Tidak ada kategori ditemukan.
                             </td>
                         </tr>

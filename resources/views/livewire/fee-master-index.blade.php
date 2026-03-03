@@ -61,7 +61,7 @@
                                 <button type="button" wire:confirm="Apakah Anda yakin ingin mengarsipkan data ini?"
                                     wire:click="delete({{ $fee->id }})"
                                     class="text-destructive hover:text-destructive/80 font-medium">Hapus/Arsip</button>
-                            </td>
+                                </td>
                         </tr>
                     @empty
                         <tr>

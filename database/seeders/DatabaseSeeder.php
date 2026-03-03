@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             FeeCategorySeeder::class,
             FeeMasterSeeder::class,
             BillingSeeder::class,
+            SpmbScheduleSeeder::class,
         ]);
     }
 }

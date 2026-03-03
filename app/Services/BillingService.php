@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Models\Billing;
 use App\Models\Discount;
+use App\Models\FeeCategory;
 use App\Models\FeeMaster;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class BillingService
 {
@@ -17,6 +19,13 @@ class BillingService
      */
     public function generateBill(Student $student, int $feeCategoryId, string $title, ?string $feeItemName = null)
     {
+        $category = FeeCategory::find($feeCategoryId);
+        if (!$category) {
+            return null;
+        }
+
+        $this->validateBillingCreation($category, $student);
+
         $query = FeeMaster::where('fee_category_id', $feeCategoryId)
             ->where(function ($q) use ($student) {
                 $q->where('unit_target', $student->unit_code)
@@ -35,6 +44,13 @@ class BillingService
 
         if ($fees->isEmpty()) {
             return null;
+        }
+
+        $firstFee = $fees->first();
+
+        if ($category->isSingleActivePerKey()) {
+            $key = $this->getBillingKey($firstFee, $student);
+            $this->deactivateOldBillings($key);
         }
 
         $totalOriginalAmount = 0;
@@ -70,8 +86,6 @@ class BillingService
 
         $finalAmount = $totalOriginalAmount - $totalDiscount;
 
-        $firstFee = $fees->first();
-
         return Billing::create([
             'student_id' => $student->id,
             'fee_master_id' => $firstFee?->id,
@@ -81,6 +95,83 @@ class BillingService
             'final_amount' => $finalAmount,
             'status' => 'UNPAID',
         ]);
+    }
+
+    /**
+     * Get the billing key for a fee master and student.
+     * This key defines uniqueness for billing records.
+     */
+    private function getBillingKey(FeeMaster $feeMaster, Student $student): array
+    {
+        $category = $feeMaster->category;
+
+        if (!$category) {
+            return [];
+        }
+
+        $key = [
+            'student_id' => $student->id,
+            'fee_category_id' => $category->id,
+        ];
+
+        if ($feeMaster->billing_month) {
+            $key['billing_month'] = $feeMaster->billing_month;
+        }
+
+        if ($feeMaster->unit_target) {
+            $key['unit_target'] = $feeMaster->unit_target;
+        }
+
+        if ($feeMaster->residence_target) {
+            $key['residence_target'] = $feeMaster->residence_target;
+        }
+
+        return $key;
+    }
+
+    /**
+     * Validate billing creation based on category rules.
+     */
+    private function validateBillingCreation(FeeCategory $category, Student $student): void
+    {
+        if ($category->requiresAcceptance()) {
+            if (!$student->isAccepted()) {
+                throw new Exception("Tagihan kategori {$category->name} hanya dapat dibuat untuk siswa dengan status 'diterima'. Status siswa saat ini: {$student->status}");
+            }
+        }
+
+        if ($category->isManualOnly()) {
+            throw new Exception("Tagihan kategori {$category->name} hanya dapat dibuat secara manual melalui antarmuka admin.");
+        }
+    }
+
+    /**
+     * Deactivate old billings that match the given key.
+     */
+    private function deactivateOldBillings(array $key): void
+    {
+        if (empty($key)) {
+            return;
+        }
+
+        $query = Billing::where('status', 'UNPAID');
+
+        foreach ($key as $field => $value) {
+            $query->where($field, $value);
+        }
+
+        $billings = $query->get();
+
+        foreach ($billings as $billing) {
+            $billing->update(['visible_to_wali' => false]);
+
+            Log::info('Deactivated old billing', [
+                'billing_id' => $billing->id,
+                'title' => $billing->title,
+                'student_id' => $billing->student_id,
+                'key' => $key,
+            ]);
+        }
     }
 
     /**
@@ -104,6 +195,17 @@ class BillingService
      */
     private function createBillFromFee(Student $student, FeeMaster $fee, string $title, $discounts = null)
     {
+        $category = $fee->category;
+
+        if ($category) {
+            $this->validateBillingCreation($category, $student);
+
+            if ($category->isSingleActivePerKey()) {
+                $key = $this->getBillingKey($fee, $student);
+                $this->deactivateOldBillings($key);
+            }
+        }
+
         $amount = $fee->amount;
         $discountAmount = 0;
 
@@ -272,12 +374,23 @@ class BillingService
     public function generateOnceBillsForSelectedFees(Student $student, array $feeMasterIds): int
     {
         $count = 0;
+        $skipped = 0;
 
-        DB::transaction(function () use ($student, $feeMasterIds, &$count) {
-            $fees = FeeMaster::whereIn('id', $feeMasterIds)->get();
+        DB::transaction(function () use ($student, $feeMasterIds, &$count, &$skipped) {
+            $fees = FeeMaster::whereIn('id', $feeMasterIds)
+                ->with('category')
+                ->get();
+
             $discounts = $this->loadDiscountsForFees($fees, $student);
 
             foreach ($fees as $fee) {
+                $category = $fee->category;
+
+                if ($category && $category->isManualOnly()) {
+                    $skipped++;
+                    continue;
+                }
+
                 $this->createBillFromFee($student, $fee, $fee->item_name, $discounts);
                 $count++;
             }
@@ -287,6 +400,60 @@ class BillingService
             'student_id' => $student->id,
             'fee_master_ids' => $feeMasterIds,
             'count' => $count,
+            'skipped' => $skipped,
+        ]);
+
+        return $count;
+    }
+
+    /**
+     * Generate all required billings for a student when they are accepted.
+     * This method creates billings for all fee categories that can be generated after acceptance.
+     */
+    public function generateBillingsForAcceptedStudent(Student $student): int
+    {
+        $count = 0;
+
+        DB::transaction(function () use ($student, &$count) {
+            // Get all fee categories that can be generated after acceptance
+            $feeCategories = FeeCategory::where('can_generate_before_acceptance', false)
+                ->where('is_locked', false)
+                ->whereNotIn('activation_mode', ['MANUAL_ONLY'])
+                ->get();
+
+            foreach ($feeCategories as $category) {
+                // Find all fee masters for this category that match the student's profile
+                $feeMasters = FeeMaster::where('fee_category_id', $category->id)
+                    ->where('is_active', true)
+                    ->where(function ($q) use ($student) {
+                        $q->where('unit_target', $student->unit_code)
+                          ->orWhereNull('unit_target');
+                    })
+                    ->where(function ($q) use ($student) {
+                        $q->where('residence_target', $student->residence_status)
+                          ->orWhereNull('residence_target');
+                    })
+                    ->get();
+
+                foreach ($feeMasters as $feeMaster) {
+                    try {
+                        $this->createBillFromFee($student, $feeMaster, $feeMaster->item_name);
+                        $count++;
+                    } catch (Exception $e) {
+                        Log::warning('Failed to generate billing for accepted student', [
+                            'student_id' => $student->id,
+                            'fee_master_id' => $feeMaster->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            }
+        });
+
+        Log::info('Generated billings for accepted student', [
+            'student_id' => $student->id,
+            'student_name' => $student->full_name,
+            'billings_generated' => $count,
         ]);
 
         return $count;
