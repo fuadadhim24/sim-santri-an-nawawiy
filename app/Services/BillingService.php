@@ -458,4 +458,57 @@ class BillingService
 
         return $count;
     }
+
+    /**
+     * Generate billings for a student with specific fee categories selected
+     */
+    public function generateBillingsForStudentWithCategories(Student $student, array $feeCategoryIds): int
+    {
+        $count = 0;
+
+        DB::transaction(function () use ($student, $feeCategoryIds, &$count) {
+            // Get only the selected fee categories
+            $feeCategories = FeeCategory::whereIn('id', $feeCategoryIds)
+                ->where('is_locked', false)
+                ->get();
+
+            foreach ($feeCategories as $category) {
+                // Find all fee masters for this category that match the student's profile
+                $feeMasters = FeeMaster::where('fee_category_id', $category->id)
+                    ->where('is_active', true)
+                    ->where(function ($q) use ($student) {
+                        $q->where('unit_target', $student->unit_code)
+                          ->orWhereNull('unit_target');
+                    })
+                    ->where(function ($q) use ($student) {
+                        $q->where('residence_target', $student->residence_status)
+                          ->orWhereNull('residence_target');
+                    })
+                    ->get();
+
+                foreach ($feeMasters as $feeMaster) {
+                    try {
+                        $this->createBillFromFee($student, $feeMaster, $feeMaster->item_name);
+                        $count++;
+                    } catch (Exception $e) {
+                        Log::warning('Failed to generate billing for selected category', [
+                            'student_id' => $student->id,
+                            'fee_category_id' => $category->id,
+                            'fee_master_id' => $feeMaster->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            }
+        });
+
+        Log::info('Generated billings for selected categories', [
+            'student_id' => $student->id,
+            'student_name' => $student->full_name,
+            'categories_count' => count($feeCategoryIds),
+            'billings_generated' => $count,
+        ]);
+
+        return $count;
+    }
 }

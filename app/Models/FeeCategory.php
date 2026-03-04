@@ -17,6 +17,9 @@ class FeeCategory extends Model
         'is_locked',
         'activation_mode',
         'can_generate_before_acceptance',
+        'unit_target',
+        'domicile_target',
+        'description',
     ];
 
     protected $casts = [

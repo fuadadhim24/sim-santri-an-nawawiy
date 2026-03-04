@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('special_status', ['UMUM', 'ANAK_GURU', 'YATIM'])->default('UMUM');
             $table->string('class_name')->nullable();
             $table->text('address')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }

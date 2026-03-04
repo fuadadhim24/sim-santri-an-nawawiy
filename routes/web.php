@@ -57,6 +57,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/students/{student}/edit', \App\Livewire\StudentForm::class)->name('admin.students.edit');
         Route::get('/admin/students/{student}', \App\Livewire\StudentDetail::class)->name('admin.students.show');
         Route::get('/admin/student-acceptance', \App\Livewire\StudentAcceptance::class)->name('admin.student-acceptance');
+        Route::get('/admin/student-acceptance/{student}/confirm', \App\Livewire\StudentAcceptanceConfirm::class)->name('admin.student-acceptance-confirm');
+        Route::post('/admin/students/{student}/reject', [\App\Http\Controllers\StudentAcceptanceController::class, 'reject'])->name('admin.students.reject');
 
         Route::get('/admin/billings/archive', \App\Livewire\BillingArchive::class)->name('admin.billings.archive');
         Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');

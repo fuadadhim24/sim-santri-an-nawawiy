@@ -48,7 +48,9 @@ class UserSeeder extends Seeder
             'special_status' => 'UMUM',
             'class_name' => '7A',
             'address' => 'Jl. Pendidikan No. 1',
-            'is_active' => true,
+            // new students start inactive and pending acceptance
+            'is_active' => false,
+            'status' => 'menunggu',
         ]);
     }
 }

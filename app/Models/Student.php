@@ -91,17 +91,27 @@ class Student extends Model
 
     public function markAsAccepted(): void
     {
-        $this->update(['status' => StudentStatus::ACCEPTED->value]);
+        // when a student is accepted, also make them active
+        $this->update([
+            'status' => StudentStatus::ACCEPTED->value,
+            'is_active' => true,
+        ]);
     }
 
     public function markAsPending(): void
     {
-        $this->update(['status' => StudentStatus::PENDING->value]);
+        $this->update([
+            'status' => StudentStatus::PENDING->value,
+            'is_active' => false,
+        ]);
     }
 
     public function markAsRejected(): void
     {
-        $this->update(['status' => StudentStatus::REJECTED->value]);
+        $this->update([
+            'status' => StudentStatus::REJECTED->value,
+            'is_active' => false,
+        ]);
     }
 
     public function setStatus(string $status): void
