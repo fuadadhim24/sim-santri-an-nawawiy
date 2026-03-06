@@ -1,354 +1,722 @@
 <!DOCTYPE html>
 <html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>An-Nawawiy</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Manajemen Santri - An-Nawawiy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        background: 'var(--background, #f8f5f0)',
-                        foreground: 'var(--foreground, #3e2723)',
-                        card: 'var(--card, #f8f5f0)',
-                        'card-foreground': 'var(--card-foreground, #3e2723)',
-                        primary: 'var(--primary, #2e7d32)',
-                        'primary-foreground': 'var(--primary-foreground, #ffffff)',
-                        secondary: 'var(--secondary, #e8f5e9)',
-                        'secondary-foreground': 'var(--secondary-foreground, #1b5e20)',
-                        muted: 'var(--muted, #f0e9e0)',
-                        'muted-foreground': 'var(--muted-foreground, #6d4c41)',
-                        destructive: 'var(--destructive, #c62828)',
-                        'destructive-foreground': 'var(--destructive-foreground, #ffffff)',
-                        border: 'var(--border, #e0d6c9)',
-                        input: 'var(--input, #e0d6c9)',
-                        chart: {
-                            1: 'var(--chart-1, #4caf50)',
-                            2: 'var(--chart-2, #388e3c)'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Montserrat', 'sans-serif'],
-                        serif: ['Merriweather', 'serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
+    <link rel="shortcut icon" href="image/pondok.png" type="image/x-icon" />
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+    <link href="style.css" rel="stylesheet" />
 
-        .hero-pattern {
-            background-color: var(--background);
-            background-image: radial-gradient(var(--border) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-
-        .text-gradient {
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(to right, var(--primary), var(--chart-2));
-        }
-    </style>
-</head>
-
-<body class="antialiased min-h-screen flex flex-col bg-background text-foreground font-sans">
-    @php
-        $spmbTotal =
-            (\App\Models\FeeMaster::find(1)->amount ?? 150000) + (\App\Models\FeeMaster::find(2)->amount ?? 1250000);
-        $sppMondok = \App\Models\FeeMaster::find(5)->amount ?? 450000;
-        $sppLaju = \App\Models\FeeMaster::find(4)->amount ?? 200000;
-    @endphp
-
-    <!-- Navbar -->
-    <nav class="fixed w-full z-50 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex-shrink-0 flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center font-bold text-primary-foreground shadow-md">
-                        AN
-                    </div>
-                    <span class="font-bold text-xl tracking-tight text-foreground hidden sm:block font-serif">SIM
-                        An-Nawawiy</span>
-                </div>
-                <div>
-                    @if (Route::has('login'))
-                        @auth
-                            <a href="{{ url('/dashboard') }}"
-                                class="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">Dashboard</a>
-                        @else
-                            <a href="{{ route('login') }}"
-                                class="text-sm font-semibold px-5 py-2.5 rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-all">Login</a>
-                            <a href="{{ route('register') }}"
-                                class="text-sm ml-2 font-semibold px-5 py-2.5 rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90 transition-all">Daftar Wali Santri</a>
-                        @endauth
-                    @endif
-                </div>
-            </div>
+    <!-- font montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&family=Poppins:wght@300;400;700&display=swap" rel="stylesheet" />
+    <!-- font awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- jqueary -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+      integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+  </head>
+  <body>
+    <!-- NAVBAR START -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand fw-bold fs-6" href="#"><img src="image/pondok.png" width="50" />An-Nawawiy</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-lg-flex justify-content-between" id="navbarNavDarkDropdown">
+          <ul class="navbar-nav nav-pills mx-auto mb-2 mb-lg-0 text-center flex-grow-1 justify-content-center align-items-center">
+            <li class="nav-item">
+              <a class="nav-link active mx-1" style="background-color: green" aria-current="page" href="#">Home</a>
+            </li>
+            <!-- dropdown 1 start -->
+            <li class="nav-item dropdown mx-1">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Profile </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="/Sejarah-Pondok/index.html">Sejarah</a></li>
+                <li><a class="dropdown-item" href="#">Visi dan Misi</a></li>
+                <li><a class="dropdown-item" href="#">Struktur Oraganisasi</a></li>
+                <li><a class="dropdown-item" href="/Profile-Pengasuh/index.html">Pengasuh</a></li>
+              </ul>
+            </li>
+            <!-- dropdown 1 end -->
+            <!-- dropdown 2 start -->
+            <li class="nav-item dropdown mx-1">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Lembaga </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="#">TPQ</a></li>
+                <li><a class="dropdown-item" href="/SMP/index.html">SMP</a></li>
+                <li><a class="dropdown-item" href="#">SMA</a></li>
+                <li><a class="dropdown-item" href="#">PPTQ</a></li>
+              </ul>
+            </li>
+            <!-- dropdown 2 end -->
+            <!-- dropdown 3 start -->
+            <li class="nav-item dropdown mx-1">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Informasi </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="#">Kajian</a></li>
+                <li><a class="dropdown-item" href="#">Berita Pondok</a></li>
+                <li><a class="dropdown-item" href="#">Pengumuman</a></li>
+              </ul>
+            </li>
+            <!-- dropdown 3 end -->
+             <!-- dropdown 4 start -->
+            <li class="nav-item dropdown mx-1">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Santri </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="/Dokumentasi-Acara/index.html">Dokumentasi Acara</a></li>
+                <li><a class="dropdown-item" href="#">Diskusi Santri</a></li>
+              </ul>
+            </li>
+            <!-- dropdown 4 end -->
+            <li class="nav-item">
+              <a class="nav-link mx-1" href="#">Pendaftaran</a>
+            </li>
+          </ul>
+          <div class="d-flex flex-column flex-lg-row align-items-center gap-2 ms-lg-auto">
+            @if (Route::has('login'))
+              @auth
+                <a href="{{ url('/dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+              @else
+                <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm me-2">Login</a>
+                <a href="{{ route('register') }}" class="btn btn-light btn-sm text-dark">Daftar Wali Santri</a>
+              @endauth
+            @endif
+          </div>
         </div>
+      </div>
     </nav>
+    <!-- test -->
 
-    <!-- Hero Section -->
-    <div class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 flex-grow flex items-center hero-pattern">
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 w-full">
-            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 font-serif text-foreground">
-                Portal Resmi <br class="hidden md:block" />
-                <span class="text-gradient">Pendidikan & Tagihan</span>
-            </h1>
-            <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed">
-                Kelola administrasi, pendaftaran, dan rincian biaya pendidikan santri Pondok Pesantren An-Nawawiy secara
-                terpadu, transparan, dan mudah.
+    <!-- test -->
+    <!-- NAVBAR END -->
+    <!-- HERO START -->
+    <div class="hero d-flex align-items-center">
+      <div class="container">
+        <div class="row row-cols-lg-2 row-cols-1">
+          <div class="col-lg-7 col-sm-12">
+            <h1 class="display-1 fw-bold text-white mb-4">PPTQ<br />AN-NAWAWIY</h1>
+            <p class="text-white" style="opacity: 88%">Pondok Pesantren dengan program menghafal Al - Qur'an serta memiliki pengetahuan umum yang tinggi</p>
+          </div>
+          <!-- carousel start -->
+          <div class="col-sm-12 col-lg-5">
+            <div class="card">
+              <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  <div class="carousel-item active">
+                    <img src="image/hero-1_2_11zon.jpg" class="d-block w-100"/>
+                  </div>
+                  <div class="carousel-item">
+                    <img src="image/hero-2_1_11zon.jpg" class="d-block w-100" alt="..." />
+                  </div>
+                  <div class="carousel-item">
+                    <img src="image/halaman3.jpg" class="d-block w-100" alt="..." />
+                  </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- carousel end -->
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO END -->
+    <!-- ABOUT START -->
+    <div class="about">
+      <div class="container-fluid">
+        <div class="row row-cols-lg-3 row-cols-1">
+          <div class="col-jumlahsantri text-center py-5 text-white bg-dark">
+            <h3 class="fw-bold">Jumlah Santri</h3>
+            <p>di seluruhl Lembaga Pendidikan Pondok Pesantren Tahfidzul Qur'an An-Nawawiy</p>
+            <div class="row justify-content-center mt-4">
+              <div class="col-4">
+                <img src="image/pondok.png" width="37%" class="my-3" />
+
+              </div>
+              <div class="col-4">
+                <p>Santri Putra</p>
+            <h5 class="mb-4">127</h5>
+              </div>
+              <div class="col-4">
+                <p>Santri Putri</p>
+            <h5 class="mb-4">124</h5>
+              </div>
+            </div>
+            <div class="row justify-content-center mt-4">
+              <div class="col-4">
+                <img src="image/smpq.png" width="37%" class="my-3" />
+
+              </div>
+              <div class="col-4">
+                <p>Siswa Putra</p>
+            <h5 class="mb-4">93</h5>
+              </div>
+              <div class="col-4">
+                <p>Siswa Putri</p>
+            <h5 class="mb-4">72</h5>
+              </div>
+            </div>
+            <div class="row justify-content-center mt-4">
+              <div class="col-4">
+                <img src="image/LOGO SMAQ.png" width="37%" class="my-3" />
+
+              </div>
+              <div class="col-4">
+                <p>Siswa Putra</p>
+            <h5 class="mb-4">32</h5>
+              </div>
+              <div class="col-4">
+                <p>Siswa Putri</p>
+            <h5 class="mb-4">35</h5>
+              </div>
+            </div>
+            <br />
+         </div>
+
+          <div class="col pt-5">
+  <h2 class="text-center fw-bold mb-0">Video Profil Pondok</h2>
+  <p class="text-pengumuman text-center mb-3">
+    <a href="#">Lihat Lainnya</a>
+  </p>
+
+  <div class="ratio ratio-16x9">
+    <iframe src="https://www.youtube.com/embed/BiKLlsuEWxA"
+            title="Video Profil"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+    </iframe>
+    <p></p>
+      </div>
+        </div>
+        <!-- VIDIO PROFIL END -->
+        <!-- PENGUMUMAN START -->
+          <div class="col pt-5 bg-dark text-white">
+            <h3 class="text-center fw-bold mb-0">Pengumuman</h3>
+            <p class="text-pengumuman text-center mb-3">
+              <a href="#">Semua Pengumuman</a>
             </p>
-
-            <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
-                <a href="#biaya"
-                    class="px-8 py-4 rounded-md bg-primary text-primary-foreground font-bold text-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all w-full sm:w-auto text-center border border-transparent">
-                    Lihat Rincian Biaya
-                </a>
-                <a href="{{ route('login') }}"
-                    class="px-8 py-4 rounded-md bg-card text-card-foreground font-bold text-lg shadow-sm hover:shadow-md transition-all w-full sm:w-auto text-center border border-border">
-                    Masuk ke Sistem
-                </a>
-            </div>
+            <ul>
+              <li>Pendaftaran SMP & SMA Al-Qur'an An-Nawawiy Telah dibuka <span class="fw-bold">02 Mei 2023</span>.<a class="text-dua nav-link" href="#">read more</a></li>
+              <li>An-Nawawiy Festival Qur'any 2026 (AFQy) <span class="fw-bold">17 Januari 2026</span></li>
+              <li>Pelaksanaan Ujian Rajab 1447 Hijriyah <span class="fw-bold">05 Januari 2026</span></li>
+            </ul>
+          </div>
+          <!-- PENGUMUMAN END -->
         </div>
+      </div>
     </div>
 
-    <!-- Pricing / Layanan Section -->
-    <div id="biaya" class="relative py-24 bg-card border-t border-border z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl md:text-4xl font-bold text-foreground font-serif">Struktur Biaya & Layanan</h2>
-                <div class="w-24 h-1 bg-primary mx-auto mt-6 mb-4 rounded-full"></div>
-                <p class="mt-4 text-muted-foreground max-w-2xl mx-auto text-lg mb-8">Silakan pelajari paket pendaftaran
-                    awal
-                    dan biaya pendidikan bulanan kami. Modul simulasi checkout tersedia untuk proses verifikasi
-                    integrasi pembayaran Duitku.</p>
+    <!-- ABOUT END -->
+    <!-- PROFIL PENGASUH START -->
 
-                <!-- Demo Accounts Alert -->
-                <div
-                    class="inline-block bg-primary/10 border border-primary/20 rounded-xl p-6 text-left max-w-2xl shadow-sm">
-                    <div class="flex items-center gap-3 mb-3">
-                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <h4 class="font-bold text-foreground text-lg font-serif">Akses Akun Evaluasi (Demo)</h4>
-                    </div>
-                    <p class="text-sm text-muted-foreground mb-4">Untuk keperluan verifikasi dan peninjauan flow
-                        pembayaran secara menyeluruh dari sisi Wali Santri maupun Dashboard Admin, gunakan kredensial
-                        berikut:</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-background rounded-lg p-3 border border-border">
-                            <span class="text-xs font-bold text-primary uppercase tracking-wider block mb-1">Akses Wali
-                                Santri</span>
-                            <div class="text-sm text-foreground"><span class="font-semibold">Email:</span> wali@test.com
-                            </div>
-                            <div class="text-sm text-foreground"><span class="font-semibold">Pass:</span> password</div>
-                        </div>
-                        <div class="bg-background rounded-lg p-3 border border-border">
-                            <span class="text-xs font-bold text-primary uppercase tracking-wider block mb-1">Akses
-                                Admin</span>
-                            <div class="text-sm text-foreground"><span class="font-semibold">Email:</span>
-                                admin@annawawiy.ac.id</div>
-                            <div class="text-sm text-foreground"><span class="font-semibold">Pass:</span> password</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                <!-- Package 1: Pendaftaran Baru / SPMB -->
-                <div
-                    class="bg-background rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-border flex flex-col relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <svg class="w-32 h-32 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z">
-                            </path>
-                        </svg>
-                    </div>
-
-                    <div class="p-8 flex-grow flex flex-col">
-                        <div class="mb-4">
-                            <span
-                                class="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-secondary text-secondary-foreground rounded-full border border-secondary">Paket
-                                Unggulan</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-foreground mb-3 font-serif">SPMB (Pendaftaran Baru)</h3>
-                        <p class="text-muted-foreground text-sm mb-6 flex-grow">Mencakup biaya pendaftaran seleksi awal
-                            dan daftar ulang untuk hak asrama serta fasilitas madrasah.</p>
-
-                        <div class="mb-8 pb-8 border-b border-border">
-                            <span class="text-4xl font-extrabold text-foreground">Rp
-                                {{ number_format($spmbTotal, 0, ',', '.') }}</span>
-                        </div>
-
-                        <ul class="space-y-4 text-sm text-foreground mb-8">
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Biaya Pendaftaran SPMB</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Biaya Daftar Ulang SPMB</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Kitab Pegangan Dasar</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="p-8 pt-0 mt-auto">
-                        <a href="{{ route('checkout.test', ['package' => 'SPMB (Pendaftaran Santri Baru)', 'price' => $spmbTotal]) }}"
-                            class="w-full py-3 rounded-md bg-secondary text-secondary-foreground text-center font-bold transition-all flex justify-center items-center shadow-sm hover:brightness-110 border border-secondary/50">
-                            Simulasi Checkout
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Package 2: SPP Bulanan (Mondok) -->
-                <div
-                    class="bg-background rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 border-2 border-primary flex flex-col relative overflow-hidden transform lg:-translate-y-4">
-                    <div class="absolute top-0 inset-x-0 h-2 bg-primary"></div>
-
-                    <div class="p-8 flex-grow flex flex-col">
-                        <h3 class="text-2xl font-bold text-foreground mb-3 font-serif mt-2">SPP Bulanan (Mondok)</h3>
-                        <p class="text-muted-foreground text-sm mb-6 flex-grow">Iuran komprehensif bulanan untuk
-                            mendukung seluruh fasilitas asrama, konsumsi, dan operasional mengaji santri mukim.</p>
-
-                        <div class="mb-8 pb-8 border-b border-border text-primary">
-                            <span class="text-4xl font-extrabold text-primary">Rp
-                                {{ number_format($sppMondok, 0, ',', '.') }}</span><span
-                                class="text-muted-foreground text-lg ml-1 font-normal">/bulan</span>
-                        </div>
-
-                        <ul class="space-y-4 text-sm text-foreground mb-8">
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Fasilitas Asrama Penuh</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Makan 3x Sehari (Dapur Umum)</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Program Tahfidz & Ekstrakurikuler</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="p-8 pt-0 mt-auto bg-primary/5">
-                        <a href="{{ route('checkout.test', ['package' => 'SPP Bulanan (Mondok)', 'price' => $sppMondok]) }}"
-                            class="w-full py-3 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground text-center font-bold transition-all flex justify-center items-center shadow-md border border-transparent">
-                            Simulasi Checkout
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Package 3: SPP Bulanan (Laju) -->
-                <div
-                    class="bg-background rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-border flex flex-col relative overflow-hidden">
-                    <div class="p-8 flex-grow flex flex-col">
-                        <h3 class="text-2xl font-bold text-foreground mb-3 font-serif mt-2">SPP Bulanan (Laju)</h3>
-                        <p class="text-muted-foreground text-sm mb-6 flex-grow">Biaya SPP bulanan yang dirancang khusus
-                            untuk santri non-mukim (laju) guna menunjang fasilitas belajar madrasah diniyah.</p>
-
-                        <div class="mb-8 pb-8 border-b border-border">
-                            <span class="text-4xl font-extrabold text-foreground">Rp
-                                {{ number_format($sppLaju, 0, ',', '.') }}</span><span
-                                class="text-muted-foreground text-lg ml-1 font-normal">/bulan</span>
-                        </div>
-
-                        <ul class="space-y-4 text-sm text-foreground mb-8">
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Fasilitas Ruang Kelas & Belajar</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span>Akses Perpustakaan & Laboratorium</span>
-                            </li>
-                            <li class="flex items-start gap-3 opacity-60">
-                                <svg class="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                <span class="text-muted-foreground">Tidak Termasuk Makan/Asrama</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="p-8 pt-0 mt-auto">
-                        <a href="{{ route('checkout.test', ['package' => 'SPP Bulanan (Laju)', 'price' => $sppLaju]) }}"
-                            class="w-full py-3 rounded-md bg-card hover:bg-muted text-card-foreground text-center font-bold transition-all flex justify-center items-center shadow-sm border border-border">
-                            Simulasi Checkout
-                        </a>
-                    </div>
-                </div>
-
-            </div>
+    <div class="container-fluid">
+      <div class="mt-5 col" id="tag-headline">
+        <h2 style="font-size: 2.1rem" class="fw-bold py-2">Pengasuh Pondok</h2>
+      </div>
+      <div class="container mt-4">
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-12">
+            <img src="/image/-KH.-Masrur-Yusuf-foto.jpg" style="width: 100%" />
+          </div>
+          <div class="col-lg-5 col-12">
+            <h4 class="fw-bold">KH. Masrur Yusuf</h4>
+            <p align="justify" class="">
+              Beliau terlahir pada tanggal 10 Juni 1948 di Dusun Mengelo, Desa Sooko, Kecamatan Sooko Kab. Mojokerto dari pasangan suami istri, Muhammad Yusuf dan Sa’diyah. Muhammad Yusuf adalah seorang pengusaha serabutan, tetapi ia
+              kemudian sukses dalam berjualan gethuk hingga mampu mempekerjakan tetangga dikanan kirinya.
+            </p>
+            <a href="#" class="text-profilpengasuh"> Selengkapnya </a>
+          </div>
         </div>
+      </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="py-10 border-t border-border bg-background text-center flex-shrink-0 z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-2 text-foreground">
-                    <div
-                        class="w-8 h-8 rounded bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground">
-                        AN</div>
-                    <span class="font-bold font-serif">SIM An-Nawawiy</span>
-                </div>
-                <p class="text-sm text-muted-foreground">
-                    &copy; 2026 PP An-Nawawiy. Seluruh hak cipta dilindungi. <span class="hidden sm:inline">|</span>
-                    <br class="sm:hidden" /> Payment Gateway by <span
-                        class="font-semibold text-primary">Duitku</span>.
-                </p>
-            </div>
+    <!-- PROFIL PENGASUH END -->
+
+    <!-- BERITA START -->
+
+    <div id="project" class="project">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col" id="tag-headline">
+            <h2 style="font-size: 2.1rem" class="fw-bold py-2">Berita Pondok</h2>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- highlight image start -->
+    <div class="container mb-5" id="image-start">
+      <div class="row row-cols-lg-2 row-cols-1">
+        <div class="col-lg-8 col-sm-8 mb-4">
+          <div class="card">
+            <div id="carouselExampleCaptions" class="carousel slide carousel-fade" data-bs-ride="carousel">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="https://ik.imagekit.io/Annawawiy/Untitled%20design%20(3).png?f-auto" class="d-block w-100" alt="..." />
+                  <div class="carousel-caption d-none d-md-block">
+                  </div>
+                </div>
+                <div class="carousel-item ">
+                  <img src="https://ik.imagekit.io/Annawawiy/Untitled%20design%20(2).png?f-auto" class="d-block w-100" alt="..." />
+                  <div class="carousel-caption d-none d-md-block">
+                  </div>
+                </div>
+                <div class="carousel-item">
+                  <img src="https://ik.imagekit.io/Annawawiy/DSC04897.JPG?f-auto" class="d-block w-100" alt="..." />
+                  <div class="carousel-caption d-none d-md-block">
+                  </div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- highlight image end -->
+
+        <div class="col-lg-4 col-sm-8">
+          <h3 class="fw-bold text-center">Terbaru</h3>
+          <hr />
+          <div class="card p-2">
+            <div class="card-body">
+              <h5 class="fw-bold">PPDB 2026</h5>
+              <p>Telah dibuka PPDB SMP & SMA Al-Qur'an An-Nawawiy 2026</p>
+              <a href="#" class="stretched-link"></a>
+            </div>
+          </div>
+          <div class="card p-2">
+            <div class="card-body">
+              <h5 class="fw-bold">Juara MHQ Tingkat Nasional</h5>
+              <p>Siswa SMP Al-Qur'an An-Nawawiy berhasil mendapatkan juara 1, 2 & dan 3....
+              </p>
+              <a href="#" class="stretched-link"></a>
+            </div>
+          </div>
+          <div class="card p-2">
+            <div class="card-body">
+              <h5 class="fw-bold">AFQy 2026</h5>
+              <p>An-Nawawiy Festival Qur'any sukses dilaksanakan pada hari Sabtu, 17 Januari 2026</p>
+              <a href="#" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HIGHLIGHT BERITA END -->
+
+    <!-- BERITA START -->
+    <!-- <div class="container">
+      <div class="card-content">
+        <div class="row row-cols-lg-4 row-cols-2">
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">1</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">1</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">1</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">1</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">2</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">2</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">2</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="card">
+              <a href="#"><img src="image/halaman.JPG" class="w-100 p-2" alt="" /></a>
+              <div class="card-body">
+                <h5 class="card-title">2</h5>
+                <p class="card-text">Ujian ini akan dilaksanakan pada tangal 12 Desember 2022</p>
+                <a href="#" class="stretched-link aria-hidden"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pagination-indi">
+      <li class="page-item previous-page disable"><a class="page-link" href="#">Prev</a></li>
+      <li class="page-item current-page active"><a class="page-link" href="#">1</a></li>
+      <li class="page-item dots"><a class="page-link" href="#">...</a></li>
+      <li class="page-item current-page"><a class="page-link" href="#">5</a></li>
+      <li class="page-item current-page"><a class="page-link" href="#">6</a></li>
+      <li class="page-item dots"><a class="page-link" href="#">...</a></li>
+      <li class="page-item current-page"><a class="page-link" href="#">10</a></li>
+      <li class="page-item next-page"><a class="page-link" href="#">Next</a></li>
+    </div> -->
+    <!-- BERITA END -->
+
+    <!-- KONTEN PONDOK START -->
+    <div class="container mb-5">
+      <div class="row row-cols-lg-2 row-cols-1">
+        <div class="col-lg-10 col-sm-12">
+          <h2 style="font-size: 2.5rem" class="text-dokumentasi">Konten Pondok.</h2>
+        </div>
+
+        <div class="col-lg-2 col-sm-12 align-self-center">
+          <a href="/Dokumentasi-Acara/index.html" class="text-dokumentasi-lainnya text-white">Lihat Semua</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- image start -->
+    <div class="container mb-4">
+      <div class="row">
+        <div class="col-lg-3 col-sm-6">
+          <div class="card m-2">
+            <iframe src="https://www.youtube.com/embed/YyzoYfm7dmU?si=eW-uMS-YFXnJ6SqH"
+            title="Video Profil"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+    </iframe>
+            <div class="card-body">
+              <h5 class="card-title">Murojaah Bersama Juz 1</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card m-2">
+            <iframe src="https://www.youtube.com/embed/28kYfZOTqdw?si=LW3jNW2An85124Gd"
+            title="Video Profil"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+    </iframe>
+            <div class="card-body">
+              <h5 class="card-title">Murojaah Bersama Juz 2</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card m-2">
+            <iframe src="https://www.youtube.com/embed/wURHZXUbVZI?si=jZpEzp_53E6M8dzP"
+            title="Video Profil"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+    </iframe>
+            <div class="card-body">
+              <h5 class="card-title">Murojaah Bersama Juz 3</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card m-2">
+            <iframe src="https://www.youtube.com/embed/https://youtu.be/tu3zgvOTwhY?si=8ekd3V9onD-M42oF"
+            title="Video Profil"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+    </iframe>
+            <div class="card-body">
+              <h5 class="card-title">Murojaah Bersama Juz 4</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- KONTEN PONDOK END -->
+
+    <footer class="text-center text-lg-start bg-dark text-white">
+      <!-- Section: Social media -->
+      <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+        <!-- Left -->
+        <div class="ms-5 d-none d-lg-block fw-bold">
+          <span>Pondok Pesantren Tahfizul Quran An-Nawawiy</span>
+        </div>
+        <!-- Left -->
+
+        <!-- Right -->
+        <div>
+          <div class="dropdown dropdown-footer rounded-3">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Hubungi Kami </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href=" https://api.whatsapp.com/send?phone=085746644232" target="_blank">Ustadz Huda</a></li>
+              <li><a class="dropdown-item" href="https://api.whatsapp.com/send?phone=08563195659" target="_blank">Ustadzah Okta</a></li>
+            </ul>
+          </div>
+          <!-- <a href="" class="logo-sosial logo-sosial-1 me-4 text-reset">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="" class="logo-sosial logo-sosial-2 me-4 text-reset">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="" class="logo-sosial logo-sosial-3 me-4 text-reset">
+            <i class="fab fa-google"></i>
+          </a>
+          <a href="" class="logo-sosial logo-sosial-4 me-4 text-reset">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="" class="logo-sosial logo-sosial-5 me-4 text-reset">
+            <i class="fab fa-youtube"></i>
+          </a> -->
+        </div>
+        <!-- Right -->
+      </section>
+      <!-- Section: Social media -->
+
+      <!-- Section: Links  -->
+      <section class="">
+        <div class="container text-center text-md-start mt-5">
+          <!-- Grid row -->
+          <div class="row mt-3">
+            <!-- Grid column -->
+            <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+              <!-- Content -->
+              <i><img src="image/smpq.png" width="67" class="mb-3" /></i>
+              <h6 class="text-uppercase fw-bold mb-3"><i class=""></i>SMP AL-QUR'AN AN-NAWAWIY</h6>
+              <hr />
+              <p>SMP Al Qur'an An-Nawawiy berlokasi di Mengelo - Sooko - Mojokerto</p>
+            </div>
+            <!-- Grid column -->
+            <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+              <!-- Content -->
+              <i><img src="image/LOGO SMAQ.png" width="67" class="mb-3" /></i>
+              <h6 class="text-uppercase fw-bold mb-3"><i class=""></i>SMA AL-QUR'AN AN-NAWAWIY</h6>
+              <hr />
+              <p>SMA Al Qur'an An- Nawawiy berlokasi di Mengelo - Sooko - Mojokerto</p>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-md-4 col-lg-4 col-xl-3 mx-auto mb-md-0 mt-4">
+              <!-- Links -->
+              <h5 class="fw-bold mb-3">Lokasi Pondok</h5>
+              <!--Google map-->
+              <div id="map-container-google-3" class="z-depth-1-half map-container-3 align-items-center">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.7604045094995!2d112.42749667425213!3d-7.4916852738837285!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e780d7ded31c417%3A0x82190db1566d3d13!2sSMP%20Alquran%20An-nawawiy%20Mangelo%20mojokerto!5e0!3m2!1sen!2sus!4v1683362633997!5m2!1sen!2sus"
+                  width="400"
+                  height="300"
+                  style="border: 0"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            </div>
+            <!-- Grid column -->
+          </div>
+          <!-- Grid row -->
+        </div>
+      </section>
+      <!-- Section: Links  -->
+
+      <!-- Copyright -->
+      <div class="d-flex justify-content-center mt-4" style="background-color: rgba(0, 0, 0, 0.05)">
+         <div class="logo-navbar d-flex gap-4 align-items-center">
+              <a class="nav-link logo-navbar-1 fa-brands fa-youtube fs-5" href="https://www.youtube.com/@PPTQAn-Nawawiy" target="_blank"> </a>
+
+              <a class="nav-link logo-navbar-2 fa-brands fa-instagram fs-5" href="https://www.instagram.com/pptq.annawawiy.mojokerto" target="_blank"> </a>
+
+              <a class="nav-link logo-navbar-3 fa-brands fa-facebook fs-5" href="https://www.facebook.com/profile.php?id=100090290989902&mibextid=ZbWKwL" target="_blank"> </a>
+
+              <a class="nav-link logo-navbar-4 fa-brands fa-tiktok fs-5" href="https://www.tiktok.com/@pptq.annawawiy.mojokerto" target="_blank"> </a>
+            </div>
+             <div class="text-center p-4">
+        © 2023 Copyright:
+        <a class="text-reset fw-bold" href="#">IT An - Nawawiy</a>
+      </div>
+
+      </div>
+
+      <!-- Copyright -->
     </footer>
-</body>
 
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+      function getPageList(totalPages, page, maxLength) {
+        function range(start, end) {
+          return Array.from(Array(end - start + 1), (_, i) => i + start);
+        }
+
+        var sideWidth = maxLength < 9 ? 1 : 2;
+        var leftWidth = (maxLength - sideWidth * 2 - 3) >> 1;
+        var rightWidth = (maxLength - sideWidth * 2 - 3) >> 1;
+
+        if (totalPages <= maxLength) {
+          return range(1, totalPages);
+        }
+
+        if (page <= maxLength - sideWidth - 1 - rightWidth) {
+          return range(1, maxLength - sideWidth - 1).concat(0, range(totalPages - sideWidth + 1, totalPages));
+        }
+
+        if (page >= totalPages - sideWidth - 1 - rightWidth) {
+          return range(1, sideWidth).concat(0, range(totalPages - sideWidth - 1 - rightWidth - leftWidth, totalPages));
+        }
+
+        return range(1, sideWidth).concat(0, range(page - leftWidth, page + rightWidth), 0, range(totalPages - sideWidth + 1, totalPages));
+      }
+
+      $(function () {
+        var numberOfItems = $(".card-content .card").length;
+        var limitPerPage = 4; //How many card items visible per a page
+        var totalPages = Math.ceil(numberOfItems / limitPerPage);
+        var paginationSize = 7; //How many page elements visible in the pagination
+        var currentPage;
+
+        function showPage(whichPage) {
+          if (whichPage < 1 || whichPage > totalPages) return false;
+
+          currentPage = whichPage;
+
+          $(".card-content .card")
+            .hide()
+            .slice((currentPage - 1) * limitPerPage, currentPage * limitPerPage)
+            .show();
+
+          $(".pagination-indi li").slice(1, -1).remove();
+
+          getPageList(totalPages, currentPage, paginationSize).forEach((item) => {
+            $("<li>")
+              .addClass("page-item")
+              .addClass(item ? "current-page" : "dots")
+              .toggleClass("active", item === currentPage)
+              .append(
+                $("<a>")
+                  .addClass("page-link")
+                  .attr({ href: "javascript:void(0)" })
+                  .text(item || "...")
+              )
+              .insertBefore(".next-page");
+          });
+
+          $(".previous-page").toggleClass("disable", currentPage === 1);
+          $(".next-page").toggleClass("disable", currentPage === totalPages);
+          return true;
+        }
+
+        $(".pagination-indi").append(
+          $("<li>")
+            .addClass("page-item")
+            .addClass("previous-page")
+            .append($("<a>").addClass("page-link").attr({ href: "javascript:void(0)" }).text("Prev")),
+          $("<li>")
+            .addClass("page-item")
+            .addClass("next-page")
+            .append($("<a>").addClass("page-link").attr({ href: "javascript:void(0)" }).text("Next"))
+        );
+
+        $(".card-content").show();
+        showPage(1);
+
+        $(document).on("click", ".pagination-indi li.current-page:not(.active)", function () {
+          return showPage(+$(this).text());
+        });
+
+        $(".next-page").on("click", function () {
+          return showPage(currentPage + 1);
+        });
+
+        $(".previous-page").on("click", function () {
+          return showPage(currentPage - 1);
+        });
+      });
+    </script>
+  </body>
 </html>
