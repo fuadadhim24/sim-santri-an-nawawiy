@@ -31,6 +31,21 @@ class SpmbStudentRegistration extends Component
     #[Rule('nullable|string')]
     public $address = '';
 
+    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    public $kk = null;
+
+    #[Rule('required|file|mimes:jpg,jpeg,png|max:1024')]
+    public $foto = null;
+
+    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    public $nisn_document = null;
+
+    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    public $akta = null;
+
+    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    public $ijazah = null;
+
     public function mount()
     {
         $this->scheduleId = session('selected_spmb_schedule_id');
@@ -46,6 +61,14 @@ class SpmbStudentRegistration extends Component
             return redirect()->route('wali.spmb-schedules')
                 ->with('error', 'Jadwal pendaftaran tidak tersedia atau sudah ditutup.');
         }
+    }
+
+    /**
+     * Reset specific file input field
+     */
+    public function removeFile($field)
+    {
+        $this->$field = null;
     }
 
     public function getGuardianProperty()
@@ -79,6 +102,11 @@ class SpmbStudentRegistration extends Component
             'nis' => $nis,
             'is_active' => false,
             'status' => StudentStatus::PENDING->value,
+            'kk' => $this->kk,
+            'foto' => $this->foto,
+            'nisn_document' => $this->nisn_document,
+            'akta' => $this->akta,
+            'ijazah' => $this->ijazah,
         ];
 
         $newStudent = Student::create($data);

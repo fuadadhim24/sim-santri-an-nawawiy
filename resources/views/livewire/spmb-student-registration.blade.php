@@ -137,6 +137,119 @@
                         @enderror
                     </div>
 
+                    <!-- Document Uploads -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">Upload Dokumen</h3>
+                        <p class="text-sm text-gray-600 mb-4">Silakan upload dokumen-dokumen yang diperlukan dalam format JPG, JPEG, PNG, atau PDF.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- KK -->
+                            <div>
+                                <label for="kk" class="block text-sm font-medium text-gray-700">Kartu Keluarga (KK) <span class="text-red-500">*</span></label>
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="kk" id="kk"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                @if($this->kk && !is_string($this->kk))
+                                    <div class="mt-2 flex items-center">
+                                        <span class="text-sm text-gray-600 mr-2">{{ $this->kk->getClientOriginalName() }}</span>
+                                        <button type="button" wire:click="removeFile('kk')" class="text-red-500 hover:text-red-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+                                @error('kk')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Foto -->
+                            <div>
+                                <label for="foto" class="block text-sm font-medium text-gray-700">Pas Foto <span class="text-red-500">*</span></label>
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG (Max: 1MB)</p>
+                                <input type="file" wire:model="foto" id="foto"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                @if($this->foto && !is_string($this->foto))
+                                    <div class="mt-2 flex items-center">
+                                        <span class="text-sm text-gray-600 mr-2">{{ $this->foto->getClientOriginalName() }}</span>
+                                        <button type="button" wire:click="removeFile('foto')" class="text-red-500 hover:text-red-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+                                @error('foto')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- NISN -->
+                            <div>
+                                <label for="nisn_document" class="block text-sm font-medium text-gray-700">Kartu NISN <span class="text-red-500">*</span></label>
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="nisn_document" id="nisn_document"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                @if($this->nisn_document && !is_string($this->nisn_document))
+                                    <div class="mt-2 flex items-center">
+                                        <span class="text-sm text-gray-600 mr-2">{{ $this->nisn_document->getClientOriginalName() }}</span>
+                                        <button type="button" wire:click="removeFile('nisn_document')" class="text-red-500 hover:text-red-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+                                @error('nisn_document')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Akta -->
+                            <div>
+                                <label for="akta" class="block text-sm font-medium text-gray-700">Akta Kelahiran <span class="text-red-500">*</span></label>
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="akta" id="akta"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                @if($this->akta && !is_string($this->akta))
+                                    <div class="mt-2 flex items-center">
+                                        <span class="text-sm text-gray-600 mr-2">{{ $this->akta->getClientOriginalName() }}</span>
+                                        <button type="button" wire:click="removeFile('akta')" class="text-red-500 hover:text-red-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+                                @error('akta')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Ijazah -->
+                            <div>
+                                <label for="ijazah" class="block text-sm font-medium text-gray-700">Ijazah Terakhir <span class="text-red-500">*</span></label>
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="ijazah" id="ijazah"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                @if($this->ijazah && !is_string($this->ijazah))
+                                    <div class="mt-2 flex items-center">
+                                        <span class="text-sm text-gray-600 mr-2">{{ $this->ijazah->getClientOriginalName() }}</span>
+                                        <button type="button" wire:click="removeFile('ijazah')" class="text-red-500 hover:text-red-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+                                @error('ijazah')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="flex justify-end space-x-3 pt-4">
                         <a href="{{ route('wali.spmb-schedules') }}"
@@ -152,66 +265,12 @@
             </div>
         </div>
 
-        <!-- Requirements Section -->
+        <!-- Information Section -->
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Persyaratan Pendaftaran</h3>
-                <p class="text-sm text-gray-600 mb-4">Pastikan Anda telah menyiapkan dokumen-dokumen berikut:</p>
-
-                <ul class="space-y-3 text-sm text-gray-700">
-                    <li class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-medium">Akta Kelahiran</p>
-                            <p class="text-xs text-gray-500">Fotokopi akta kelahiran yang sah</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-medium">Kartu Keluarga</p>
-                            <p class="text-xs text-gray-500">Fotokopi kartu keluarga yang terbaru</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-medium">Pas Foto Terbaru</p>
-                            <p class="text-xs text-gray-500">Pas foto berwarna ukuran 3x4 (2 lembar)</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 mt-0.5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-medium">Ijazah Terakhir</p>
-                            <p class="text-xs text-gray-500">Fotokopi ijazah atau SKL yang dilegalisir</p>
-                        </div>
-                    </li>
-                </ul>
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Informasi Pendaftaran</h3>
+                <p class="text-sm text-gray-600 mb-4">Pastikan semua data yang Anda masukkan sudah benar dan lengkap.</p>
+                <p class="text-sm text-gray-600">Setelah mendaftar, data Anda akan diproses oleh admin untuk verifikasi.</p>
             </div>
         </div>
 
