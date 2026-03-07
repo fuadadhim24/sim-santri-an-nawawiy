@@ -44,6 +44,7 @@ class Student extends Model
         'guardian_id',
         'spmb_schedule_id',
         'school_class_id',
+        'nis',
         'kk',
         'foto',
         'nisn',

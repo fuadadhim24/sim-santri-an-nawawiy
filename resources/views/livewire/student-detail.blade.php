@@ -47,12 +47,16 @@
                         <span class="col-span-2 text-foreground">{{ $student->address ?? '-' }}</span>
                     </div>
                 </div>
-                <div class="mt-6">
-                    <a href="{{ route('admin.students.edit', $student) }}"
-                        class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">
-                        Ubah Santri
-                    </a>
-                </div>
+                @auth
+                    @if (Auth::user()->role === 'SUPER_ADMIN' || Auth::user()->role === 'ADMIN_TU')
+                        <div class="mt-6">
+                            <a href="{{ route('admin.students.edit', $student) }}"
+                                class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">
+                                Ubah Santri
+                            </a>
+                        </div>
+                    @endif
+                @endauth
             </div>
 
             <!-- Guardian Info -->
@@ -72,12 +76,16 @@
                         <span class="col-span-2 text-foreground">{{ $student->guardian->user->email ?? '-' }}</span>
                     </div>
                 </div>
-                <div class="mt-6">
-                    <a href="{{ route('admin.guardians.edit', $student->guardian) }}"
-                        class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">
-                        Ubah Wali
-                    </a>
-                </div>
+                @auth
+                    @if (Auth::user()->role === 'SUPER_ADMIN' || Auth::user()->role === 'ADMIN_TU')
+                        <div class="mt-6">
+                            <a href="{{ route('admin.guardians.edit', $student->guardian) }}"
+                                class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">
+                                Ubah Wali
+                            </a>
+                        </div>
+                    @endif
+                @endauth
             </div>
         </div>
 

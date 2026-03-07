@@ -22,16 +22,22 @@ class RoleMiddleware
 
         $user = Auth::user();
 
+        // If no roles are specified, allow access
+        if (empty($roles)) {
+            return $next($request);
+        }
+
         if (in_array($user->role, $roles)) {
             return $next($request);
         }
 
+        // If user doesn't have the required role, redirect based on their actual role
         if ($user->role === 'WALI_SANTRI') {
-            return redirect()->route('dashboard');
+            return redirect()->route('wali.dashboard');
         }
 
         if (in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU'])) {
-            return redirect()->route('dashboard');
+            return redirect()->route('admin.dashboard');
         }
 
         abort(403, 'Unauthorized action.');

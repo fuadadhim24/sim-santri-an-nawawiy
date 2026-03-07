@@ -72,15 +72,13 @@ class GuardianDashboard extends Component
                 ->get();
         }
 
-        // Get active SPMB schedules
         $activeSpmbSchedules = SpmbSchedule::where('is_active', true)
             ->orderBy('registration_start', 'desc')
-            ->get();
+            ->get()
+            ->unique('name');
 
-        // For each schedule, get registered students for this guardian
         $schedulesWithStudents = [];
         foreach ($activeSpmbSchedules as $schedule) {
-            // Get students for this guardian that are associated with this schedule
             $studentsInSchedule = Student::where('guardian_id', $guardian->id)
                 ->where('created_at', '>=', $schedule->registration_start)
                 ->where('created_at', '<=', $schedule->registration_end->addDay()) // Include end date

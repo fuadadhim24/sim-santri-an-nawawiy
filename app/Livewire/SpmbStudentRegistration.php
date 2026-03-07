@@ -10,9 +10,11 @@ use App\Services\NisGeneratorService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class SpmbStudentRegistration extends Component
 {
+    use WithFileUploads;
     public $selectedSchedule;
     public $scheduleId;
 
