@@ -187,7 +187,7 @@
 
                             <!-- NISN -->
                             <div>
-                                <label for="nisn_document" class="block text-sm font-medium text-gray-700">Kartu NISN <span class="text-red-500">*</span></label>
+                                <label for="nisn_document" class="block text-sm font-medium text-gray-700">Kartu NISN (Opsional)</label>
                                 <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
                                 <input type="file" wire:model="nisn_document" id="nisn_document"
                                     class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">

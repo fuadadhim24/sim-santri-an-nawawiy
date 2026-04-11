@@ -34,6 +34,9 @@ class StudentForm extends Component
     #[Rule('nullable|string')]
     public $address = '';
 
+    #[Rule('nullable|string|max:20')]
+    public $nisn = '';
+
     public $selectedFeeMasters = [];
     public $generatedNis = null;
     public $isEdit = false;
@@ -77,6 +80,7 @@ class StudentForm extends Component
             $this->special_status = $student->special_status;
             $this->class_name = $student->class_name;
             $this->address = $student->address;
+            $this->nisn = $student->nisn;
             $this->generatedNis = $student->nis;
             $this->isEdit = true;
         } else {
@@ -119,6 +123,7 @@ class StudentForm extends Component
             'special_status' => $this->special_status,
             'class_name' => $this->class_name,
             'address' => $this->address,
+            'nisn' => $this->nisn,
             'is_active' => $this->is_active,
         ];
 

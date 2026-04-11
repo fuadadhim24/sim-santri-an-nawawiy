@@ -39,7 +39,7 @@ class SpmbStudentRegistration extends Component
     #[Rule('required|file|mimes:jpg,jpeg,png|max:1024')]
     public $foto = null;
 
-    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    #[Rule('nullable|file|mimes:jpg,jpeg,png,pdf|max:2048')]
     public $nisn_document = null;
 
     #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
@@ -93,6 +93,12 @@ class SpmbStudentRegistration extends Component
         $year = date('Y');
         $nis = $nisService->generate($this->unit_code, $year);
 
+        $kkPath = $this->kk ? $this->kk->store('student-documents/kk', 'public') : null;
+        $fotoPath = $this->foto ? $this->foto->store('student-documents/foto', 'public') : null;
+        $nisnDocPath = $this->nisn_document ? $this->nisn_document->store('student-documents/nisn', 'public') : null;
+        $aktaPath = $this->akta ? $this->akta->store('student-documents/akta', 'public') : null;
+        $ijazahPath = $this->ijazah ? $this->ijazah->store('student-documents/ijazah', 'public') : null;
+
         $data = [
             'guardian_id' => $guardian->id,
             'spmb_schedule_id' => $this->scheduleId,
@@ -104,11 +110,11 @@ class SpmbStudentRegistration extends Component
             'nis' => $nis,
             'is_active' => false,
             'status' => StudentStatus::PENDING->value,
-            'kk' => $this->kk,
-            'foto' => $this->foto,
-            'nisn_document' => $this->nisn_document,
-            'akta' => $this->akta,
-            'ijazah' => $this->ijazah,
+            'kk' => $kkPath,
+            'foto' => $fotoPath,
+            'nisn_document' => $nisnDocPath,
+            'akta' => $aktaPath,
+            'ijazah' => $ijazahPath,
         ];
 
         $newStudent = Student::create($data);

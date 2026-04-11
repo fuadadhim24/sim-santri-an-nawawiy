@@ -9,11 +9,33 @@
 
                 @if ($isEdit)
                     <!-- NIS Display (Read Only) -->
-                    <div>
-                        <label class="block text-sm font-medium text-foreground">NIS</label>
-                        <div class="mt-1 p-2 bg-muted rounded-md text-muted-foreground font-mono">
-                            {{ $generatedNis }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-foreground">NIS</label>
+                            <div class="mt-1 p-2 bg-muted rounded-md text-muted-foreground font-mono">
+                                {{ $generatedNis }}
+                            </div>
                         </div>
+                        
+                        <!-- NISN Input (Edit mode side-by-side with NIS if desired, but let's just use standard flow) -->
+                        <div>
+                            <label for="nisn" class="block text-sm font-medium text-foreground">NISN</label>
+                            <input wire:model="nisn" type="text" id="nisn" placeholder="Masukkan NISN (opsional)"
+                                class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            @error('nisn')
+                                <span class="text-destructive text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                @else
+                    <!-- NISN Input (Create mode) -->
+                    <div>
+                        <label for="nisn" class="block text-sm font-medium text-foreground">NISN</label>
+                        <input wire:model="nisn" type="text" id="nisn" placeholder="Masukkan NISN (opsional)"
+                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                        @error('nisn')
+                            <span class="text-destructive text-sm">{{ $message }}</span>
+                        @enderror
                     </div>
                 @endif
 
