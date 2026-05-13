@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Billing;
+use App\Services\SecurePaymentService;
 use Illuminate\Http\Request;
 use Duitku\Config;
 use Duitku\Pop;
@@ -12,8 +13,9 @@ use Illuminate\Support\Facades\Log;
 class DuitkuController extends Controller
 {
     private $duitkuConfig;
+    protected $securePaymentService;
 
-    public function __construct()
+    public function __construct(SecurePaymentService $securePaymentService)
     {
         $merchantCode = env('DUITKU_MERCHANT_CODE');
         $apiKey = env('DUITKU_API_KEY');
@@ -23,6 +25,8 @@ class DuitkuController extends Controller
         $this->duitkuConfig->setSandboxMode(!$isProduction);
         $this->duitkuConfig->setSanitizedMode(false);
         $this->duitkuConfig->setDuitkuLogs(false);
+        
+        $this->securePaymentService = $securePaymentService;
     }
 
     public function createInvoice($billingId, Request $request = null)
@@ -111,35 +115,32 @@ class DuitkuController extends Controller
                 'amount' => $notif->amount ?? null,
             ]);
 
-            if ($notif->resultCode == "00") {
-                $merchantOrderId = $notif->merchantOrderId;
-                $billingId = explode('-', $merchantOrderId)[0];
+            $billing = Billing::where('payment_reference', $notif->merchantOrderId)->first();
 
-                $billing = Billing::find($billingId);
-                if ($billing && $billing->status !== 'PAID') {
-                    $billing->update(['status' => 'PAID']);
-
-                    \App\Models\Payment::create([
-                        'billing_id' => $billing->id,
-                        'payment_method' => $notif->paymentCode ?? 'DUITKU',
-                        'amount' => $notif->amount,
-                        'paid_at' => now(),
-                    ]);
-
-                    Log::info('Payment recorded via callback', [
-                        'billing_id' => $billing->id,
-                        'amount' => $notif->amount,
-                        'payment_method' => $notif->paymentCode ?? 'DUITKU',
-                    ]);
-                }
+            if (!$billing) {
+                return response()->json(['error' => 'Billing not found'], 404);
             }
-            return response()->json(['success' => true]);
+
+            try {
+                $payment = $this->securePaymentService->processDuitkuPaymentSecurely([
+                    'merchantOrderId' => $notif->merchantOrderId,
+                    'amount' => $notif->amount,
+                    'reference' => $notif->reference,
+                    'resultCode' => $notif->resultCode,
+                    'paymentCode' => $notif->paymentCode,
+                ]);
+
+                return response()->json(['success' => true, 'payment' => $payment->id]);
+            } catch (Exception $e) {
+                Log::error('Payment processing failed: ' . $e->getMessage());
+                return response()->json(['error' => $e->getMessage()], 422);
+            }
         } catch (Exception $e) {
             Log::error('Duitku callback error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 

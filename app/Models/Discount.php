@@ -10,7 +10,12 @@ class Discount extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'fee_master_id',
+        'target_status',
+        'discount_amount',
+        'description',
+    ];
 
     public function feeMaster(): BelongsTo
     {

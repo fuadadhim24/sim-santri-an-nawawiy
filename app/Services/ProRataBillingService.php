@@ -38,15 +38,30 @@ class ProRataBillingService
         Carbon $periodEnd
     ): array {
         try {
+            if ($periodEnd <= $periodStart) {
+                throw new Exception('Tanggal berakhir harus setelah tanggal mulai periode.');
+            }
+
+            if ($monthlyAmount < 0) {
+                throw new Exception('Jumlah biaya bulanan tidak boleh negatif.');
+            }
+
+            if (!$student || !$student->exists) {
+                throw new Exception('Data santri tidak valid.');
+            }
+
             // Determine effective billing period based on student's join/left dates
             $effectiveStart = $this->getEffectiveStartDate($student, $periodStart);
             $effectiveEnd = $this->getEffectiveEndDate($student, $periodEnd);
 
             // Calculate days the student is responsible for
-            $totalDays = $periodStart->diffInDays($periodEnd) + 1; // +1 untuk include tanggal awal
-            $activeDays = $effectiveStart->diffInDays($effectiveEnd) + 1;
+            $totalDays = $periodStart->diffInDays($periodEnd) + 1;
+            $activeDays = max(0, $effectiveStart->diffInDays($effectiveEnd) + 1);
 
-            // Check if free billing applies
+            if ($activeDays < 0) {
+                throw new Exception('Perhitungan hari aktif tidak valid.');
+            }
+
             if ($this->shouldBeFreeBilling($student, $periodStart, $periodEnd)) {
                 return [
                     'type' => 'free',
@@ -57,7 +72,6 @@ class ProRataBillingService
                 ];
             }
 
-            // Full month billing
             if ($activeDays >= $totalDays) {
                 return [
                     'type' => 'full',
@@ -68,11 +82,13 @@ class ProRataBillingService
                 ];
             }
 
-            // Pro-rata billing
             $rate = ($activeDays / $totalDays) * 100;
             $prorataAmount = ($monthlyAmount / $totalDays) * $activeDays;
 
-            // Round to nearest Rp1000
+            if ($prorataAmount < 0) {
+                throw new Exception('Jumlah pro-rata yang dihitung tidak boleh negatif.');
+            }
+
             $prorataAmount = round($prorataAmount / 1000) * 1000;
 
             return [

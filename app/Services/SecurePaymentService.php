@@ -157,6 +157,19 @@ class SecurePaymentService
      */
     public function processDuitkuPaymentSecurely(array $callbackData): Payment
     {
+        // IDEMPOTENCY CHECK - Prevent duplicate processing
+        $reference = $callbackData['reference'] ?? null;
+        if ($reference) {
+            $existingPayment = Payment::where('duitku_reference', $reference)->first();
+            if ($existingPayment) {
+                Log::info('Duitku payment already processed (idempotent)', [
+                    'payment_id' => $existingPayment->id,
+                    'reference' => $reference,
+                ]);
+                return $existingPayment;
+            }
+        }
+
         // Validate callback
         $validated = $this->validateDuitkuCallback($callbackData);
         $billing = $validated['billing'];
@@ -216,12 +229,18 @@ class SecurePaymentService
     }
 
     /**
-     * VERIFY Duitku webhook signature (implement with actual Duitku SDK)
+     * VERIFY Duitku webhook signature - Prevents fraud
      */
     private function verifyDuitkuSignature(array $data): bool
     {
-        // TODO: Implement with Duitku SDK
-        // For now, return true (implement proper signature verification)
-        return true;
+        $merchantOrderId = $data['merchantOrderId'] ?? '';
+        $amount = $data['amount'] ?? 0;
+        $signature = $data['signature'] ?? '';
+
+        $merchantKey = config('payment.duitku.merchant_key');
+
+        $expectedSignature = md5($merchantKey . $merchantOrderId . $amount);
+
+        return hash_equals($expectedSignature, $signature);
     }
 }

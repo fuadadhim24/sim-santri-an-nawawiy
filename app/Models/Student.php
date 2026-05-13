@@ -51,11 +51,15 @@ class Student extends Model
         'nisn_document',
         'akta',
         'ijazah',
+        'joined_at',
+        'left_at',
     ];
 
     protected $casts = [
         'status' => 'string',
         'is_active' => 'boolean',
+        'joined_at' => 'datetime',
+        'left_at' => 'datetime',
     ];
 
     protected static function booted(): void
@@ -272,6 +276,44 @@ class Student extends Model
     public function getStatus(): string
     {
         return $this->status;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'ACTIVE';
+    }
+
+    public function hasJoined(): bool
+    {
+        return $this->joined_at && now()->isAfter($this->joined_at);
+    }
+
+    public function hasLeft(): bool
+    {
+        return $this->left_at && now()->isAfter($this->left_at);
+    }
+
+    public function getActiveBillings()
+    {
+        return $this->billings()
+            ->where('status', '!=', 'PAID')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                      ->orWhere('expires_at', '>', now());
+            });
+    }
+
+    public function getMonthlyFeeForPeriod($start, $end)
+    {
+        if ($this->joined_at && $this->joined_at->between($start, $end)) {
+            return true;
+        }
+
+        if ($this->left_at && $this->left_at->between($start, $end)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getStatusEnum(): ?StudentStatus

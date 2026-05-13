@@ -58,6 +58,16 @@ class EnhancedBillingService
             return null;
         }
 
+        // 4.5 CHECK FOR DUPLICATE BILLING
+        $existingBilling = Billing::where('student_id', $student->id)
+            ->where('fee_category_id', $feeCategoryId)
+            ->where('status', '!=', 'VOID')
+            ->first();
+
+        if ($existingBilling && (!$existingBilling->expires_at || $existingBilling->expires_at->isFuture())) {
+            throw new Exception('Tagihan untuk biaya ini sudah ada untuk santri. Tidak bisa membuat duplikat.');
+        }
+
         // 5. QUERY FEE MASTERS with targeting
         $query = FeeMaster::where('fee_category_id', $feeCategoryId)
             ->where('is_active', true)

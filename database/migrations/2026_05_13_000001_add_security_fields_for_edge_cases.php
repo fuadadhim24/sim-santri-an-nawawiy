@@ -12,29 +12,32 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            // Track when student joined
             $table->timestamp('joined_at')->nullable()->after('is_active');
-            // Track when student left/graduated
             $table->timestamp('left_at')->nullable()->after('joined_at');
+            
+            $table->index('joined_at');
+            $table->index('left_at');
         });
 
         Schema::table('billings', function (Blueprint $table) {
-            // Snapshot the price at billing creation time (immutable)
             $table->json('price_snapshot')->nullable()->after('final_amount');
-            // Track when billing was generated
             $table->timestamp('billing_generated_at')->nullable()->after('price_snapshot');
-            // Billing period start (for pro-rata calculations)
             $table->date('billing_period_start')->nullable()->after('billing_generated_at');
-            // Billing period end
             $table->date('billing_period_end')->nullable()->after('billing_period_start');
-            // Optional: Expiry date for billing (after which it's auto-cancelled)
             $table->timestamp('expires_at')->nullable()->after('billing_period_end');
+            
+            $table->string('proration_type')->nullable()->after('expires_at');
+            $table->decimal('proration_rate', 5, 4)->nullable()->after('proration_type');
+            $table->text('proration_note')->nullable()->after('proration_rate');
+            
+            $table->index('expires_at');
+            $table->index('payment_reference');
+            $table->index('billing_period_start');
+            $table->index('billing_period_end');
         });
 
         Schema::table('payments', function (Blueprint $table) {
-            // Snapshot the amount at payment time (to verify against callback)
             $table->decimal('snapshot_billing_amount', 12, 2)->nullable()->after('duitku_reference');
-            // Add index for faster lookup
             $table->index(['billing_id', 'status']);
         });
     }
@@ -42,22 +45,31 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('students', function (Blueprint $table) {
+            $table->dropIndex(['joined_at']);
+            $table->dropIndex(['left_at']);
             $table->dropColumn(['joined_at', 'left_at']);
         });
 
         Schema::table('billings', function (Blueprint $table) {
+            $table->dropIndex(['expires_at']);
+            $table->dropIndex(['payment_reference']);
+            $table->dropIndex(['billing_period_start']);
+            $table->dropIndex(['billing_period_end']);
             $table->dropColumn([
                 'price_snapshot',
                 'billing_generated_at',
                 'billing_period_start',
                 'billing_period_end',
                 'expires_at',
+                'proration_type',
+                'proration_rate',
+                'proration_note',
             ]);
         });
 
         Schema::table('payments', function (Blueprint $table) {
-            $table->dropColumn('snapshot_billing_amount');
             $table->dropIndex(['billing_id', 'status']);
+            $table->dropColumn('snapshot_billing_amount');
         });
     }
 };

@@ -28,6 +28,14 @@ class Billing extends Model
         'archived_by',
         'archived_at',
         'archive_reason',
+        'price_snapshot',
+        'billing_generated_at',
+        'billing_period_start',
+        'billing_period_end',
+        'expires_at',
+        'proration_type',
+        'proration_rate',
+        'proration_note',
     ];
 
     protected $casts = [
@@ -36,6 +44,11 @@ class Billing extends Model
         'final_amount' => 'decimal:2',
         'visible_to_wali' => 'boolean',
         'archived_at' => 'datetime',
+        'price_snapshot' => 'array',
+        'billing_generated_at' => 'datetime',
+        'billing_period_start' => 'date',
+        'billing_period_end' => 'date',
+        'expires_at' => 'datetime',
     ];
 
     protected static function booted(): void
@@ -105,6 +118,30 @@ class Billing extends Model
     public function isPaid(): bool
     {
         return $this->status === 'PAID';
+    }
+
+    public function isExpired(): bool
+    {
+        if (!$this->expires_at) {
+            return false;
+        }
+
+        return now()->isAfter($this->expires_at);
+    }
+
+    public function isActive(): bool
+    {
+        return !$this->isPaid() && !$this->isExpired();
+    }
+
+    public function canBeUpdated(): bool
+    {
+        return !$this->isPaid() && $this->status !== 'VOID';
+    }
+
+    public function canBeDeleted(): bool
+    {
+        return !$this->isPaid();
     }
 
     public function isEditable(): bool
