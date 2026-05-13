@@ -18,8 +18,8 @@ class FeeMasterFactory extends Factory
             'fee_category_id' => FeeCategory::factory(),
             'unit_target' => $this->faker->randomElement([null, 'MTK', 'TSANAWIYAH', 'ALIYAH']),
             'residence_target' => $this->faker->randomElement([null, 'MUKIM', 'NON_MUKIM']),
-            'start_date' => $this->faker->dateThisYear(),
-            'end_date' => $this->faker->dateThisYear(),
+            'start_date' => now(),
+            'end_date' => now()->addMonths(3),
             'is_active' => true,
         ];
     }

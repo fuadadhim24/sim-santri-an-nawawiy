@@ -13,8 +13,10 @@ class FeeCategoryFactory extends Factory
     {
         return [
             'name' => $this->faker->words(2, true),
-            'description' => $this->faker->sentence(),
-            'is_single_active_per_key' => $this->faker->boolean(),
+            'code' => $this->faker->unique()->bothify('??###'),
+            'is_locked' => false,
+            'activation_mode' => 'multi_active',
+            'can_generate_before_acceptance' => true,
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Billing;
 use App\Models\Student;
+use App\Models\FeeMaster;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BillingFactory extends Factory
@@ -14,6 +15,7 @@ class BillingFactory extends Factory
     {
         return [
             'student_id' => Student::factory(),
+            'fee_master_id' => FeeMaster::factory(),
             'title' => $this->faker->words(3, true),
             'original_amount' => $this->faker->numberBetween(100000, 5000000),
             'discount_applied' => $this->faker->numberBetween(0, 500000),

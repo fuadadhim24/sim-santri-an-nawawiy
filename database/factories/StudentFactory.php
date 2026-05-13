@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Student;
+use App\Models\Guardian;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class StudentFactory extends Factory
@@ -12,7 +13,7 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'guardian_id' => null, // Will be set if needed
+            'guardian_id' => Guardian::factory(),
             'nis' => $this->faker->unique()->regexify('[0-9]{10}'),
             'nisn' => $this->faker->unique()->regexify('[0-9]{10}'),
             'full_name' => $this->faker->name(),
@@ -22,6 +23,7 @@ class StudentFactory extends Factory
             'class_name' => 'Kelas ' . $this->faker->randomElement(['X', 'XI', 'XII']),
             'address' => $this->faker->address(),
             'is_active' => $this->faker->boolean(),
+            'status' => 'ACTIVE',
         ];
     }
 
