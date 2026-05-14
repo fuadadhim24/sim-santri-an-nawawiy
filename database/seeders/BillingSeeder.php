@@ -21,6 +21,9 @@ class BillingSeeder extends Seeder
      */
     public function run(): void
     {
+        // Disable observers during seeding (no authenticated user for audit logs)
+        Billing::withoutEvents(function () {
+        Payment::withoutEvents(function () {
         $admin = User::where('role', 'SUPER_ADMIN')->first();
 
         // Santri diterima (untuk billing)
@@ -63,7 +66,6 @@ class BillingSeeder extends Seeder
             'method' => 'cash',
             'status' => 'paid',
             'paid_at' => Carbon::parse('2026-01-10'),
-            'snapshot_billing_amount' => $fmSPP_SMP->amount,
         ]);
 
         // ══════════════════════════════════════════════
@@ -88,7 +90,6 @@ class BillingSeeder extends Seeder
             'duitku_reference' => 'DUITKU-REF-20260210-001',
             'status' => 'paid',
             'paid_at' => Carbon::parse('2026-02-10'),
-            'snapshot_billing_amount' => $fmSPP_SMP->amount,
         ]);
 
         // ══════════════════════════════════════════════
@@ -127,7 +128,6 @@ class BillingSeeder extends Seeder
                 'method' => 'cash',
                 'status' => 'paid',
                 'paid_at' => Carbon::parse('2025-12-20'),
-                'snapshot_billing_amount' => $fmSPMB->amount,
             ]);
         }
 
@@ -154,7 +154,6 @@ class BillingSeeder extends Seeder
                 'method' => 'cash',
                 'status' => 'paid',
                 'paid_at' => Carbon::parse('2026-01-08'),
-                'snapshot_billing_amount' => $fmSPP_SMA->amount - $discountAmount,
             ]);
 
             // SPP SMA Februari (UNPAID, ada payment PENDING via duitku)
@@ -178,7 +177,6 @@ class BillingSeeder extends Seeder
                 'duitku_reference' => 'DUITKU-REF-20260215-PENDING',
                 'status' => 'pending',
                 'paid_at' => Carbon::parse('2026-02-15'),
-                'snapshot_billing_amount' => $fmSPP_SMA->amount - $discountAmount,
             ]);
         }
 
@@ -264,7 +262,6 @@ class BillingSeeder extends Seeder
                 'duitku_reference' => 'DUITKU-REF-20260212-FAIL',
                 'status' => 'failed',
                 'paid_at' => Carbon::parse('2026-02-12'),
-                'snapshot_billing_amount' => $fmSPP_SMP->amount - $yatimDiscount,
                 'notes' => 'Pembayaran gagal: saldo tidak mencukupi.',
             ]);
         }
@@ -307,8 +304,9 @@ class BillingSeeder extends Seeder
                 'duitku_reference' => 'DUITKU-REF-20251215-002',
                 'status' => 'paid',
                 'paid_at' => Carbon::parse('2025-12-15'),
-                'snapshot_billing_amount' => $fmSPMB->amount,
             ]);
         }
+        }); // end Payment::withoutEvents
+        }); // end Billing::withoutEvents
     }
 }
