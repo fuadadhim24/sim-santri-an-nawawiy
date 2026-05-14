@@ -20,6 +20,7 @@ class Billing extends Model
         'discount_applied',
         'final_amount',
         'status',
+        'due_date',
         'payment_url',
         'payment_reference',
         'version_of',
@@ -34,6 +35,7 @@ class Billing extends Model
         'original_amount' => 'decimal:2',
         'discount_applied' => 'decimal:2',
         'final_amount' => 'decimal:2',
+        'due_date' => 'date',
         'visible_to_wali' => 'boolean',
         'archived_at' => 'datetime',
     ];

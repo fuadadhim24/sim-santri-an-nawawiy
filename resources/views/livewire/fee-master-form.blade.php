@@ -62,6 +62,45 @@
                     @enderror
                 </div>
 
+                <!-- Scheduling / Recurrence Rules -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-border">
+                    <div>
+                        <label for="recurrence_type" class="block text-sm font-medium text-foreground mb-1">Tipe Siklus Tagihan</label>
+                        <select wire:model.live="recurrence_type" id="recurrence_type"
+                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            <option value="ONE_TIME">Sekali Bayar (Misal: Uang Pangkal)</option>
+                            <option value="MONTHLY">Bulanan (Misal: SPP)</option>
+                            <option value="YEARLY">Tahunan (Misal: Daftar Ulang)</option>
+                        </select>
+                        @error('recurrence_type')
+                            <span class="text-destructive text-sm">{{ $message }}</span>
+                        @enderror
+                        <p class="text-xs text-muted-foreground mt-1">Siklus berulangnya tagihan ini.</p>
+                    </div>
+
+                    <div>
+                        <label for="due_days" class="block text-sm font-medium text-foreground mb-1">Jatuh Tempo (Hari)</label>
+                        <input wire:model="due_days" type="number" id="due_days" min="0" placeholder="14"
+                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                        @error('due_days')
+                            <span class="text-destructive text-sm">{{ $message }}</span>
+                        @enderror
+                        <p class="text-xs text-muted-foreground mt-1">Batas waktu bayar setelah tagihan terbit.</p>
+                    </div>
+
+                    @if($recurrence_type !== 'ONE_TIME')
+                    <div>
+                        <label for="billing_day" class="block text-sm font-medium text-foreground mb-1">Tanggal Generate</label>
+                        <input wire:model="billing_day" type="number" id="billing_day" min="1" max="31" placeholder="1"
+                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                        @error('billing_day')
+                            <span class="text-destructive text-sm">{{ $message }}</span>
+                        @enderror
+                        <p class="text-xs text-muted-foreground mt-1">Tagihan otomatis dibuat setiap tanggal ini.</p>
+                    </div>
+                    @endif
+                </div>
+
                 <!-- Validity Dates -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>

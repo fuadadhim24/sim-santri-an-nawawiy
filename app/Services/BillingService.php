@@ -85,6 +85,7 @@ class BillingService
         }
 
         $finalAmount = $totalOriginalAmount - $totalDiscount;
+        $dueDate = $firstFee ? now()->addDays($firstFee->due_days ?? 14)->format('Y-m-d') : null;
 
         return Billing::create([
             'student_id' => $student->id,
@@ -94,6 +95,7 @@ class BillingService
             'discount_applied' => $totalDiscount,
             'final_amount' => $finalAmount,
             'status' => 'UNPAID',
+            'due_date' => $dueDate,
         ]);
     }
 
@@ -224,6 +226,7 @@ class BillingService
         }
 
         $finalAmount = max(0, $amount - $discountAmount);
+        $dueDate = now()->addDays($fee->due_days ?? 14)->format('Y-m-d');
 
         return Billing::create([
             'student_id' => $student->id,
@@ -233,6 +236,7 @@ class BillingService
             'discount_applied' => $discountAmount,
             'final_amount' => $finalAmount,
             'status' => 'UNPAID',
+            'due_date' => $dueDate,
         ]);
     }
 

@@ -27,6 +27,10 @@ class FeeMasterForm extends Component
 
     public $isEdit = false;
 
+    public $recurrence_type = 'ONE_TIME';
+    public $due_days = 14;
+    public $billing_day = 1;
+
     protected function rules(): array
     {
         return [
@@ -35,6 +39,9 @@ class FeeMasterForm extends Component
             'fee_category_id' => 'required|exists:fee_categories,id',
             'unit_target' => 'nullable|in:01,02,03',
             'residence_target' => 'nullable|in:MONDOK,NON_MONDOK,NGAJI_ONLY',
+            'recurrence_type' => 'required|in:ONE_TIME,MONTHLY,YEARLY',
+            'due_days' => 'required|integer|min:0',
+            'billing_day' => 'nullable|integer|min:1|max:31',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ];
@@ -49,6 +56,9 @@ class FeeMasterForm extends Component
             $this->fee_category_id = $feeMaster->fee_category_id;
             $this->unit_target = $feeMaster->unit_target;
             $this->residence_target = $feeMaster->residence_target;
+            $this->recurrence_type = $feeMaster->recurrence_type ?? 'ONE_TIME';
+            $this->due_days = $feeMaster->due_days ?? 14;
+            $this->billing_day = $feeMaster->billing_day ?? 1;
             $this->start_date = $feeMaster->start_date ? $feeMaster->start_date->format('Y-m-d') : '';
             $this->end_date = $feeMaster->end_date ? $feeMaster->end_date->format('Y-m-d') : '';
             $this->isEdit = true;
@@ -71,9 +81,12 @@ class FeeMasterForm extends Component
 
             $feeCategoryName = $this->feeCategories->find($this->fee_category_id)?->name ?? '';
 
+            // Copywriting ramah pengguna: Beri info tambahan jika Bulanan/Tahunan
+            $infoRecurrence = $this->recurrence_type === 'MONTHLY' ? ' (Bulanan)' : ($this->recurrence_type === 'YEARLY' ? ' (Tahunan)' : ' (Sekali Bayar)');
+
             $this->dispatch('confirm-fee-creation',
                 studentCount: $studentCount,
-                itemName: $this->item_name,
+                itemName: $this->item_name . $infoRecurrence,
                 amount: number_format($this->amount, 0, ',', '.'),
                 category: $feeCategoryName,
                 unitTarget: $this->unit_target ?? 'Semua Unit',
@@ -108,6 +121,9 @@ class FeeMasterForm extends Component
             'fee_category_id' => $this->fee_category_id,
             'unit_target' => $this->unit_target ?: null,
             'residence_target' => $this->residence_target ?: null,
+            'recurrence_type' => $this->recurrence_type,
+            'due_days' => $this->due_days,
+            'billing_day' => in_array($this->recurrence_type, ['MONTHLY', 'YEARLY']) ? $this->billing_day : null,
             'start_date' => $this->start_date ?: null,
             'end_date' => $this->end_date ?: null,
         ];
