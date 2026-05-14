@@ -50,15 +50,15 @@ class UserTest extends TestCase
      */
     public function test_password_is_hashed()
     {
-        $plainPassword = 'password123';
         $user = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => bcrypt($plainPassword),
+            'whatsapp' => '081234567891',
+            'password' => bcrypt('password123'),
             'role' => 'ADMIN_TU',
         ]);
 
-        $this->assertTrue(password_verify($plainPassword, $user->password));
+        $this->assertTrue(password_verify('password123', $user->password));
     }
 
     /**
@@ -66,12 +66,13 @@ class UserTest extends TestCase
      */
     public function test_user_email_must_be_unique()
     {
-        User::factory()->create(['email' => 'unique@example.com']);
+        User::factory()->create(['email' => 'unique@example.com', 'whatsapp' => '081234567892']);
 
         $this->expectException(\Exception::class);
         User::create([
             'name' => 'Another User',
             'email' => 'unique@example.com',
+            'whatsapp' => '081234567893',
             'password' => bcrypt('password'),
             'role' => 'ADMIN_TU',
         ]);

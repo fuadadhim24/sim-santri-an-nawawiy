@@ -21,7 +21,6 @@ class BillingSeeder extends Seeder
      */
     public function run(): void
     {
-        // Disable observers during seeding (no authenticated user for audit logs)
         Billing::withoutEvents(function () {
         Payment::withoutEvents(function () {
         $admin = User::where('role', 'SUPER_ADMIN')->first();
