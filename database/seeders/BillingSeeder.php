@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Billing;
+use App\Models\Payment;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
 
@@ -15,15 +17,17 @@ class BillingSeeder extends Seeder
     public function run(): void
     {
         $student = Student::first();
+        $admin = User::where('role', 'SUPER_ADMIN')->first();
 
-        if (!$student) {
-            $this->command->info('No students found. Please run UserSeeder first.');
+        if (!$student || !$admin) {
+            $this->command->info('No students or admin found. Please run UserSeeder first.');
             return;
         }
 
         $this->command->info('Seeding billings for student: ' . $student->full_name);
 
-        Billing::create([
+        // Billing 1: Paid
+        $billing1 = Billing::create([
             'student_id' => $student->id,
             'title' => 'SPP Januari ' . date('Y'),
             'original_amount' => 500,
@@ -34,6 +38,17 @@ class BillingSeeder extends Seeder
             'updated_at' => Carbon::now()->subMonth()->endOfMonth(),
         ]);
 
+        // Create payment record for paid billing
+        Payment::create([
+            'billing_id' => $billing1->id,
+            'amount' => 500,
+            'method' => 'CASH',
+            'admin_id' => $admin->id,
+            'paid_at' => Carbon::now()->subMonth()->endOfMonth(),
+            'status' => 'paid',
+        ]);
+
+        // Billing 2: Unpaid
         Billing::create([
             'student_id' => $student->id,
             'title' => 'SPP ' . Carbon::now()->isoFormat('MMMM Y'),
@@ -45,6 +60,7 @@ class BillingSeeder extends Seeder
             'updated_at' => Carbon::now()->startOfMonth(),
         ]);
 
+        // Billing 3: Unpaid
         Billing::create([
             'student_id' => $student->id,
             'title' => 'Uang Pangkal / Gedung',
@@ -57,3 +73,4 @@ class BillingSeeder extends Seeder
         ]);
     }
 }
+

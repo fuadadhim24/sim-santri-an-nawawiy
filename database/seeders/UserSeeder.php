@@ -48,7 +48,33 @@ class UserSeeder extends Seeder
             'special_status' => 'UMUM',
             'class_name' => '7A',
             'address' => 'Jl. Pendidikan No. 1',
-            // new students start inactive and pending acceptance
+            'is_active' => false,
+            'status' => 'menunggu',
+        ]);
+
+        // Add second guardian for IDOR testing
+        $waliUser2 = User::create([
+            'name' => 'Ibu Siti',
+            'email' => 'siti@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'WALI_SANTRI',
+        ]);
+
+        $guardian2 = Guardian::create([
+            'user_id' => $waliUser2->id,
+            'full_name' => 'Ibu Siti Mariyam',
+            'whatsapp' => '082345678901',
+        ]);
+
+        Student::create([
+            'guardian_id' => $guardian2->id,
+            'nis' => '2026.01.0002',
+            'full_name' => 'Fatima Binti Usman',
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
+            'special_status' => 'UMUM',
+            'class_name' => '7B',
+            'address' => 'Jl. Pesantren No. 5',
             'is_active' => false,
             'status' => 'menunggu',
         ]);

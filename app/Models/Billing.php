@@ -115,6 +115,12 @@ class Billing extends Model
         return $this->belongsTo(User::class, 'archived_by');
     }
 
+    // Accessor for backward compatibility: 'amount' => 'final_amount'
+    public function getAmountAttribute()
+    {
+        return $this->final_amount;
+    }
+
     public function isPaid(): bool
     {
         return $this->status === 'PAID';
