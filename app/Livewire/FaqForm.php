@@ -54,7 +54,7 @@ class FaqForm extends Component
         $this->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'category' => 'required|in:umum,program,biaya,fasilitas,pendaftaran',
+            'category' => 'required|in:umum,program,biaya,fasilitas,pendaftaran,pengumuman',
             'sort_order' => 'required|integer|min:0',
             'is_active' => 'boolean',
             'image' => 'nullable|image|max:2048',
@@ -102,6 +102,7 @@ class FaqForm extends Component
             'biaya' => 'Informasi Biaya',
             'fasilitas' => 'Fasilitas',
             'pendaftaran' => 'Pendaftaran',
+            'pengumuman' => 'Pengumuman',
         ];
     }
 

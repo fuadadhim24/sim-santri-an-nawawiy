@@ -42,6 +42,7 @@ class Faq extends Model
             'biaya' => 'Informasi Biaya',
             'fasilitas' => 'Fasilitas',
             'pendaftaran' => 'Pendaftaran',
+            'pengumuman' => 'Pengumuman',
             default => 'Umum',
         };
     }

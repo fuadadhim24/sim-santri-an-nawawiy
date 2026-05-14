@@ -4,7 +4,10 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function() {
-    return view('welcome'); // Landing page untuk verifikasi Duitku
+    $pengumumans = \App\Models\Faq::active()->where('category', 'pengumuman')->get();
+    $faqs = \App\Models\Faq::active()->where('category', '!=', 'pengumuman')->get()->groupBy('category');
+
+    return view('welcome', compact('pengumumans', 'faqs'));
 });
 
 Route::get('/checkout-test/{package}/{price}', function($package, $price) {

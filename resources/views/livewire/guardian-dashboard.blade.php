@@ -187,21 +187,6 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 pt-6 border-t border-gray-100">
-                        <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Informasi Sekolah
-                        </h4>
-                        <div class="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground space-y-2">
-                            <p><strong>Kantor Admin:</strong> +62 812-3456-7890</p>
-                            <p><strong>Email:</strong> admin@an-nawawiy.sch.id</p>
-                            <p><strong>Alamat:</strong> Jl. Pesantren No. 123</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -287,21 +272,6 @@
                                 </div>
                             </div>
 
-                            <div class="mt-8 pt-6 border-t border-gray-100">
-                                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Informasi Sekolah
-                                </h4>
-                                <div class="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground space-y-2">
-                                    <p><strong>Kantor Admin:</strong> +62 812-3456-7890</p>
-                                    <p><strong>Email:</strong> admin@an-nawawiy.sch.id</p>
-                                    <p><strong>Alamat:</strong> Jl. Pesantren No. 123</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -446,21 +416,6 @@
                             </div>
                         </div>
 
-                        <div class="mt-8 pt-6 border-t border-gray-100">
-                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Informasi Sekolah
-                            </h4>
-                            <div class="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground space-y-2">
-                                <p><strong>Kantor Admin:</strong> +62 812-3456-7890</p>
-                                <p><strong>Email:</strong> admin@an-nawawiy.sch.id</p>
-                                <p><strong>Alamat:</strong> Jl. Pesantren No. 123</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
