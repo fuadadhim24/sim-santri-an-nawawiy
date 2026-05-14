@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Billing;
 use App\Models\FeeMaster;
 use App\Models\Student;
+use App\Services\EnhancedBillingService;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 
@@ -28,6 +29,12 @@ class BillingForm extends Component
     #[Rule('required|numeric|min:0')]
     public $final_amount = '';
 
+    #[Rule('nullable|date')]
+    public $period_start = null;
+
+    #[Rule('nullable|date|after_or_equal:period_start')]
+    public $period_end = null;
+
     public $isEdit = false;
 
     public function mount($billing = null)
@@ -40,6 +47,8 @@ class BillingForm extends Component
             $this->original_amount = $billing->original_amount;
             $this->discount_applied = $billing->discount_applied;
             $this->final_amount = $billing->final_amount;
+            $this->period_start = $billing->billing_period_start?->format('Y-m-d');
+            $this->period_end = $billing->billing_period_end?->format('Y-m-d');
         }
     }
 
@@ -67,22 +76,28 @@ class BillingForm extends Component
 
     public function save()
     {
+        abort_unless(auth()->user()->role === 'SUPER_ADMIN' || auth()->user()->role === 'ADMIN_TU', 403);
+        
         $this->validate();
 
-        $data = [
-            'student_id' => $this->student_id,
-            'fee_master_id' => $this->fee_master_id ?: null,
-            'title' => $this->title,
-            'original_amount' => $this->original_amount,
-            'discount_applied' => $this->discount_applied ?: 0,
-            'final_amount' => $this->final_amount,
-            'status' => 'UNPAID',
-        ];
+        try {
+            $service = new EnhancedBillingService();
+            $student = Student::findOrFail($this->student_id);
 
-        Billing::create($data);
+            $billing = $service->generateBillSecurely(
+                $student,
+                $this->fee_master_id,
+                $this->title,
+                null,
+                $this->period_start ? \Carbon\Carbon::parse($this->period_start) : null,
+                $this->period_end ? \Carbon\Carbon::parse($this->period_end) : null
+            );
 
-        session()->flash('message', 'Tagihan berhasil dibuat.');
-        return redirect()->route('admin.billings');
+            session()->flash('message', 'Tagihan berhasil dibuat.');
+            return redirect()->route('admin.billings');
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+        }
     }
 
     public function getStudentsProperty()

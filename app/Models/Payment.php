@@ -21,6 +21,7 @@ class Payment extends Model
         'status',
         'notes',
         'paid_at',
+        'snapshot_billing_amount',
     ];
 
     protected $casts = [

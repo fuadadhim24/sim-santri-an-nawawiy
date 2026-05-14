@@ -69,7 +69,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/spmb-schedules/{id}/edit', \App\Livewire\SpmbScheduleForm::class)->name('admin.spmb-schedules.edit');
     });
 
-    Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])->name('admin.receipts.show');
+    Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])
+        ->middleware('auth')
+        ->middleware('role:SUPER_ADMIN,ADMIN_TU,WALI_SANTRI')
+        ->name('admin.receipts.show');
 
     Route::get('/payment/pay/{billingId}', [\App\Http\Controllers\DuitkuController::class, 'createInvoice'])->name('duitku.pay');
 

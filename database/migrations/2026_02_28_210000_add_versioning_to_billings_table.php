@@ -31,8 +31,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('billings', function (Blueprint $table) {
+            // Drop indexes first
+            $table->dropIndex('billings_version_of_index');
+            $table->dropIndex('billings_visible_to_wali_index');
+            $table->dropIndex('billings_archived_by_index');
+            
+            // Drop foreign keys
             $table->dropForeign(['version_of']);
             $table->dropForeign(['archived_by']);
+            
+            // Drop columns
             $table->dropColumn([
                 'version_of',
                 'version',

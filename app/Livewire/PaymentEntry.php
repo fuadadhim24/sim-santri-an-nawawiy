@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Billing;
 use App\Models\Student;
+use App\Services\SecurePaymentService;
 use Livewire\Component;
 use SweetAlert2\Laravel\Swal;
 
@@ -59,14 +60,25 @@ class PaymentEntry extends Component
     #[\Livewire\Attributes\On('confirmed-payment')]
     public function processPayment()
     {
+        abort_unless(auth()->user()->role === 'SUPER_ADMIN' || auth()->user()->role === 'ADMIN_TU', 403);
+        
         if (!$this->billingIdToProcess) {
             return;
         }
 
-        $bill = Billing::find($this->billingIdToProcess);
+        try {
+            $bill = Billing::find($this->billingIdToProcess);
 
-        if ($bill && $bill->status == 'UNPAID') {
-            $bill->update(['status' => 'PAID']);
+            if (!$bill || $bill->status != 'UNPAID') {
+                throw new \Exception('Tagihan tidak ditemukan atau sudah dibayar.');
+            }
+
+            $service = new SecurePaymentService();
+            $payment = $service->processCashPaymentSecurely(
+                $bill,
+                auth()->id(),
+                'Pembayaran tunai oleh admin'
+            );
 
             $this->unpaidBills = $this->selectedStudent->billings()
                 ->where('status', 'UNPAID')
@@ -77,6 +89,12 @@ class PaymentEntry extends Component
                 'title' => 'Pembayaran berhasil dicatat untuk: ' . $bill->title,
             ]);
 
+            $this->billingIdToProcess = null;
+        } catch (\Exception $e) {
+            Swal::error([
+                'title' => 'Error',
+                'text' => $e->getMessage(),
+            ]);
             $this->billingIdToProcess = null;
         }
     }

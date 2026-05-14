@@ -2,13 +2,6 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <!-- Dummy Logo Space -->
-    <div class="flex justify-center mb-8">
-        <div class="w-20 h-20 rounded-xl bg-primary/10 border-2 border-dashed border-primary/30 flex items-center justify-center">
-            <span class="text-primary/50 text-xs font-medium">Logo</span>
-        </div>
-    </div>
-
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
