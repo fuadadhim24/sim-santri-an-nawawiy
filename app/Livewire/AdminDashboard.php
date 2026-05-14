@@ -15,7 +15,7 @@ class AdminDashboard extends Component
         $totalStudents = Student::count();
         $totalGuardians = Guardian::count();
         $unpaidInvoices = Billing::where('status', 'UNPAID')->count();
-        $totalIncome = Billing::where('status', 'PAID')->sum('final_amount');
+        $totalIncome = (int) Billing::where('status', 'PAID')->sum('final_amount');
 
         $incomeData = [];
         $months = [];
