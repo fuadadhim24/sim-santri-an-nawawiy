@@ -17,12 +17,12 @@ class DuitkuController extends Controller
 
     public function __construct(SecurePaymentService $securePaymentService)
     {
-        $merchantCode = env('DUITKU_MERCHANT_CODE');
-        $apiKey = env('DUITKU_API_KEY');
-        $isProduction = env('APP_ENV') === 'production';
+        $merchantCode = config('payment.duitku.merchant_code');
+        $apiKey = config('payment.duitku.merchant_key');
+        $isSandbox = config('payment.duitku.sandbox', false);
 
         $this->duitkuConfig = new Config($apiKey, $merchantCode);
-        $this->duitkuConfig->setSandboxMode(!$isProduction);
+        $this->duitkuConfig->setSandboxMode($isSandbox);
         $this->duitkuConfig->setSanitizedMode(false);
         $this->duitkuConfig->setDuitkuLogs(false);
         
