@@ -61,7 +61,7 @@ class GenerateRecurringBillings extends Command
             }
 
             // Get students matching the criteria
-            $query = \App\Models\Student::where('is_active', true);
+            $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
             
             if ($feeMaster->unit_target) {
                 $query->where('unit_code', $feeMaster->unit_target);

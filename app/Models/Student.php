@@ -51,12 +51,24 @@ class Student extends Model
         'nisn_document',
         'akta',
         'ijazah',
+        'class_level_id',
+        'study_group_id',
     ];
 
     protected $casts = [
         'status' => 'string',
         'is_active' => 'boolean',
     ];
+
+    public function classLevel(): BelongsTo
+    {
+        return $this->belongsTo(ClassLevel::class);
+    }
+
+    public function studyGroup(): BelongsTo
+    {
+        return $this->belongsTo(StudyGroup::class);
+    }
 
     protected static function booted(): void
     {

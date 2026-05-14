@@ -70,7 +70,7 @@ class FeeMasterForm extends Component
         $this->validate();
 
         if (!$this->isEdit) {
-            $query = \App\Models\Student::where('is_active', true);
+            $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
             if ($this->unit_target) {
                 $query->where('unit_code', $this->unit_target);
             }
@@ -132,7 +132,7 @@ class FeeMasterForm extends Component
             DB::transaction(function () use ($data) {
                 $feeMaster = FeeMaster::create($data);
 
-                $query = \App\Models\Student::where('is_active', true);
+                $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
                 if ($this->unit_target) {
                     $query->where('unit_code', $this->unit_target);
                 }

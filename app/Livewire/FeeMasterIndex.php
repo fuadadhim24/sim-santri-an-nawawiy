@@ -45,12 +45,17 @@ class FeeMasterIndex extends Component
         }
     }
 
-    public function confirmSync($id)
+    public function confirmSync($feeMasterId)
     {
-        $feeMaster = FeeMaster::find($id);
-        if (!$feeMaster) return;
+        $this->syncFeeMasterId = $feeMasterId;
+        $feeMaster = \App\Models\FeeMaster::find($feeMasterId);
+        
+        if (!$feeMaster) {
+            return;
+        }
 
-        $query = \App\Models\Student::where('is_active', true);
+        // Count eligible students
+        $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
         
         if ($feeMaster->unit_target) {
             $query->where('unit_code', $feeMaster->unit_target);
@@ -101,7 +106,7 @@ class FeeMasterIndex extends Component
         $feeMaster = FeeMaster::find($id);
         if (!$feeMaster) return;
 
-        $query = \App\Models\Student::where('is_active', true);
+        $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
         
         if ($feeMaster->unit_target) {
             $query->where('unit_code', $feeMaster->unit_target);

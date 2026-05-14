@@ -7,6 +7,7 @@ enum StudentStatus: string
     case PENDING = 'menunggu';
     case ACCEPTED = 'diterima';
     case REJECTED = 'ditolak';
+    case LULUS = 'lulus';
 
     public function getLabel(): string
     {
@@ -14,6 +15,7 @@ enum StudentStatus: string
             self::PENDING => 'Menunggu',
             self::ACCEPTED => 'Diterima',
             self::REJECTED => 'Ditolak',
+            self::LULUS => 'Lulus',
         };
     }
 
