@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/spmb-schedules', \App\Livewire\SpmbScheduleSelection::class)->name('wali.spmb-schedules');
         Route::get('/spmb/register', \App\Livewire\SpmbStudentRegistration::class)->name('wali.spmb.register');
         Route::get('/students/{student}', \App\Livewire\StudentDetail::class)->name('wali.students.show');
+        Route::get('/faq', \App\Livewire\GuardianFaqIndex::class)->name('wali.faq');
     });
 
     Route::middleware(['role:SUPER_ADMIN,ADMIN_TU'])->group(function () {
