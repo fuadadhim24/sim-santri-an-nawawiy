@@ -90,6 +90,8 @@ class GuardianDashboard extends Component
             ];
         }
 
+        $faqs = \App\Models\Faq::active()->get()->groupBy('category');
+
         return view('livewire.guardian-dashboard', [
             'guardian' => $guardian,
             'totalUnpaid' => $totalUnpaid,
@@ -97,7 +99,8 @@ class GuardianDashboard extends Component
             'hasActiveStudents' => $hasActiveStudents,
             'hasPendingStudents' => $hasPendingStudents,
             'spmbFeeMasters' => $spmbFeeMasters,
-            'schedulesWithStudents' => $schedulesWithStudents
+            'schedulesWithStudents' => $schedulesWithStudents,
+            'faqs' => $faqs,
         ])->layout('layouts.guardian');
     }
 }

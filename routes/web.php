@@ -91,6 +91,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/discounts/{discount}/edit', \App\Livewire\DiscountForm::class)->name('admin.discounts.edit');
 
         Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
+
+        Route::get('/admin/faqs', \App\Livewire\FaqIndex::class)->name('admin.faqs');
+        Route::get('/admin/faqs/create', \App\Livewire\FaqForm::class)->name('admin.faqs.create');
+        Route::get('/admin/faqs/{faq}/edit', \App\Livewire\FaqForm::class)->name('admin.faqs.edit');
     });
 
 });
