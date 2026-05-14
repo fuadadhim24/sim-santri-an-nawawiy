@@ -12,9 +12,9 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email / NIS / Phone -->
+        <!-- Email / Phone -->
         <div>
-            <x-input-label for="identifier" :value="__('Email / NIS / No. HP')" />
+            <x-input-label for="identifier" :value="__('No. WhatsApp / Email')" />
             <x-text-input id="identifier" class="block mt-1 w-full" type="text" name="identifier" :value="old('identifier')"
                 required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('identifier')" class="mt-2" />

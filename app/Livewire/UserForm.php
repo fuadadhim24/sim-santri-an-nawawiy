@@ -14,7 +14,10 @@ class UserForm extends Component
     #[Rule('required|min:3')]
     public $name = '';
 
-    #[Rule('required|email|unique:users,email')]
+    #[Rule('required|string|max:20')]
+    public $whatsapp = '';
+
+    #[Rule('nullable|email|unique:users,email')]
     public $email = '';
 
     #[Rule('nullable|min:6')]
@@ -30,6 +33,7 @@ class UserForm extends Component
         if ($user) {
             $this->user = $user;
             $this->name = $user->name;
+            $this->whatsapp = $user->whatsapp;
             $this->email = $user->email;
             $this->role = $user->role;
             $this->isEdit = true;
@@ -39,15 +43,17 @@ class UserForm extends Component
     public function save()
     {
         $this->validate([
-            'email' => 'required|email|unique:users,email,' . ($this->user ? $this->user->id : 'NULL'),
             'name' => 'required|min:3',
+            'whatsapp' => 'required|string|max:20|unique:users,whatsapp,' . ($this->user ? $this->user->id : 'NULL'),
+            'email' => 'nullable|email|unique:users,email,' . ($this->user ? $this->user->id : 'NULL'),
             'password' => $this->isEdit ? 'nullable|min:6' : 'required|min:6',
             'role' => 'required|in:SUPER_ADMIN,ADMIN_TU',
         ]);
 
         $data = [
             'name' => $this->name,
-            'email' => $this->email,
+            'whatsapp' => $this->whatsapp,
+            'email' => $this->email ?: null,
             'role' => $this->role,
         ];
 
@@ -57,11 +63,11 @@ class UserForm extends Component
 
         if ($this->isEdit) {
             $this->user->update($data);
-            session()->flash('message', 'User updated successfully.');
+            session()->flash('message', 'User berhasil diperbarui.');
         } else {
             $data['password'] = Hash::make($this->password);
             User::create($data);
-            session()->flash('message', 'User created successfully.');
+            session()->flash('message', 'User berhasil ditambahkan.');
         }
 
         return redirect()->route('admin.users');

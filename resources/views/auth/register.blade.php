@@ -9,29 +9,29 @@
 
         <!-- Name -->
         <div>
-            <x-input-label for="name" :value="__('Name')" />
+            <x-input-label for="name" :value="__('Nama Lengkap')" />
             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required
                 autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
-        <!-- Email Address -->
+        <!-- WhatsApp Number (Primary) -->
         <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
-                required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- WhatsApp Number -->
-        <div class="mt-4">
-            <x-input-label for="whatsapp" :value="__('Nomor WhatsApp')" />
+            <x-input-label for="whatsapp" :value="__('Nomor WhatsApp *')" />
             <x-text-input id="whatsapp" class="block mt-1 w-full" type="tel" name="whatsapp" :value="old('whatsapp')"
-                required autocomplete="tel" />
+                required autocomplete="tel" placeholder="08xxxxxxxxxx" />
             <p class="mt-1 text-sm text-muted-foreground">
-                {{ __('Masukkan nomor WhatsApp aktif untuk komunikasi') }}
+                {{ __('Nomor WhatsApp aktif, digunakan untuk login dan komunikasi') }}
             </p>
             <x-input-error :messages="$errors->get('whatsapp')" class="mt-2" />
+        </div>
+
+        <!-- Email Address (Optional) -->
+        <div class="mt-4">
+            <x-input-label for="email" :value="__('Email (opsional)')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
+                autocomplete="username" placeholder="contoh@email.com" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
@@ -46,7 +46,7 @@
 
         <!-- Confirm Password -->
         <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
 
             <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password"
                 name="password_confirmation" required autocomplete="new-password" />
@@ -57,11 +57,11 @@
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-muted-foreground hover:text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                 href="{{ route('login') }}">
-                {{ __('Already registered?') }}
+                {{ __('Sudah punya akun?') }}
             </a>
 
             <x-primary-button class="ms-4">
-                {{ __('Register') }}
+                {{ __('Daftar') }}
             </x-primary-button>
         </div>
     </form>
