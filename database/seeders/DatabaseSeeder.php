@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SpmbScheduleSeeder::class,
+            RombelSeeder::class,
             UserSeeder::class,
             FeeCategorySeeder::class,
             FeeMasterSeeder::class,

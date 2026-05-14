@@ -33,8 +33,19 @@ class UserSeeder extends Seeder
             'role' => 'ADMIN_TU',
         ]);
 
-        // Get active SPMB schedule
         $spmbSchedule = SpmbSchedule::where('is_active', true)->first();
+
+        $level7 = \App\Models\ClassLevel::where('name', 'Kelas 7 SMP')->first();
+        $rombel7A = \App\Models\StudyGroup::where('name', 'Kelas 7 SMP - A')->first();
+        
+        $level8 = \App\Models\ClassLevel::where('name', 'Kelas 8 SMP')->first();
+        $rombel8B = \App\Models\StudyGroup::where('name', 'Kelas 8 SMP - B')->first();
+
+        $level10 = \App\Models\ClassLevel::where('name', 'Kelas 10 SMA')->first();
+        $rombel10A = \App\Models\StudyGroup::where('name', 'Kelas 10 SMA - A')->first();
+
+        $levelTahfidz = \App\Models\ClassLevel::where('name', 'Kelas Tahfidz')->first();
+        $rombelTahfidzA = \App\Models\StudyGroup::where('name', 'Kelas Tahfidz - A')->first();
 
         // ──────────────────────────────────────────────
         // 2. Wali Santri 1 — H. Abdullah (2 santri: diterima + ditolak)
@@ -63,7 +74,8 @@ class UserSeeder extends Seeder
             'residence_status' => 'MONDOK',
             'special_status' => 'UMUM',
             'status' => StudentStatus::ACCEPTED->value,
-            'class_name' => '7A',
+            'class_level_id' => $level7?->id,
+            'study_group_id' => $rombel7A?->id,
             'address' => 'Jl. Pendidikan No. 1, Kab. Bogor',
             'is_active' => true,
         ]);
@@ -78,7 +90,8 @@ class UserSeeder extends Seeder
             'residence_status' => 'MONDOK',
             'special_status' => 'YATIM',
             'status' => StudentStatus::REJECTED->value,
-            'class_name' => null,
+            'class_level_id' => null,
+            'study_group_id' => null,
             'address' => 'Jl. Pendidikan No. 1, Kab. Bogor',
             'is_active' => false,
         ]);
@@ -110,7 +123,8 @@ class UserSeeder extends Seeder
             'residence_status' => 'NON_MONDOK',
             'special_status' => 'UMUM',
             'status' => StudentStatus::PENDING->value,
-            'class_name' => '7B',
+            'class_level_id' => null,
+            'study_group_id' => null,
             'address' => 'Jl. Pesantren No. 5, Kab. Bogor',
             'is_active' => false,
         ]);
@@ -142,7 +156,8 @@ class UserSeeder extends Seeder
             'residence_status' => 'MONDOK',
             'special_status' => 'ANAK_GURU',
             'status' => StudentStatus::ACCEPTED->value,
-            'class_name' => '10A',
+            'class_level_id' => $level10?->id,
+            'study_group_id' => $rombel10A?->id,
             'address' => 'Jl. Ulama No. 10, Kota Bandung',
             'is_active' => true,
         ]);
@@ -157,7 +172,8 @@ class UserSeeder extends Seeder
             'residence_status' => 'MONDOK',
             'special_status' => 'UMUM',
             'status' => StudentStatus::ACCEPTED->value,
-            'class_name' => 'Tahfidz 1',
+            'class_level_id' => $levelTahfidz?->id,
+            'study_group_id' => $rombelTahfidzA?->id,
             'address' => 'Jl. Ulama No. 10, Kota Bandung',
             'is_active' => true,
         ]);
@@ -189,13 +205,14 @@ class UserSeeder extends Seeder
             'residence_status' => 'NGAJI_ONLY',
             'special_status' => 'YATIM',
             'status' => StudentStatus::ACCEPTED->value,
-            'class_name' => '8A',
+            'class_level_id' => $level8?->id,
+            'study_group_id' => $rombel8B?->id,
             'address' => 'Jl. Bahagia No. 3, Kab. Bogor',
             'is_active' => true,
         ]);
 
         // ──────────────────────────────────────────────
-        // 6. Wali Santri 5 — Bapak Hasan (1 santri: menunggu, NON_MONDOK)
+        // 6. Wali Santri 5 — Bapak Hasan (1 santri: menunggu, NON_MONDOK) + 1 Santri LULUS
         // ──────────────────────────────────────────────
         $waliUser5 = User::create([
             'name' => 'Bapak Hasan',
@@ -221,8 +238,25 @@ class UserSeeder extends Seeder
             'residence_status' => 'NON_MONDOK',
             'special_status' => 'ANAK_GURU',
             'status' => StudentStatus::PENDING->value,
-            'class_name' => '10B',
+            'class_level_id' => null,
+            'study_group_id' => null,
             'address' => 'Jl. Merdeka No. 7, Kota Bogor',
+            'is_active' => false,
+        ]);
+
+        // Santri 8: LULUS ALUMNI
+        Student::create([
+            'guardian_id' => $guardian5->id,
+            'spmb_schedule_id' => $spmbSchedule?->id,
+            'nis' => '2023.01.0009',
+            'full_name' => 'Fathurrahman (Alumni)',
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
+            'special_status' => 'UMUM',
+            'status' => 'lulus',
+            'class_level_id' => null,
+            'study_group_id' => null,
+            'address' => 'Jl. Pahlawan No. 9, Kota Bogor',
             'is_active' => false,
         ]);
     }
