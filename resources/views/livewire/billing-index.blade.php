@@ -3,23 +3,86 @@
         Tagihan & Pembayaran
     </x-slot>
 
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-card rounded-lg shadow-sm border border-border p-4">
+            <p class="text-xs text-muted-foreground uppercase tracking-wide">Belum Lunas</p>
+            <p class="text-2xl font-bold text-red-600 mt-1">{{ $countUnpaid }}</p>
+            <p class="text-sm text-muted-foreground">Rp {{ number_format($totalUnpaid, 0, ',', '.') }}</p>
+        </div>
+        <div class="bg-card rounded-lg shadow-sm border border-border p-4">
+            <p class="text-xs text-muted-foreground uppercase tracking-wide">Lunas</p>
+            <p class="text-2xl font-bold text-green-600 mt-1">{{ $countPaid }}</p>
+            <p class="text-sm text-muted-foreground">Rp {{ number_format($totalPaid, 0, ',', '.') }}</p>
+        </div>
+        <div class="bg-card rounded-lg shadow-sm border border-border p-4">
+            <p class="text-xs text-muted-foreground uppercase tracking-wide">Total Tagihan</p>
+            <p class="text-2xl font-bold text-foreground mt-1">{{ $countUnpaid + $countPaid }}</p>
+            <p class="text-sm text-muted-foreground">Rp {{ number_format($totalUnpaid + $totalPaid, 0, ',', '.') }}</p>
+        </div>
+        <div class="bg-card rounded-lg shadow-sm border border-border p-4">
+            <p class="text-xs text-muted-foreground uppercase tracking-wide">Tingkat Lunas</p>
+            <p class="text-2xl font-bold text-primary mt-1">
+                {{ ($countUnpaid + $countPaid) > 0 ? round(($countPaid / ($countUnpaid + $countPaid)) * 100) : 0 }}%
+            </p>
+            <p class="text-sm text-muted-foreground">dari total tagihan</p>
+        </div>
+    </div>
+
     <div class="bg-card rounded-lg shadow-sm border border-border">
-        <div class="p-6 border-b border-border flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
-            <h3 class="text-lg font-semibold text-card-foreground whitespace-nowrap">Daftar Tagihan</h3>
-            <div class="flex items-center space-x-2">
-                <select wire:model.live="statusFilter"
-                    class="w-full md:w-56 py-2 px-8 pr-10 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.75rem_center] bg-no-repeat transition-all">
+        <!-- Filter Bar -->
+        <div class="p-6 border-b border-border space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-card-foreground whitespace-nowrap">Daftar Tagihan</h3>
+                <div class="flex items-center space-x-2">
+                    <a href="{{ route('admin.billings.archive') }}"
+                        class="inline-flex items-center justify-center py-2 px-4 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 font-semibold whitespace-nowrap flex-none shrink-0">
+                        Arsip Tagihan</a>
+                </div>
+            </div>
+
+            <!-- Filters Row -->
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Filter Jenjang -->
+                <select wire:model.live="unitFilter" id="filter-unit"
+                    class="py-2 px-3 pr-8 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm">
+                    <option value="">Semua Jenjang</option>
+                    <option value="01">SMP</option>
+                    <option value="02">SMA</option>
+                    <option value="03">PPTQ</option>
+                </select>
+
+                <!-- Filter Kelas (dynamic based on unit) -->
+                <select wire:model.live="classFilter" id="filter-class"
+                    class="py-2 px-3 pr-8 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm">
+                    <option value="">Semua Kelas</option>
+                    @foreach($this->classOptions as $className)
+                        <option value="{{ $className }}">{{ $className }}</option>
+                    @endforeach
+                </select>
+
+                <!-- Filter Golongan -->
+                <select wire:model.live="specialFilter" id="filter-special"
+                    class="py-2 px-3 pr-8 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm">
+                    <option value="">Semua Golongan</option>
+                    <option value="UMUM">Umum</option>
+                    <option value="ANAK_GURU">Anak Guru</option>
+                    <option value="YATIM">Yatim</option>
+                </select>
+
+                <!-- Filter Status -->
+                <select wire:model.live="statusFilter" id="filter-status"
+                    class="py-2 px-3 pr-8 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm">
                     <option value="">Semua Status</option>
                     <option value="UNPAID">Belum Lunas</option>
                     <option value="PAID">Lunas</option>
                     <option value="EXPIRED">Kadaluarsa</option>
                     <option value="VOID">Dibatalkan</option>
                 </select>
-                <input wire:model.live="search" type="text" placeholder="Cari tagihan..."
-                    class="w-full md:w-64 py-2 px-4 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground">
-                <a href="{{ route('admin.billings.archive') }}"
-                    class="inline-flex items-center justify-center py-2 px-4 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 font-semibold whitespace-nowrap flex-none shrink-0">
-                    Arsip Tagihan</a>
+
+                <!-- Search -->
+                <input wire:model.live="search" type="text" placeholder="Cari santri / tagihan..."
+                    class="flex-1 min-w-[200px] py-2 px-4 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm">
             </div>
         </div>
 
@@ -41,6 +104,7 @@
                     <tr>
                         <th class="px-6 py-3">Tanggal Tagihan</th>
                         <th class="px-6 py-3">Santri</th>
+                        <th class="px-6 py-3">Jenjang</th>
                         <th class="px-6 py-3">Deskripsi</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
                         <th class="px-6 py-3">Status</th>
@@ -55,6 +119,17 @@
                             <td class="px-6 py-4 font-medium text-foreground">
                                 {{ $billing->student->full_name }}
                                 <span class="text-xs text-muted-foreground block">{{ $billing->student->nis }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                @php
+                                    $unitLabels = ['01' => 'SMP', '02' => 'SMA', '03' => 'PPTQ'];
+                                @endphp
+                                <span class="text-xs font-medium px-2 py-0.5 rounded bg-primary/10 text-primary">
+                                    {{ $unitLabels[$billing->student->unit_code] ?? $billing->student->unit_code }}
+                                </span>
+                                @if($billing->student->class_name)
+                                    <span class="text-xs text-muted-foreground block mt-0.5">{{ $billing->student->class_name }}</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-foreground">{{ $billing->title }}</td>
                             <td class="px-6 py-4 text-right font-mono font-medium text-foreground">
@@ -75,10 +150,13 @@
                                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                         BELUM LUNAS
                                     </span>
-                                @elseif ($billing->status == 'PENDING')
-                                    <span
-                                        class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
-                                        PENDING
+                                @elseif ($billing->status == 'EXPIRED')
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                                        KADALUARSA
+                                    </span>
+                                @elseif ($billing->status == 'VOID')
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                        DIBATALKAN
                                     </span>
                                 @else
                                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
@@ -130,7 +208,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-muted-foreground">
+                            <td colspan="7" class="px-6 py-8 text-center text-muted-foreground">
                                 Tidak ada tagihan ditemukan.
                             </td>
                         </tr>

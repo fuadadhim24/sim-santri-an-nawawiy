@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Billing;
+use App\Models\Student;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -14,6 +15,53 @@ class BillingIndex extends Component
 
     public $search = '';
     public $statusFilter = '';
+    public $unitFilter = '';       // Jenjang: 01, 02, 03
+    public $classFilter = '';      // Kelas
+    public $specialFilter = '';    // Golongan: UMUM, ANAK_GURU, YATIM
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingUnitFilter()
+    {
+        $this->classFilter = ''; // Reset kelas saat jenjang berubah
+        $this->resetPage();
+    }
+
+    public function updatingClassFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSpecialFilter()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Get daftar kelas berdasarkan unit yang dipilih.
+     */
+    public function getClassOptionsProperty(): array
+    {
+        $query = Student::query();
+
+        if ($this->unitFilter) {
+            $query->where('unit_code', $this->unitFilter);
+        }
+
+        return $query->whereNotNull('class_name')
+            ->distinct()
+            ->orderBy('class_name')
+            ->pluck('class_name')
+            ->toArray();
+    }
 
     public function processCashPayment($billingId)
     {
@@ -61,10 +109,58 @@ class BillingIndex extends Component
             $query->where('status', $this->statusFilter);
         }
 
+        // Filter by jenjang (unit_code)
+        if ($this->unitFilter) {
+            $query->whereHas('student', function ($sq) {
+                $sq->where('unit_code', $this->unitFilter);
+            });
+        }
+
+        // Filter by kelas
+        if ($this->classFilter) {
+            $query->whereHas('student', function ($sq) {
+                $sq->where('class_name', $this->classFilter);
+            });
+        }
+
+        // Filter by golongan (special_status)
+        if ($this->specialFilter) {
+            $query->whereHas('student', function ($sq) {
+                $sq->where('special_status', $this->specialFilter);
+            });
+        }
+
         $billings = $query->orderBy('created_at', 'desc')->paginate(10);
 
+        // Summary stats
+        $summaryQuery = Billing::where('visible_to_wali', true);
+
+        // Apply same filters to summary
+        if ($this->unitFilter || $this->classFilter || $this->specialFilter) {
+            $summaryQuery->whereHas('student', function ($sq) {
+                if ($this->unitFilter) {
+                    $sq->where('unit_code', $this->unitFilter);
+                }
+                if ($this->classFilter) {
+                    $sq->where('class_name', $this->classFilter);
+                }
+                if ($this->specialFilter) {
+                    $sq->where('special_status', $this->specialFilter);
+                }
+            });
+        }
+
+        $totalUnpaid = (clone $summaryQuery)->where('status', 'UNPAID')->sum('final_amount');
+        $totalPaid = (clone $summaryQuery)->where('status', 'PAID')->sum('final_amount');
+        $countUnpaid = (clone $summaryQuery)->where('status', 'UNPAID')->count();
+        $countPaid = (clone $summaryQuery)->where('status', 'PAID')->count();
+
         return view('livewire.billing-index', [
-            'billings' => $billings
+            'billings' => $billings,
+            'totalUnpaid' => $totalUnpaid,
+            'totalPaid' => $totalPaid,
+            'countUnpaid' => $countUnpaid,
+            'countPaid' => $countPaid,
         ])->layout('layouts.admin');
     }
 
