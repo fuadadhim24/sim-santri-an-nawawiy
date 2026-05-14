@@ -50,146 +50,179 @@
         </div>
 
         @if ($hasActiveStudents)
-            <!-- Student Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach ($guardian->students as $student)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 border-b border-gray-200">
-                        <div class="flex justify-between items-start mb-4">
+            <!-- Student Accordions & Profile -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Students Accordion (Spans 2 columns on large screens) -->
+                <div class="lg:col-span-2 space-y-4" x-data="{ activeStudent: null }">
+                    @foreach ($guardian->students->where('status', 'diterima') as $student)
+                    @php
+                        $unpaidBills = $student->billings->where('status', 'UNPAID');
+                        $studentTotalUnpaid = $unpaidBills->sum('final_amount');
+                    @endphp
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
+                        <!-- Accordion Header -->
+                        <button @click="activeStudent = activeStudent === {{ $student->id }} ? null : {{ $student->id }}" 
+                                class="w-full text-left p-6 flex justify-between items-center focus:outline-none hover:bg-gray-50 transition border-b border-transparent"
+                                :class="{'border-gray-200': activeStudent === {{ $student->id }}}">
                             <div>
                                 <h3 class="text-xl font-bold text-gray-800">{{ $student->full_name }}</h3>
-                                <span class="text-sm text-gray-500">NIS: {{ $student->nis }}</span>
-                                <span
-                                    class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">{{ $student->unit_code == '01' ? 'SMP' : ($student->unit_code == '02' ? 'SMA' : 'PPTQ') }}</span>
+                                <div class="mt-1 space-x-2">
+                                    <span class="text-sm text-gray-500">NIS: {{ $student->nis }}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                                        {{ $student->unit_code == '01' ? 'SMP' : ($student->unit_code == '02' ? 'SMA' : 'PPTQ') }}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $student->is_active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground' }}">
+                                        {{ $student->is_active ? 'AKTIF' : 'TIDAK AKTIF' }}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="text-right">
-                                <span
-                                    class="px-2 py-1 rounded text-xs font-semibold {{ $student->is_active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground' }}">
-                                    {{ $student->is_active ? 'AKTIF' : 'TIDAK AKTIF' }}
-                                </span>
+                            <div class="flex items-center space-x-6">
+                                <div class="text-right hidden sm:block">
+                                    <p class="text-xs text-gray-500 font-medium uppercase">Total Tagihan</p>
+                                    <p class="text-lg font-bold text-destructive">Rp {{ number_format($studentTotalUnpaid, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="text-gray-400 bg-gray-100 p-2 rounded-full">
+                                    <svg class="w-5 h-5 transform transition-transform duration-200" :class="{'rotate-180': activeStudent === {{ $student->id }}}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
                             </div>
-                        </div>
+                        </button>
 
-                        <div class="mt-4">
-                            <h4 class="font-semibold text-gray-700 mb-2">Tagihan Belum Lunas</h4>
-                            @php
-                                $unpaidBills = $student->billings->where('status', 'UNPAID');
-                            @endphp
+                        <!-- Accordion Body -->
+                        <div x-show="activeStudent === {{ $student->id }}" style="display: none;"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 transform -translate-y-2"
+                             x-transition:enter-end="opacity-100 transform translate-y-0"
+                             class="p-6 bg-gray-50/50">
+                            
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Tagihan Belum Lunas
+                                </h4>
+                                
+                                @if ($unpaidBills->isNotEmpty())
+                                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                        <ul class="divide-y divide-gray-100">
+                                            @foreach ($unpaidBills as $bill)
+                                                <li class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center hover:bg-gray-50 transition">
+                                                    <div class="mb-3 sm:mb-0">
+                                                        <p class="text-sm font-medium text-gray-900">{{ $bill->title }}</p>
+                                                        <p class="text-xs text-gray-500 mt-1">
+                                                            Tenggat: {{ $bill->created_at->locale('id')->isoFormat('D MMMM Y') }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-4">
+                                                        <span class="text-sm font-bold text-destructive">
+                                                            Rp {{ number_format($bill->final_amount, 0, ',', '.') }}
+                                                        </span>
+                                                        <a href="{{ route('duitku.pay', [$bill->id, 'force' => 1]) }}"
+                                                            onclick="return confirm('Anda akan diarahkan ke halaman pembayaran otomatis Duitku. Lanjutkan?')"
+                                                            class="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 transition shadow-sm">
+                                                            Bayar
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @else
+                                    <div class="bg-white p-4 rounded-lg border border-gray-200 text-center">
+                                        <p class="text-sm text-gray-500 italic">Tidak ada tagihan belum lunas.</p>
+                                    </div>
+                                @endif
+                            </div>
 
-                            @if ($unpaidBills->isNotEmpty())
-                                <ul class="divide-y divide-gray-100">
-                                    @foreach ($unpaidBills as $bill)
-                                        <li class="py-3 flex justify-between items-center">
-                                            <div>
-                                                <p class="text-sm font-medium text-gray-900">{{ $bill->title }}</p>
-                                                <p class="text-xs text-gray-500">
-                                                    {{ $bill->created_at->locale('id')->isoFormat('D MMMM Y') }}</p>
-                                            </div>
-                                            <div class="flex items-center space-x-3">
-                                                <span class="text-sm font-bold text-destructive">Rp
-                                                    {{ number_format($bill->final_amount, 0, ',', '.') }}</span>
-                                                <a href="{{ route('duitku.pay', [$bill->id, 'force' => 1]) }}"
-                                                    onclick="return confirm('Anda akan diarahkan ke halaman pembayaran otomatis Duitku. Lanjutkan?')"
-                                                    class="px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition inline-block">
-                                                    Bayar
-                                                </a>
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p class="text-sm text-gray-500 italic">Tidak ada tagihan belum lunas.</p>
-                            @endif
-                        </div>
-
-                        <div class="mt-6 pt-4 border-t border-gray-100">
-                            <h4 class="font-semibold text-gray-700 mb-2">Riwayat Terakhir</h4>
-                            @php
-                                $historyBills = $student->billings->where('status', '!=', 'UNPAID')->take(3);
-                            @endphp
-                            @if ($historyBills->isNotEmpty())
-                                <ul class="divide-y divide-gray-100">
-                                    @foreach ($historyBills as $bill)
-                                        <li class="py-2 flex justify-between items-center opacity-75">
-                                            <div>
-                                                <p class="text-sm text-gray-800">{{ $bill->title }}</p>
-                                            </div>
-                                            <div class="flex items-center space-x-2">
-                                                <span
-                                                    class="text-xs font-medium px-2 py-0.5 rounded {{ $bill->status == 'PAID' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground' }}">
-                                                    {{ $bill->status == 'PAID' ? 'LUNAS' : ($bill->status == 'UNPAID' ? 'BELUM LUNAS' : $bill->status) }}
-                                                </span>
-                                                @if ($bill->status == 'PAID')
-                                                    <a href="{{ route('admin.receipts.show', $bill->id) }}"
-                                                        target="_blank"
-                                                        class="text-xs text-primary hover:text-primary/80 underline">
-                                                        Kwitansi
-                                                    </a>
-                                                @endif
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p class="text-xs text-gray-400 italic">Belum ada riwayat.</p>
-                            @endif
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    Riwayat Terakhir (3 Transaksi)
+                                </h4>
+                                @php
+                                    $historyBills = $student->billings->where('status', '!=', 'UNPAID')->take(3);
+                                @endphp
+                                @if ($historyBills->isNotEmpty())
+                                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                        <ul class="divide-y divide-gray-100">
+                                            @foreach ($historyBills as $bill)
+                                                <li class="p-3 flex justify-between items-center opacity-80 hover:opacity-100 transition">
+                                                    <div>
+                                                        <p class="text-sm text-gray-800 font-medium">{{ $bill->title }}</p>
+                                                        <p class="text-xs text-gray-500 mt-0.5">{{ $bill->updated_at->locale('id')->isoFormat('D MMMM Y') }}</p>
+                                                    </div>
+                                                    <div class="flex items-center space-x-3">
+                                                        <span class="text-xs font-medium px-2 py-1 rounded {{ $bill->status == 'PAID' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground' }}">
+                                                            {{ $bill->status == 'PAID' ? 'LUNAS' : $bill->status }}
+                                                        </span>
+                                                        @if ($bill->status == 'PAID')
+                                                            <a href="{{ route('admin.receipts.show', $bill->id) }}"
+                                                                target="_blank"
+                                                                class="p-1.5 text-primary bg-primary/5 hover:bg-primary/10 rounded transition" title="Lihat Kwitansi">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                            </a>
+                                                        @endif
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @else
+                                    <div class="bg-white p-3 rounded-lg border border-gray-200 text-center">
+                                        <p class="text-xs text-gray-400 italic">Belum ada riwayat pembayaran.</p>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                    @endforeach
                 </div>
-            @endforeach
 
-            <!-- Guardian Profile & Info Card -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Profil Wali</h3>
+                <!-- Guardian Profile & Info Card (Right Column) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg sticky top-6">
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">Profil Wali Santri</h3>
 
-                    <div class="space-y-2">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2 bg-primary/10 rounded-full text-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500 uppercase font-semibold">Nama Lengkap</p>
-                                <p class="font-medium text-gray-900">{{ $guardian->full_name }}</p>
-                            </div>
-                        </div>
+                            <div class="space-y-4 mt-4">
+                                <div class="flex items-start space-x-3">
+                                    <div class="p-2 bg-primary/10 rounded-full text-primary mt-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 uppercase font-semibold">Nama Lengkap</p>
+                                        <p class="font-medium text-gray-900">{{ $guardian->full_name }}</p>
+                                    </div>
+                                </div>
 
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2 bg-primary/10 rounded-full text-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500 uppercase font-semibold">WhatsApp</p>
-                                <p class="font-medium text-gray-900">{{ $guardian->whatsapp }}</p>
-                            </div>
-                        </div>
+                                <div class="flex items-start space-x-3">
+                                    <div class="p-2 bg-primary/10 rounded-full text-primary mt-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 uppercase font-semibold">WhatsApp</p>
+                                        <p class="font-medium text-gray-900">{{ $guardian->whatsapp }}</p>
+                                    </div>
+                                </div>
 
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2 bg-primary/10 rounded-full text-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500 uppercase font-semibold">Akun Email</p>
-                                <p class="font-medium text-gray-900">{{ $guardian->user->email ?? 'Tidak Ada' }}</p>
+                                <div class="flex items-start space-x-3">
+                                    <div class="p-2 bg-primary/10 rounded-full text-primary mt-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 uppercase font-semibold">Akun Email</p>
+                                        <p class="font-medium text-gray-900 truncate max-w-[150px] sm:max-w-xs" title="{{ $guardian->user->email ?? 'Tidak Ada' }}">{{ $guardian->user->email ?? 'Tidak Ada' }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
-        </div>
         @else
             @if ($hasPendingStudents)
                 <!-- Pending Students Section -->
