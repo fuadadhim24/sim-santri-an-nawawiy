@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE students MODIFY COLUMN status ENUM('menunggu', 'diterima', 'ditolak', 'lulus') DEFAULT 'menunggu'");
+        if (config('database.default') !== 'sqlite' && !\Illuminate\Support\Facades\DB::connection() instanceof \Illuminate\Database\SQLiteConnection) {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE students MODIFY COLUMN status ENUM('menunggu', 'diterima', 'ditolak', 'lulus') DEFAULT 'menunggu'");
+        }
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE students MODIFY COLUMN status ENUM('menunggu', 'diterima', 'ditolak') DEFAULT 'menunggu'");
+        if (config('database.default') !== 'sqlite' && !\Illuminate\Support\Facades\DB::connection() instanceof \Illuminate\Database\SQLiteConnection) {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE students MODIFY COLUMN status ENUM('menunggu', 'diterima', 'ditolak') DEFAULT 'menunggu'");
+        }
     }
 };
