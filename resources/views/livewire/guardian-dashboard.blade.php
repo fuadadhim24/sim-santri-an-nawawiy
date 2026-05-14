@@ -116,7 +116,7 @@
                                                             Rp {{ number_format($bill->final_amount, 0, ',', '.') }}
                                                         </span>
                                                         <a href="{{ route('duitku.pay', [$bill->id, 'force' => 1]) }}"
-                                                            onclick="return confirm('Anda akan diarahkan ke halaman pembayaran otomatis Duitku. Lanjutkan?')"
+                                                            onclick="event.preventDefault(); Swal.fire({title: 'Konfirmasi', text: 'Anda akan diarahkan ke halaman pembayaran. Lanjutkan?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Lanjutkan', cancelButtonText: 'Batal'}).then((result) => { if(result.isConfirmed) window.location.href = this.href; })"
                                                             class="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 transition shadow-sm">
                                                             Bayar
                                                         </a>

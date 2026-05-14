@@ -176,7 +176,7 @@
                                             Bayar Cash
                                         </button>
                                         <a href="{{ route('duitku.pay', [$billing->id, 'force' => 1]) }}"
-                                            onclick="return confirm('Anda akan diarahkan ke halaman pembayaran Duitku. Lanjutkan?')"
+                                            onclick="event.preventDefault(); Swal.fire({title: 'Konfirmasi', text: 'Anda akan diarahkan ke halaman pembayaran. Lanjutkan?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Lanjutkan', cancelButtonText: 'Batal'}).then((result) => { if(result.isConfirmed) window.location.href = this.href; })"
                                             class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium ml-2">
                                             Bayar Cashless
                                         </a>

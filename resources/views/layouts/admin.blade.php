@@ -225,6 +225,41 @@
     {{-- Livewire scripts required for wire:click, polling, modals, etc. --}}
     @livewireScripts
 
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.directive('confirm', ({ el, directive, component, cleanup }) => {
+                let content = directive.expression
+
+                let onClick = e => {
+                    e.preventDefault()
+                    e.stopImmediatePropagation()
+
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: content,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Lanjutkan!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            cleanup()
+                            el.click()
+                        }
+                    })
+                }
+
+                el.addEventListener('click', onClick, { capture: true })
+
+                cleanup(() => {
+                    el.removeEventListener('click', onClick, { capture: true })
+                })
+            })
+        })
+    </script>
+
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col md:ml-64 transition-all duration-300 h-screen p-3 md:p-4 bg-sidebar">
             <div class="flex-1 flex flex-col bg-background rounded-lg shadow-sm border border-border overflow-hidden">
