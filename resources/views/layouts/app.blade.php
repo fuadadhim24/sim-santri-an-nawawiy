@@ -38,7 +38,7 @@
             {{ $slot }}
         </main>
     </div>
-    @include('sweetalert2::alert')
+    @includeIf('sweetalert2::alert')
 
     {{-- Include Livewire scripts at the end of body --}}
     @livewireScripts

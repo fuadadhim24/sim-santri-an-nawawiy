@@ -7,18 +7,11 @@ use Illuminate\Http\Request;
 
 class ReceiptController extends Controller
 {
-    public function show($id)
+    public function show(Billing $billing)
     {
-        $user = auth()->user();
-        $billing = Billing::with(['student', 'payments'])->findOrFail($id);
+        $this->authorize('view', $billing);
 
-        // Security check for Guardians
-        if ($user->role === 'WALI_SANTRI') {
-            $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
-            if (!$guardian || !$guardian->students->contains($billing->student_id)) {
-                abort(403, 'Anda tidak memiliki akses ke kwitansi ini.');
-            }
-        }
+        $billing = $billing->load(['student', 'payments']);
 
         return view('receipt', compact('billing'));
     }

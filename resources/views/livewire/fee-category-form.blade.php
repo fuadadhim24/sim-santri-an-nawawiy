@@ -37,9 +37,10 @@
                         @endforeach
                     </select>
                     <p class="mt-1 text-xs text-muted-foreground">
-                        Single Active Per Key: Hanya satu tagihan aktif per kunci<br>
-                        Multi Active: Beberapa tagihan dapat aktif sekaligus<br>
-                        Manual Only: Tagihan hanya bisa dibuat secara manual
+                        Mengatur bagaimana tagihan di-generate saat santri diterima:<br><br>
+                        <strong>Otomatis (1 tagihan aktif):</strong> Tagihan lama dinonaktifkan saat tagihan baru dibuat (contoh: SPP bulanan)<br>
+                        <strong>Otomatis (boleh banyak tagihan):</strong> Bisa punya beberapa tagihan aktif bersamaan (contoh: Daftar Ulang, Uang Saku)<br>
+                        <strong>Tidak Otomatis (manual):</strong> Tidak ikut di-generate saat santri diterima, admin harus buat tagihan sendiri (contoh: Biaya SPMB)
                     </p>
                     @error('activation_mode')
                         <span class="text-destructive text-sm">{{ $message }}</span>

@@ -14,7 +14,13 @@ class Guardian extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'full_name',
+        'phone',
+        'email',
+        'address',
+    ];
 
     protected static function booted(): void
     {

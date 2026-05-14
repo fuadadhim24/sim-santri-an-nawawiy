@@ -30,7 +30,7 @@
                     <!-- Registration Start -->
                     <div>
                         <label for="registration_start" class="block text-sm font-medium text-foreground">Tanggal Mulai Pendaftaran</label>
-                        <input wire:model="registration_start" type="datetime-local" id="registration_start"
+                        <input wire:model.blur="registration_start" type="datetime-local" id="registration_start"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('registration_start')
                             <span class="text-destructive text-sm">{{ $message }}</span>
@@ -40,7 +40,7 @@
                     <!-- Registration End -->
                     <div>
                         <label for="registration_end" class="block text-sm font-medium text-foreground">Tanggal Selesai Pendaftaran</label>
-                        <input wire:model="registration_end" type="datetime-local" id="registration_end"
+                        <input wire:model.blur="registration_end" type="datetime-local" id="registration_end"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('registration_end')
                             <span class="text-destructive text-sm">{{ $message }}</span>

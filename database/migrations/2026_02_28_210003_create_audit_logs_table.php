@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('log_type');
             $table->string('subject_type');
             $table->unsignedBigInteger('subject_id');
-            $table->foreignId('performed_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('performed_by')->nullable()->constrained('users')->onDelete('cascade');
             $table->json('old_values')->nullable();
             $table->json('new_values')->nullable();
             $table->string('ip_address')->nullable();

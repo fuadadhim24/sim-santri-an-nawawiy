@@ -55,7 +55,7 @@ class FinancialReport extends Component
         $paidBills = $query->with('student')->orderBy('updated_at', 'desc')->paginate(10);
 
         $statsQuery = clone $query;
-        $totalIncome = $statsQuery->sum('final_amount');
+        $totalIncome = (int) $statsQuery->sum('final_amount');
         $totalTransactions = $statsQuery->count();
 
         return view('livewire.financial-report', [

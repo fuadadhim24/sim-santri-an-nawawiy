@@ -19,7 +19,7 @@ class FeeCategoryForm extends Component
 
     public $is_locked = false;
     public $activation_mode = 'multi_active';
-    public $can_generate_before_acceptance = true;
+    public $can_generate_before_acceptance = false;
 
     public $isEdit = false;
 
@@ -70,9 +70,9 @@ class FeeCategoryForm extends Component
     public function getActivationModeOptionsProperty(): array
     {
         return [
-            'single_active_per_key' => 'Single Active Per Key',
-            'multi_active' => 'Multi Active',
-            'manual_only' => 'Manual Only',
+            'single_active_per_key' => 'Otomatis (1 tagihan aktif per periode)',
+            'multi_active' => 'Otomatis (boleh banyak tagihan)',
+            'manual_only' => 'Tidak Otomatis (dibuat manual oleh admin)',
         ];
     }
 

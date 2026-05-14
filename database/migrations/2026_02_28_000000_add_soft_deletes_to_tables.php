@@ -27,20 +27,28 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasColumn('students', 'deleted_at')) {
+            Schema::table('students', function (Blueprint $table) {
+                $table->dropSoftDeletes();
+            });
+        }
 
-        Schema::table('billings', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasColumn('billings', 'deleted_at')) {
+            Schema::table('billings', function (Blueprint $table) {
+                $table->dropSoftDeletes();
+            });
+        }
 
-        Schema::table('payments', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasColumn('payments', 'deleted_at')) {
+            Schema::table('payments', function (Blueprint $table) {
+                $table->dropSoftDeletes();
+            });
+        }
 
-        Schema::table('guardians', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasColumn('guardians', 'deleted_at')) {
+            Schema::table('guardians', function (Blueprint $table) {
+                $table->dropSoftDeletes();
+            });
+        }
     }
 };

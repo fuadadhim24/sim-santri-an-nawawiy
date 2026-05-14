@@ -17,13 +17,27 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('fee_masters', function (Blueprint $table) {
-            $table->dropForeign(['replaced_by']);
-            $table->dropColumn([
-                'is_active',
-                'replaced_by',
-                'deleted_at',
-            ]);
-        });
+        if (Schema::hasColumn('fee_masters', 'replaced_by')) {
+            Schema::table('fee_masters', function (Blueprint $table) {
+                $table->dropForeign(['replaced_by']);
+            });
+        }
+
+        $columnsToDelete = [];
+        if (Schema::hasColumn('fee_masters', 'is_active')) {
+            $columnsToDelete[] = 'is_active';
+        }
+        if (Schema::hasColumn('fee_masters', 'replaced_by')) {
+            $columnsToDelete[] = 'replaced_by';
+        }
+        if (Schema::hasColumn('fee_masters', 'deleted_at')) {
+            $columnsToDelete[] = 'deleted_at';
+        }
+
+        if (!empty($columnsToDelete)) {
+            Schema::table('fee_masters', function (Blueprint $table) use ($columnsToDelete) {
+                $table->dropColumn($columnsToDelete);
+            });
+        }
     }
 };
