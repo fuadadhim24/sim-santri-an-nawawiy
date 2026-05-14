@@ -67,7 +67,7 @@
                                         </a>
                                         <form method="POST" action="{{ route('admin.students.reject', $student) }}" style="display:inline;">
                                             @csrf
-                                            <button type="submit" class="text-muted-foreground hover:text-foreground font-medium" onclick="return confirm('Tolak santri {{ $student->full_name }}?')">
+                                            <button type="button" class="text-muted-foreground hover:text-foreground font-medium" onclick="Swal.fire({title: 'Konfirmasi', text: 'Tolak santri {{ addslashes($student->full_name) }}?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Tolak', cancelButtonText: 'Batal'}).then((result) => { if(result.isConfirmed) this.closest('form').submit(); })">
                                                 Tolak
                                             </button>
                                         </form>

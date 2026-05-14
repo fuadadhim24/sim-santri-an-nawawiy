@@ -17,9 +17,11 @@ class FeeMaster extends Model
         'fee_category_id',
         'unit_target',
         'residence_target',
+        'recurrence_type',
         'start_date',
         'end_date',
-        'billing_month',
+        'billing_day',
+        'due_days',
         'is_active',
         'replaced_by',
     ];

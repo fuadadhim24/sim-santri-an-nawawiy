@@ -97,7 +97,7 @@ class GuardianDashboard extends Component
             'hasActiveStudents' => $hasActiveStudents,
             'hasPendingStudents' => $hasPendingStudents,
             'spmbFeeMasters' => $spmbFeeMasters,
-            'schedulesWithStudents' => $schedulesWithStudents
+            'schedulesWithStudents' => $schedulesWithStudents,
         ])->layout('layouts.guardian');
     }
 }

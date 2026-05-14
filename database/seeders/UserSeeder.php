@@ -15,10 +15,11 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // ──────────────────────────────────────────────
-        // 1. Admin accounts (keep existing)
+        // 1. Admin accounts
         // ──────────────────────────────────────────────
         User::create([
             'name' => 'Super Admin',
+            'whatsapp' => '080000000001',
             'email' => 'admin@annawawiy.ac.id',
             'password' => Hash::make('password'),
             'role' => 'SUPER_ADMIN',
@@ -26,12 +27,13 @@ class UserSeeder extends Seeder
 
         User::create([
             'name' => 'Admin TU',
+            'whatsapp' => '080000000002',
             'email' => 'tu@annawawiy.ac.id',
             'password' => Hash::make('password'),
             'role' => 'ADMIN_TU',
         ]);
 
-        // Get active SPMB schedule (created by SpmbScheduleSeeder, run before this via DatabaseSeeder)
+        // Get active SPMB schedule
         $spmbSchedule = SpmbSchedule::where('is_active', true)->first();
 
         // ──────────────────────────────────────────────
@@ -39,7 +41,8 @@ class UserSeeder extends Seeder
         // ──────────────────────────────────────────────
         $waliUser1 = User::create([
             'name' => 'H. Abdullah',
-            'email' => 'wali@test.com',
+            'whatsapp' => '081234567890',
+            'email' => null,
             'password' => Hash::make('password'),
             'role' => 'WALI_SANTRI',
         ]);
@@ -85,7 +88,8 @@ class UserSeeder extends Seeder
         // ──────────────────────────────────────────────
         $waliUser2 = User::create([
             'name' => 'Ibu Siti',
-            'email' => 'siti@test.com',
+            'whatsapp' => '082345678901',
+            'email' => null,
             'password' => Hash::make('password'),
             'role' => 'WALI_SANTRI',
         ]);
@@ -116,7 +120,8 @@ class UserSeeder extends Seeder
         // ──────────────────────────────────────────────
         $waliUser3 = User::create([
             'name' => 'Bapak Ridwan',
-            'email' => 'ridwan@test.com',
+            'whatsapp' => '085678901234',
+            'email' => null,
             'password' => Hash::make('password'),
             'role' => 'WALI_SANTRI',
         ]);
@@ -162,7 +167,8 @@ class UserSeeder extends Seeder
         // ──────────────────────────────────────────────
         $waliUser4 = User::create([
             'name' => 'Ibu Rahmah',
-            'email' => 'rahmah@test.com',
+            'whatsapp' => '087890123456',
+            'email' => null,
             'password' => Hash::make('password'),
             'role' => 'WALI_SANTRI',
         ]);
@@ -193,7 +199,8 @@ class UserSeeder extends Seeder
         // ──────────────────────────────────────────────
         $waliUser5 = User::create([
             'name' => 'Bapak Hasan',
-            'email' => 'hasan@test.com',
+            'whatsapp' => '089012345678',
+            'email' => null,
             'password' => Hash::make('password'),
             'role' => 'WALI_SANTRI',
         ]);

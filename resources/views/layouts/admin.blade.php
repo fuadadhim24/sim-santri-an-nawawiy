@@ -130,6 +130,16 @@
                     Santri
                 </a>
 
+                <a href="{{ route('admin.rombels') }}"
+                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.rombels*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                    <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.rombels*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-.84-1.875-1.875-1.875s-1.875.84-1.875 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a1.5 1.5 0 01-3 0v0c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-.84-1.875-1.875-1.875s-1.875.84-1.875 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a1.5 1.5 0 01-3 0v0c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-.84-1.875-1.875-1.875s-1.875.84-1.875 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a1.5 1.5 0 01-3 0" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                    </svg>
+                    Manajemen Rombel
+                </a>
+
 
                 <a href="{{ route('admin.spmb-schedules') }}"
                     class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.spmb-schedules*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
@@ -181,6 +191,17 @@
                         </svg>
                         Laporan Keuangan
                     </a>
+
+                    <a href="{{ route('admin.faqs') }}"
+                        class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.faqs*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                        <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.faqs*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                        </svg>
+                        FAQ & Informasi
+                    </a>
                 @endif
             </nav>
             </nav>
@@ -203,6 +224,41 @@
 
     {{-- Livewire scripts required for wire:click, polling, modals, etc. --}}
     @livewireScripts
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.directive('confirm', ({ el, directive, component, cleanup }) => {
+                let content = directive.expression
+
+                let onClick = e => {
+                    e.preventDefault()
+                    e.stopImmediatePropagation()
+
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: content,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Lanjutkan!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            cleanup()
+                            el.click()
+                        }
+                    })
+                }
+
+                el.addEventListener('click', onClick, { capture: true })
+
+                cleanup(() => {
+                    el.removeEventListener('click', onClick, { capture: true })
+                })
+            })
+        })
+    </script>
 
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col md:ml-64 transition-all duration-300 h-screen p-3 md:p-4 bg-sidebar">

@@ -4,7 +4,10 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function() {
-    return view('welcome'); // Landing page untuk verifikasi Duitku
+    $pengumumans = \App\Models\Faq::active()->where('category', 'pengumuman')->get();
+    $faqs = \App\Models\Faq::active()->where('category', '!=', 'pengumuman')->get()->groupBy('category');
+
+    return view('welcome', compact('pengumumans', 'faqs'));
 });
 
 Route::get('/checkout-test/{package}/{price}', function($package, $price) {
@@ -43,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/spmb-schedules', \App\Livewire\SpmbScheduleSelection::class)->name('wali.spmb-schedules');
         Route::get('/spmb/register', \App\Livewire\SpmbStudentRegistration::class)->name('wali.spmb.register');
         Route::get('/students/{student}', \App\Livewire\StudentDetail::class)->name('wali.students.show');
+        Route::get('/faq', \App\Livewire\GuardianFaqIndex::class)->name('wali.faq');
     });
 
     Route::middleware(['role:SUPER_ADMIN,ADMIN_TU'])->group(function () {
@@ -55,6 +59,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/students', \App\Livewire\StudentIndex::class)->name('admin.students');
         Route::get('/admin/students/create', \App\Livewire\StudentForm::class)->name('admin.students.create');
         Route::get('/admin/students/{student}/edit', \App\Livewire\StudentForm::class)->name('admin.students.edit');
+        
+        Route::get('/admin/rombels', \App\Livewire\RombelManagement::class)->name('admin.rombels');
         Route::get('/admin/students/{student}', \App\Livewire\StudentDetail::class)->name('admin.students.show');
         Route::get('/admin/student-acceptance', \App\Livewire\StudentAcceptance::class)->name('admin.student-acceptance');
         Route::get('/admin/student-acceptance/{student}/confirm', \App\Livewire\StudentAcceptanceConfirm::class)->name('admin.student-acceptance-confirm');
@@ -94,6 +100,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/discounts/{discount}/edit', \App\Livewire\DiscountForm::class)->name('admin.discounts.edit');
 
         Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
+
+        Route::get('/admin/faqs', \App\Livewire\FaqIndex::class)->name('admin.faqs');
+        Route::get('/admin/faqs/create', \App\Livewire\FaqForm::class)->name('admin.faqs.create');
+        Route::get('/admin/faqs/{faq}/edit', \App\Livewire\FaqForm::class)->name('admin.faqs.edit');
     });
 
 });

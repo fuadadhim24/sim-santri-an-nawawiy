@@ -220,11 +220,59 @@
             <p class="text-pengumuman text-center mb-3">
               <a href="#">Semua Pengumuman</a>
             </p>
-            <ul>
-              <li>Pendaftaran SMP & SMA Al-Qur'an An-Nawawiy Telah dibuka <span class="fw-bold">02 Mei 2023</span>.<a class="text-dua nav-link" href="#">read more</a></li>
-              <li>An-Nawawiy Festival Qur'any 2026 (AFQy) <span class="fw-bold">17 Januari 2026</span></li>
-              <li>Pelaksanaan Ujian Rajab 1447 Hijriyah <span class="fw-bold">05 Januari 2026</span></li>
+            <ul class="list-unstyled px-4">
+              @forelse($pengumumans as $p)
+                <li class="mb-3 border-bottom border-secondary pb-2">
+                  <a href="#" class="text-white text-decoration-none d-block" data-bs-toggle="modal" data-bs-target="#pengumumanModal{{ $p->id }}">
+                    <h6 class="fw-bold mb-1">{{ $p->title }}</h6>
+                    <small class="text-muted"><i class="fas fa-calendar-alt me-1"></i>{{ $p->created_at->format('d M Y') }}</small>
+                  </a>
+                </li>
+              @empty
+                <li class="text-muted fst-italic">Belum ada pengumuman.</li>
+              @endforelse
             </ul>
+
+            <!-- Modals for Pengumuman -->
+            @foreach($pengumumans as $p)
+            <div class="modal fade" id="pengumumanModal{{ $p->id }}" tabindex="-1" aria-labelledby="pengumumanModalLabel{{ $p->id }}" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-scrollable text-dark">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="pengumumanModalLabel{{ $p->id }}">{{ $p->title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <small class="text-muted d-block mb-3"><i class="fas fa-calendar-alt me-1"></i>Dipublikasikan: {{ $p->created_at->format('d F Y') }}</small>
+                    
+                    @if($p->image_path)
+                      <div class="text-center mb-4">
+                        <img src="{{ asset('storage/' . $p->image_path) }}" class="img-fluid rounded" alt="{{ $p->title }}" style="max-height: 400px; object-fit: contain;">
+                      </div>
+                    @endif
+
+                    <div class="mb-4 text-break" style="white-space: pre-wrap;">{{ $p->content }}</div>
+
+                    @if($p->pdf_path)
+                      <hr>
+                      <h6 class="fw-bold mb-2">Dokumen Terlampir:</h6>
+                      <iframe src="{{ asset('storage/' . $p->pdf_path) }}" class="w-100 rounded border" style="height: 500px;" title="{{ $p->title }}"></iframe>
+                      <div class="mt-2 text-end">
+                        <a href="{{ asset('storage/' . $p->pdf_path) }}" target="_blank" class="btn btn-primary btn-sm">
+                          <i class="fas fa-external-link-alt me-1"></i> Buka di Tab Baru
+                        </a>
+                      </div>
+                    @endif
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            @endforeach
+            <!-- End Modals -->
+
           </div>
           <!-- PENGUMUMAN END -->
         </div>
@@ -512,6 +560,76 @@
       </div>
     </div>
     <!-- KONTEN PONDOK END -->
+
+    <!-- FAQ START -->
+    @if(isset($faqs) && $faqs->isNotEmpty())
+    <div class="container mb-5">
+      <div class="row">
+        <div class="col-lg-12">
+          <h2 style="font-size: 2.5rem" class="text-dokumentasi mb-4 text-center">FAQ & Informasi</h2>
+        </div>
+      </div>
+      
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="accordion" id="faqAccordion">
+            @php $faqIndex = 0; @endphp
+            @foreach($faqs as $category => $categoryFaqs)
+              @php
+                  $categoryLabels = [
+                      'program' => 'Info Program',
+                      'biaya' => 'Informasi Biaya',
+                      'fasilitas' => 'Fasilitas',
+                      'pendaftaran' => 'Pendaftaran',
+                      'umum' => 'Umum',
+                  ];
+              @endphp
+              
+              <div class="mb-4">
+                <h5 class="fw-bold mb-3 text-success">
+                  <i class="fas fa-bookmark me-2"></i>{{ $categoryLabels[$category] ?? ucfirst($category) }}
+                </h5>
+                
+                @foreach($categoryFaqs as $faq)
+                  <div class="accordion-item mb-2 border rounded">
+                    <h2 class="accordion-header" id="heading{{ $faq->id }}">
+                      <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $faq->id }}" aria-expanded="false" aria-controls="collapse{{ $faq->id }}">
+                        {{ $faq->title }}
+                      </button>
+                    </h2>
+                    <div id="collapse{{ $faq->id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $faq->id }}" data-bs-parent="#faqAccordion">
+                      <div class="accordion-body">
+                        <div class="mb-3 text-break" style="white-space: pre-wrap;">{{ $faq->content }}</div>
+                        
+                        @if($faq->image_path)
+                          <div class="text-center mb-3">
+                            <img src="{{ asset('storage/' . $faq->image_path) }}" class="img-fluid rounded" style="max-height: 300px; object-fit: contain;">
+                          </div>
+                        @endif
+
+                        @if($faq->pdf_path)
+                          <hr>
+                          <p class="fw-bold mb-2">Dokumen Terlampir:</p>
+                          <iframe src="{{ asset('storage/' . $faq->pdf_path) }}" class="w-100 rounded border" style="height: 400px;" title="{{ $faq->title }}"></iframe>
+                          <div class="mt-2 text-end">
+                            <a href="{{ asset('storage/' . $faq->pdf_path) }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                              <i class="fas fa-file-pdf me-1"></i> Download / Buka PDF
+                            </a>
+                          </div>
+                        @endif
+                      </div>
+                    </div>
+                  </div>
+                  @php $faqIndex++; @endphp
+                @endforeach
+              </div>
+            @endforeach
+          </div>
+        </div>
+      </div>
+    </div>
+    @endif
+    <!-- FAQ END -->
 
     <footer class="text-center text-lg-start bg-dark text-white">
       <!-- Section: Social media -->

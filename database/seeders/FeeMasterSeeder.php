@@ -10,16 +10,13 @@ class FeeMasterSeeder extends Seeder
 {
     public function run(): void
     {
-        $catSPMB   = FeeCategory::where('code', 'SPMB')->first();
-        $catSPP    = FeeCategory::where('code', 'SPP')->first();
-        $catReg    = FeeCategory::where('code', 'REG')->first();
-        $catReReg  = FeeCategory::where('code', 'RE_REG')->first();
-        $catPocket = FeeCategory::where('code', 'POCKET')->first();
-        $catAsrama = FeeCategory::where('code', 'ASRAMA')->first();
-        $catOther  = FeeCategory::where('code', 'OTHER')->first();
+        $catSPP = FeeCategory::where('code', 'SPP')->first();
+        $catReg = FeeCategory::where('code', 'REG')->first();
+        $catReReg = FeeCategory::where('code', 'RE_REG')->first();
+        $catOther = FeeCategory::where('code', 'OTHER')->first();
 
         // ──────────────────────────────────────────────
-        // Biaya Pendaftaran (REG) — semua unit, sekali bayar
+        // Biaya Pendaftaran (Registrasi)
         // ──────────────────────────────────────────────
         FeeMaster::create([
             'fee_category_id' => $catReg->id,
@@ -31,24 +28,24 @@ class FeeMasterSeeder extends Seeder
         ]);
 
         // ──────────────────────────────────────────────
-        // Biaya Daftar Ulang (RE_REG) — semua unit
+        // Biaya Daftar Ulang (Re-Registrasi)
         // ──────────────────────────────────────────────
         FeeMaster::create([
             'fee_category_id' => $catReReg->id,
             'item_name' => 'Biaya Daftar Ulang Semester',
-            'amount' => 12000,
+            'amount' => 15000,
             'start_date' => '2025-01-01',
             'unit_target' => null,
             'residence_target' => null,
         ]);
 
         // ──────────────────────────────────────────────
-        // SPP Bulanan — per unit
+        // SPP per Jenjang
         // ──────────────────────────────────────────────
         FeeMaster::create([
             'fee_category_id' => $catSPP->id,
             'item_name' => 'SPP SMP',
-            'amount' => 12000,
+            'amount' => 10000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => '01',
@@ -58,7 +55,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catSPP->id,
             'item_name' => 'SPP SMA',
-            'amount' => 13000,
+            'amount' => 12000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => '02',
@@ -76,25 +73,22 @@ class FeeMasterSeeder extends Seeder
         ]);
 
         // ──────────────────────────────────────────────
-        // Uang Saku (POCKET) — hanya MONDOK
+        // Biaya Bulanan Lainnya
         // ──────────────────────────────────────────────
         FeeMaster::create([
-            'fee_category_id' => $catPocket->id,
-            'item_name' => 'Uang Saku Bulanan',
-            'amount' => 10000,
-            'billing_day' => 5,
+            'fee_category_id' => $catOther->id,
+            'item_name' => 'Biaya Asrama Bulanan',
+            'amount' => 13000,
+            'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => null,
             'residence_target' => 'MONDOK',
         ]);
 
-        // ──────────────────────────────────────────────
-        // Asrama — hanya MONDOK
-        // ──────────────────────────────────────────────
         FeeMaster::create([
-            'fee_category_id' => $catAsrama->id,
-            'item_name' => 'Biaya Asrama Bulanan',
-            'amount' => 14000,
+            'fee_category_id' => $catOther->id,
+            'item_name' => 'Uang Saku Bulanan',
+            'amount' => 12000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => null,
@@ -102,12 +96,12 @@ class FeeMasterSeeder extends Seeder
         ]);
 
         // ──────────────────────────────────────────────
-        // Lain-lain (OTHER)
+        // Biaya Semester & Akhir Sekolah
         // ──────────────────────────────────────────────
         FeeMaster::create([
             'fee_category_id' => $catOther->id,
             'item_name' => 'Biaya Semester',
-            'amount' => 15000,
+            'amount' => 14000,
             'start_date' => '2025-01-01',
             'unit_target' => null,
             'residence_target' => null,

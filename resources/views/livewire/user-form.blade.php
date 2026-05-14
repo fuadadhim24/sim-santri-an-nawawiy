@@ -17,10 +17,20 @@
                     @enderror
                 </div>
 
-                <!-- Email -->
+                <!-- WhatsApp -->
                 <div>
-                    <label for="email" class="block text-sm font-medium text-foreground">Alamat Email</label>
-                    <input wire:model="email" type="email" id="email"
+                    <label for="whatsapp" class="block text-sm font-medium text-foreground">Nomor WhatsApp *</label>
+                    <input wire:model="whatsapp" type="tel" id="whatsapp" placeholder="08xxxxxxxxxx"
+                        class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                    @error('whatsapp')
+                        <span class="text-destructive text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Email (Optional) -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-foreground">Email (opsional)</label>
+                    <input wire:model="email" type="email" id="email" placeholder="contoh@email.com"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('email')
                         <span class="text-destructive text-sm">{{ $message }}</span>

@@ -51,8 +51,8 @@ class Student extends Model
         'nisn_document',
         'akta',
         'ijazah',
-        'joined_at',
-        'left_at',
+        'class_level_id',
+        'study_group_id',
     ];
 
     protected $casts = [
@@ -61,6 +61,16 @@ class Student extends Model
         'joined_at' => 'datetime',
         'left_at' => 'datetime',
     ];
+
+    public function classLevel(): BelongsTo
+    {
+        return $this->belongsTo(ClassLevel::class);
+    }
+
+    public function studyGroup(): BelongsTo
+    {
+        return $this->belongsTo(StudyGroup::class);
+    }
 
     protected static function booted(): void
     {

@@ -32,6 +32,11 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the request's credentials.
      *
+     * Mendukung login dengan:
+     * 1. Nomor WhatsApp (langsung dari tabel users)
+     * 2. Email (jika diisi)
+     * 3. NIS santri (resolve ke user wali)
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function authenticate(): void
@@ -40,31 +45,32 @@ class LoginRequest extends FormRequest
 
         $identifier = $this->input('identifier');
         $password = $this->input('password');
-        $credentials = [
-            'email' => $identifier,
-            'password' => $password,
-        ];
 
-        // Resolve input to a real user email. Accepts direct email, student NIS, or guardian whatsapp.
-        $userEmail = null;
+        // 1. Coba cari user langsung via WhatsApp di tabel users
+        $user = \App\Models\User::where('whatsapp', $identifier)->first();
 
-        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-            $userEmail = $identifier;
-        } else {
+        // 2. Coba via email
+        if (!$user && filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $user = \App\Models\User::where('email', $identifier)->first();
+        }
+
+        // 3. Coba via NIS santri → resolve ke user wali
+        if (!$user) {
             $student = \App\Models\Student::where('nis', $identifier)->first();
             if ($student && $student->guardian && $student->guardian->user) {
-                $userEmail = $student->guardian->user->email;
-            }
-
-            if (! $userEmail) {
-                $guardian = \App\Models\Guardian::where('whatsapp', $identifier)->first();
-                if ($guardian && $guardian->user) {
-                    $userEmail = $guardian->user->email;
-                }
+                $user = $student->guardian->user;
             }
         }
 
-        if (! $userEmail) {
+        // 4. Fallback: coba via WhatsApp guardian (backward compat)
+        if (!$user) {
+            $guardian = \App\Models\Guardian::where('whatsapp', $identifier)->first();
+            if ($guardian && $guardian->user) {
+                $user = $guardian->user;
+            }
+        }
+
+        if (!$user) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -72,7 +78,12 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        $credentials['email'] = $userEmail;
+        // Attempt auth with the resolved user's email or whatsapp
+        $authField = $user->email ? 'email' : 'whatsapp';
+        $credentials = [
+            $authField => $user->$authField,
+            'password' => $password,
+        ];
 
         if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
@@ -101,7 +112,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'identifier' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
