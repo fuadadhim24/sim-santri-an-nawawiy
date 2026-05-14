@@ -22,7 +22,7 @@ class FaqSeeder extends Seeder
 
         Faq::create([
             'title' => 'Dokumen apa saja yang perlu disiapkan?',
-            'content' => "Dokumen yang perlu disiapkan untuk pendaftaran santri baru:\n\n• Akta Kelahiran (scan/foto jelas)\n• Kartu Keluarga (scan/foto jelas)\n• Pas Foto terbaru ukuran 3x4 (latar biru)\n• Ijazah terakhir atau Surat Keterangan Lulus\n• NISN (Nomor Induk Siswa Nasional)\n• Surat Keterangan Sehat dari dokter\n\nSemua dokumen diupload dalam format JPG/PNG dengan ukuran maksimal 2MB per file.",
+            'content' => "Dokumen yang perlu disiapkan untuk pendaftaran santri baru:\n\n• Kartu Keluarga (KK)\n• Pas Foto Terbaru\n• NISN (oleh Operator)\n• Akta Kelahiran\n• Ijazah\n\nSemua dokumen diupload dalam format JPG/PNG/PDF dengan ukuran maksimal 2MB per file.",
             'category' => 'pendaftaran',
             'sort_order' => 2,
             'is_active' => true,
