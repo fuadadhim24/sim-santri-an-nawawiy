@@ -5,7 +5,7 @@
 
     <div class="bg-card rounded-lg shadow-sm border border-border">
         <!-- Header Actions -->
-        <div class="p-6 border-b border-border flex items-center justify-between gap-4">
+        <div class="p-6 border-b border-border flex items-center gap-4">
             <div>
                 <h3 class="text-lg font-semibold text-card-foreground">Peta Rombongan Belajar</h3>
                 <p class="text-sm text-muted-foreground mt-1">Kelola penempatan santri dalam kelas dan rombongan belajar secara interaktif.</p>
@@ -136,7 +136,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" wire:loading.attr="disabled" wire:target="saveClassLevel" class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                        <button type="submit" wire:loading.attr="disabled" wire:target="saveClassLevel" class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
                             <svg wire:loading wire:target="saveClassLevel" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -178,7 +178,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" wire:loading.attr="disabled" wire:target="saveStudyGroup" class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                        <button type="submit" wire:loading.attr="disabled" wire:target="saveStudyGroup" class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
                             <svg wire:loading wire:target="saveStudyGroup" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -219,11 +219,11 @@
                     <!-- Modal Body -->
                     <div class="px-6 py-4 flex-1 overflow-y-auto bg-white">
                         <div class="flex justify-between items-center mb-4">
-                            <button type="button" wire:click="selectAllStudents" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">
+                            <button type="button" wire:click="selectAllStudents" class="text-sm font-semibold text-primary hover:text-primary/80">
                                 {{ count($selectedStudentIds) === count($modalStudents) && count($modalStudents) > 0 ? 'Deselect All' : 'Select All' }} ({{ count($modalStudents) }} Santri)
                             </button>
                             <div class="text-sm text-gray-500">
-                                Terpilih: <span class="font-bold text-indigo-600">{{ count($selectedStudentIds) }}</span>
+                                Terpilih: <span class="font-bold text-primary">{{ count($selectedStudentIds) }}</span>
                             </div>
                         </div>
 
@@ -246,7 +246,7 @@
                                     @forelse($modalStudents as $student)
                                     <tr class="hover:bg-gray-50 cursor-pointer" onclick="document.getElementById('checkbox-{{ $student->id }}').click()">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <input id="checkbox-{{ $student->id }}" wire:model.live="selectedStudentIds" value="{{ $student->id }}" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" onclick="event.stopPropagation()">
+                                            <input id="checkbox-{{ $student->id }}" wire:model.live="selectedStudentIds" value="{{ $student->id }}" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" onclick="event.stopPropagation()">
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $student->full_name }}</div>
@@ -271,7 +271,7 @@
                     <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="w-full sm:w-1/2 flex items-center gap-2">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Pindahkan ke:</label>
-                            <select wire:model="targetMoveId" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+                            <select wire:model="targetMoveId" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md shadow-sm">
                                 <option value="">-- Pilih Tujuan --</option>
                                 @foreach($classLevels as $level)
                                     <optgroup label="{{ $level->name }}">
@@ -284,7 +284,7 @@
                             </select>
                         </div>
                         
-                        <button wire:click="moveSelectedStudents" wire:loading.attr="disabled" type="button" class="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:text-sm {{ count($selectedStudentIds) === 0 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ count($selectedStudentIds) === 0 ? 'disabled' : '' }}>
+                        <button wire:click="moveSelectedStudents" wire:loading.attr="disabled" type="button" class="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:text-sm {{ count($selectedStudentIds) === 0 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ count($selectedStudentIds) === 0 ? 'disabled' : '' }}>
                             <svg wire:loading wire:target="moveSelectedStudents" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -320,18 +320,18 @@
                         <!-- Stepper UI -->
                         <div class="flex items-center justify-between mb-8">
                             <div class="flex-1 text-center">
-                                <div class="w-8 h-8 mx-auto bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold">1</div>
-                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 1 ? 'text-indigo-600' : 'text-gray-400' }}">Target</div>
+                                <div class="w-8 h-8 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">1</div>
+                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 1 ? 'text-primary' : 'text-gray-400' }}">Target</div>
                             </div>
-                            <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-indigo-600" style="width: {{ $wizardStep >= 2 ? '100%' : '0%' }}"></div></div>
+                            <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-primary" style="width: {{ $wizardStep >= 2 ? '100%' : '0%' }}"></div></div>
                             <div class="flex-1 text-center">
-                                <div class="w-8 h-8 mx-auto {{ $wizardStep >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold">2</div>
-                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 2 ? 'text-indigo-600' : 'text-gray-400' }}">Metode</div>
+                                <div class="w-8 h-8 mx-auto {{ $wizardStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold">2</div>
+                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 2 ? 'text-primary' : 'text-gray-400' }}">Metode</div>
                             </div>
-                            <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-indigo-600" style="width: {{ $wizardStep >= 3 ? '100%' : '0%' }}"></div></div>
+                            <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-primary" style="width: {{ $wizardStep >= 3 ? '100%' : '0%' }}"></div></div>
                             <div class="flex-1 text-center">
-                                <div class="w-8 h-8 mx-auto {{ $wizardStep >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold">3</div>
-                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 3 ? 'text-indigo-600' : 'text-gray-400' }}">Review</div>
+                                <div class="w-8 h-8 mx-auto {{ $wizardStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold">3</div>
+                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 3 ? 'text-primary' : 'text-gray-400' }}">Review</div>
                             </div>
                         </div>
 
@@ -339,7 +339,7 @@
                             <div class="space-y-6 max-w-lg mx-auto">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Pilih Tingkat Kelas Asal</label>
-                                    <select wire:model="sourceLevelId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+                                    <select wire:model="sourceLevelId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md shadow-sm">
                                         <option value="">-- Pilih Kelas Asal --</option>
                                         @foreach($classLevels as $level)
                                             <option value="{{ $level->id }}">{{ $level->name }}</option>
@@ -354,7 +354,7 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Pilih Tingkat Kelas Tujuan</label>
-                                    <select wire:model="destinationLevelId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+                                    <select wire:model="destinationLevelId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md shadow-sm">
                                         <option value="">-- Pilih Kelas Tujuan --</option>
                                         @foreach($classLevels as $level)
                                             <option value="{{ $level->id }}">Naik ke: {{ $level->name }}</option>
@@ -369,7 +369,7 @@
                                 <h4 class="font-bold text-gray-800 text-center mb-4">Pilih Metode Penempatan Rombel</h4>
                                 
                                 <!-- Opsi Paralel -->
-                                <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ $promotionMethod === 'paralel' ? 'border-indigo-500 ring-2 ring-indigo-500' : 'border-gray-300' }}">
+                                <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ $promotionMethod === 'paralel' ? 'border-primary ring-2 ring-primary' : 'border-gray-300' }}">
                                     <input type="radio" wire:model.live="promotionMethod" value="paralel" class="sr-only">
                                     <span class="flex flex-1">
                                         <span class="flex flex-col">
@@ -377,11 +377,11 @@
                                             <span class="mt-1 flex items-center text-sm text-gray-500">Santri di 1-A akan otomatis dipindah ke 2-A. Jika tidak ada rombel tujuan dengan nama yang sama, santri akan ditaruh di "Belum Penempatan".</span>
                                         </span>
                                     </span>
-                                    <svg class="h-5 w-5 {{ $promotionMethod === 'paralel' ? 'text-indigo-600' : 'hidden' }}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
+                                    <svg class="h-5 w-5 {{ $promotionMethod === 'paralel' ? 'text-primary' : 'hidden' }}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
                                 </label>
 
                                 <!-- Opsi Acak -->
-                                <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ $promotionMethod === 'acak' ? 'border-indigo-500 ring-2 ring-indigo-500' : 'border-gray-300' }}">
+                                <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ $promotionMethod === 'acak' ? 'border-primary ring-2 ring-primary' : 'border-gray-300' }}">
                                     <input type="radio" wire:model.live="promotionMethod" value="acak" class="sr-only">
                                     <span class="flex flex-1">
                                         <span class="flex flex-col">
@@ -389,11 +389,11 @@
                                             <span class="mt-1 flex items-center text-sm text-gray-500">Sistem akan mengacak penempatan santri ke semua rombel di tingkat tujuan secara merata sesuai kapasitas ruangan.</span>
                                         </span>
                                     </span>
-                                    <svg class="h-5 w-5 {{ $promotionMethod === 'acak' ? 'text-indigo-600' : 'hidden' }}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
+                                    <svg class="h-5 w-5 {{ $promotionMethod === 'acak' ? 'text-primary' : 'hidden' }}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
                                 </label>
 
                                 <!-- Opsi Kosong -->
-                                <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ $promotionMethod === 'kosong' ? 'border-indigo-500 ring-2 ring-indigo-500' : 'border-gray-300' }}">
+                                <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ $promotionMethod === 'kosong' ? 'border-primary ring-2 ring-primary' : 'border-gray-300' }}">
                                     <input type="radio" wire:model.live="promotionMethod" value="kosong" class="sr-only">
                                     <span class="flex flex-1">
                                         <span class="flex flex-col">
@@ -401,7 +401,7 @@
                                             <span class="mt-1 flex items-center text-sm text-gray-500">Semua santri akan naik kelas, tapi rombel-nya dikosongkan (Masuk ke status Belum Penempatan). Rombel bisa Anda atur manual nanti.</span>
                                         </span>
                                     </span>
-                                    <svg class="h-5 w-5 {{ $promotionMethod === 'kosong' ? 'text-indigo-600' : 'hidden' }}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
+                                    <svg class="h-5 w-5 {{ $promotionMethod === 'kosong' ? 'text-primary' : 'hidden' }}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
                                 </label>
 
                                 @if($promotionMethod === 'paralel' && $destinationLevelId !== 'lulus')
@@ -419,7 +419,7 @@
                                                         <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                                                     </div>
                                                     <div class="flex-1">
-                                                        <select wire:model="paralelMapping.{{ $sourceRombel['id'] }}" class="block w-full text-sm border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500">
+                                                        <select wire:model="paralelMapping.{{ $sourceRombel['id'] }}" class="block w-full text-sm border-gray-300 rounded focus:ring-primary focus:border-primary">
                                                             <option value="">-- Belum Penempatan --</option>
                                                             @foreach($destinationStudyGroups as $destRombel)
                                                                 <option value="{{ $destRombel['id'] }}">Ke: {{ $destRombel['name'] }}</option>
@@ -458,7 +458,7 @@
                                                     @if($destinationLevelId === 'lulus')
                                                         <span class="text-green-600 font-bold">🎓 LULUS</span>
                                                     @else
-                                                        <select wire:model="promotionDraft.{{ $studentId }}.new_rombel_id" class="text-sm border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500" {{ $data['skip'] ? 'disabled' : '' }}>
+                                                        <select wire:model="promotionDraft.{{ $studentId }}.new_rombel_id" class="text-sm border-gray-300 rounded focus:ring-primary focus:border-primary" {{ $data['skip'] ? 'disabled' : '' }}>
                                                             <option value="">Belum Penempatan</option>
                                                             @foreach($destinationStudyGroups as $dr)
                                                                 <option value="{{ $dr['id'] }}">{{ $dr['name'] }}</option>
@@ -487,7 +487,7 @@
                         </button>
                         
                         @if($wizardStep < 3)
-                            <button wire:click="wizardNextStep" type="button" class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700">
+                            <button wire:click="wizardNextStep" type="button" class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition">
                                 Lanjut
                             </button>
                         @else
@@ -515,7 +515,7 @@
                 icon: 'success',
                 title: data.title,
                 text: data.text,
-                confirmButtonColor: '#3b82f6'
+                confirmButtonColor: '#2e7d32'
             });
         });
     </script>

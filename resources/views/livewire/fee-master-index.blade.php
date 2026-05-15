@@ -34,7 +34,7 @@
                         <th class="px-6 py-3">Target Unit</th>
                         <th class="px-6 py-3">Target Tempat Tinggal</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
-                        <th class="px-6 py-3 text-center">Aksi</th>
+                        <th class="px-6 py-3 text-center whitespace-nowrap w-px">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
@@ -65,7 +65,7 @@
                             <td class="px-6 py-4 text-right font-mono font-medium text-foreground">
                                 Rp {{ number_format($fee->amount, 0, ',', '.') }}
                             </td>
-                            <td class="px-6 py-4 text-center space-x-2">
+                            <td class="px-6 py-4 text-center whitespace-nowrap w-px space-x-2">
                                 <button type="button" 
                                     wire:click="confirmSync({{ $fee->id }})"
                                     class="text-green-600 hover:text-green-800 font-medium" title="Sync Tagihan Susulan">
@@ -120,7 +120,7 @@
                 `,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#10b981',
+                confirmButtonColor: '#2e7d32',
                 cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Ya, Generate Tagihan',
                 cancelButtonText: 'Batal'
@@ -147,7 +147,7 @@
                 icon: 'success',
                 title: data.title,
                 text: data.text,
-                confirmButtonColor: '#3b82f6'
+                confirmButtonColor: '#2e7d32'
             });
         });
 
@@ -157,7 +157,7 @@
                 icon: 'info',
                 title: data.title,
                 text: data.text,
-                confirmButtonColor: '#3b82f6'
+                confirmButtonColor: '#2e7d32'
             });
         });
     </script>
