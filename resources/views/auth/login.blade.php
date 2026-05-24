@@ -58,7 +58,7 @@
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox"
                     class="rounded border-input text-primary shadow-sm focus:ring-ring" name="remember">
-                <span class="ms-2 text-sm text-muted-foreground">{{ __('Remember me') }}</span>
+                <span class="ms-2 text-sm text-muted-foreground">Ingat saya</span>
             </label>
         </div>
 
@@ -66,12 +66,12 @@
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-muted-foreground hover:text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                     href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
+                    Lupa Password?
                 </a>
             @endif
 
             <x-primary-button class="ms-3">
-                {{ __('Log in') }}
+                Masuk
             </x-primary-button>
         </div>
     </form>
