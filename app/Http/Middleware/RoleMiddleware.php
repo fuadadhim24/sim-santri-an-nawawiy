@@ -36,7 +36,7 @@ class RoleMiddleware
             return redirect()->route('wali.dashboard');
         }
 
-        if (in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU'])) {
+        if (in_array($user->role, ['SUPER_ADMIN', 'ADMINISTRASI', 'BENDAHARA'])) {
             return redirect()->route('admin.dashboard');
         }
 

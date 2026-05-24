@@ -80,7 +80,7 @@ class PaymentTest extends TestCase
      */
     public function test_payment_belongs_to_admin_user()
     {
-        $admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
         $payment = Payment::factory()->create(['admin_id' => $admin->id]);
 
         $this->assertTrue($payment->admin()->exists());

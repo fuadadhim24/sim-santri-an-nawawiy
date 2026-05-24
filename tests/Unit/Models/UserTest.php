@@ -37,7 +37,7 @@ class UserTest extends TestCase
      */
     public function test_user_can_have_different_roles()
     {
-        $roles = ['SUPER_ADMIN', 'ADMIN_TU', 'WALI_SANTRI'];
+        $roles = ['SUPER_ADMIN', 'ADMINISTRASI', 'WALI_SANTRI'];
 
         foreach ($roles as $role) {
             $user = User::factory()->create(['role' => $role]);
@@ -55,7 +55,7 @@ class UserTest extends TestCase
             'email' => 'test@example.com',
             'whatsapp' => '081234567891',
             'password' => bcrypt('password123'),
-            'role' => 'ADMIN_TU',
+            'role' => 'ADMINISTRASI',
         ]);
 
         $this->assertTrue(password_verify('password123', $user->password));
@@ -74,7 +74,7 @@ class UserTest extends TestCase
             'email' => 'unique@example.com',
             'whatsapp' => '081234567893',
             'password' => bcrypt('password'),
-            'role' => 'ADMIN_TU',
+            'role' => 'ADMINISTRASI',
         ]);
     }
 

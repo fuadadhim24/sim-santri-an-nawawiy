@@ -28,7 +28,7 @@ class PaymentServiceTest extends TestCase
     public function test_process_cash_payment_successfully()
     {
         $billing = Billing::factory()->create(['status' => 'UNPAID', 'final_amount' => 1000000]);
-        $admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         $payment = $this->paymentService->processCashPayment($billing, $admin->id);
 

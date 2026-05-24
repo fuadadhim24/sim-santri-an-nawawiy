@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 @auth
-                    @if (Auth::user()->role === 'SUPER_ADMIN' || Auth::user()->role === 'ADMIN_TU')
+                    @if (in_array(Auth::user()->role, ['SUPER_ADMIN', 'ADMINISTRASI']))
                         <div class="mt-6">
                             <a href="{{ route('admin.students.edit', $student) }}"
                                 class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">
@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 @auth
-                    @if (Auth::user()->role === 'SUPER_ADMIN' || Auth::user()->role === 'ADMIN_TU')
+                    @if (in_array(Auth::user()->role, ['SUPER_ADMIN', 'ADMINISTRASI']))
                         <div class="mt-6">
                             <a href="{{ route('admin.guardians.edit', $student->guardian) }}"
                                 class="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/80 transition-colors shadow-sm">

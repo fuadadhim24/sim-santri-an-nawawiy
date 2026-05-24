@@ -9,7 +9,7 @@ class BillingPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU', 'WALI_SANTRI', 'KANTOR_SANTRI']);
+        return in_array($user->role, ['SUPER_ADMIN', 'BENDAHARA', 'WALI_SANTRI', 'KANTOR_SANTRI']);
     }
 
     public function view(User $user, Billing $billing): bool
@@ -18,7 +18,7 @@ class BillingPolicy
             return true;
         }
 
-        if ($user->role === 'ADMIN_TU') {
+        if ($user->role === 'BENDAHARA') {
             return true;
         }
 
@@ -31,7 +31,7 @@ class BillingPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU']);
+        return in_array($user->role, ['SUPER_ADMIN', 'BENDAHARA']);
     }
 
     public function update(User $user, Billing $billing): bool
@@ -40,7 +40,7 @@ class BillingPolicy
             return false;
         }
 
-        return in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU']);
+        return in_array($user->role, ['SUPER_ADMIN', 'BENDAHARA']);
     }
 
     public function delete(User $user, Billing $billing): bool
@@ -49,16 +49,16 @@ class BillingPolicy
             return false;
         }
 
-        return in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU']);
+        return in_array($user->role, ['SUPER_ADMIN', 'BENDAHARA']);
     }
 
     public function restore(User $user, Billing $billing): bool
     {
-        return in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU']);
+        return in_array($user->role, ['SUPER_ADMIN', 'BENDAHARA']);
     }
 
     public function forceDelete(User $user, Billing $billing): bool
     {
-        return in_array($user->role, ['SUPER_ADMIN', 'ADMIN_TU']);
+        return in_array($user->role, ['SUPER_ADMIN', 'BENDAHARA']);
     }
 }

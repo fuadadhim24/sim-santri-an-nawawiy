@@ -19,7 +19,7 @@ class UserManagementTest extends TestCase
         parent::setUp();
         
         $this->superAdmin = User::factory()->create(['role' => 'SUPER_ADMIN']);
-        $this->admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $this->admin = User::factory()->create(['role' => 'ADMINISTRASI']);
     }
 
     /**

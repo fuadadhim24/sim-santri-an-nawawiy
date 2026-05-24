@@ -54,7 +54,8 @@
                     <label for="role" class="block text-sm font-medium text-foreground">Peran</label>
                     <select wire:model="role" id="role"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                        <option value="ADMIN_TU">Admin TU</option>
+                        <option value="ADMINISTRASI">Administrasi</option>
+                        <option value="BENDAHARA">Bendahara</option>
                         <option value="SUPER_ADMIN">Super Admin</option>
                     </select>
                     @error('role')

@@ -26,11 +26,19 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Admin TU',
+            'name' => 'Administrasi',
             'whatsapp' => '080000000002',
-            'email' => 'tu@annawawiy.ac.id',
+            'email' => 'administrasi@annawawiy.ac.id',
             'password' => Hash::make('password'),
-            'role' => 'ADMIN_TU',
+            'role' => 'ADMINISTRASI',
+        ]);
+
+        User::create([
+            'name' => 'Bendahara',
+            'whatsapp' => '080000000003',
+            'email' => 'bendahara@annawawiy.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'BENDAHARA',
         ]);
 
         $spmbSchedule = SpmbSchedule::where('is_active', true)->first();

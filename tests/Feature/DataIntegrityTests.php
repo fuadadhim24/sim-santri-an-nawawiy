@@ -141,7 +141,7 @@ class DataIntegrityTests extends TestCase
      */
     public function test_prevent_unauthorized_billing_modification()
     {
-        $admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
         $guardian = User::factory()->create(['role' => 'WALI_SANTRI']);
 
         $student = Student::factory()->create(['status' => 'ACTIVE']);

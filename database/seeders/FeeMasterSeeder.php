@@ -21,7 +21,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catReg->id,
             'item_name' => 'Biaya Pendaftaran SPMB',
-            'amount' => 10000,
+            'amount' => 12000,
             'start_date' => '2025-01-01',
             'unit_target' => null,
             'residence_target' => null,
@@ -45,7 +45,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catSPP->id,
             'item_name' => 'SPP SMP',
-            'amount' => 10000,
+            'amount' => 15000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => '01',
@@ -55,7 +55,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catSPP->id,
             'item_name' => 'SPP SMA',
-            'amount' => 12000,
+            'amount' => 16000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => '02',
@@ -65,7 +65,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catSPP->id,
             'item_name' => 'SPP PPTQ',
-            'amount' => 11000,
+            'amount' => 15500,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => '03',
@@ -78,7 +78,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catOther->id,
             'item_name' => 'Biaya Asrama Bulanan',
-            'amount' => 13000,
+            'amount' => 14000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => null,
@@ -88,7 +88,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catOther->id,
             'item_name' => 'Uang Saku Bulanan',
-            'amount' => 12000,
+            'amount' => 14500,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
             'unit_target' => null,
@@ -101,7 +101,7 @@ class FeeMasterSeeder extends Seeder
         FeeMaster::create([
             'fee_category_id' => $catOther->id,
             'item_name' => 'Biaya Semester',
-            'amount' => 14000,
+            'amount' => 15000,
             'start_date' => '2025-01-01',
             'unit_target' => null,
             'residence_target' => null,

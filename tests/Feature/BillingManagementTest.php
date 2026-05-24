@@ -96,7 +96,7 @@ class BillingManagementTest extends TestCase
     }
 
     /**
-     * Test only admin_tu and super_admin can access billing
+     * Test only ADMINISTRASI and super_admin can access billing
      */
     public function test_only_admin_can_access_billing()
     {

@@ -76,7 +76,7 @@ class BillingForm extends Component
 
     public function save()
     {
-        abort_unless(auth()->user()->role === 'SUPER_ADMIN' || auth()->user()->role === 'ADMIN_TU', 403);
+        abort_unless(auth()->user()->role === 'SUPER_ADMIN' || auth()->user()->role === 'BENDAHARA', 403);
         
         $this->validate();
 

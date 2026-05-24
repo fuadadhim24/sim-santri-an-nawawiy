@@ -23,8 +23,8 @@ class UserForm extends Component
     #[Rule('nullable|min:6')]
     public $password = '';
 
-    #[Rule('required|in:SUPER_ADMIN,ADMIN_TU')]
-    public $role = 'ADMIN_TU';
+    #[Rule('required|in:SUPER_ADMIN,ADMINISTRASI,BENDAHARA')]
+    public $role = 'ADMINISTRASI';
 
     public $isEdit = false;
 
@@ -47,7 +47,7 @@ class UserForm extends Component
             'whatsapp' => 'required|string|max:20|unique:users,whatsapp,' . ($this->user ? $this->user->id : 'NULL'),
             'email' => 'nullable|email|unique:users,email,' . ($this->user ? $this->user->id : 'NULL'),
             'password' => $this->isEdit ? 'nullable|min:6' : 'required|min:6',
-            'role' => 'required|in:SUPER_ADMIN,ADMIN_TU',
+            'role' => 'required|in:SUPER_ADMIN,ADMINISTRASI,BENDAHARA',
         ]);
 
         $data = [

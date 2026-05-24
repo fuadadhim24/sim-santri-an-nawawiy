@@ -49,9 +49,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/faq', \App\Livewire\GuardianFaqIndex::class)->name('wali.faq');
     });
 
-    Route::middleware(['role:SUPER_ADMIN,ADMIN_TU'])->group(function () {
+    Route::middleware(['role:SUPER_ADMIN,ADMINISTRASI,BENDAHARA'])->group(function () {
         Route::get('/admin/dashboard', \App\Livewire\AdminDashboard::class)->name('admin.dashboard');
+    });
 
+    Route::middleware(['role:SUPER_ADMIN,ADMINISTRASI'])->group(function () {
         Route::get('/admin/guardians', \App\Livewire\GuardianIndex::class)->name('admin.guardians');
         Route::get('/admin/guardians/create', \App\Livewire\GuardianForm::class)->name('admin.guardians.create');
         Route::get('/admin/guardians/{guardian}/edit', \App\Livewire\GuardianForm::class)->name('admin.guardians.edit');
@@ -66,18 +68,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/student-acceptance/{student}/confirm', \App\Livewire\StudentAcceptanceConfirm::class)->name('admin.student-acceptance-confirm');
         Route::post('/admin/students/{student}/reject', [\App\Http\Controllers\StudentAcceptanceController::class, 'reject'])->name('admin.students.reject');
 
-        Route::get('/admin/billings/archive', \App\Livewire\BillingArchive::class)->name('admin.billings.archive');
-        Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
-        Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
-
         Route::get('/admin/spmb-schedules', \App\Livewire\SpmbScheduleIndex::class)->name('admin.spmb-schedules');
         Route::get('/admin/spmb-schedules/create', \App\Livewire\SpmbScheduleForm::class)->name('admin.spmb-schedules.create');
         Route::get('/admin/spmb-schedules/{id}/edit', \App\Livewire\SpmbScheduleForm::class)->name('admin.spmb-schedules.edit');
     });
 
+    Route::middleware(['role:SUPER_ADMIN,BENDAHARA'])->group(function () {
+        Route::get('/admin/billings/archive', \App\Livewire\BillingArchive::class)->name('admin.billings.archive');
+        Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
+        Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
+    });
+
     Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])
         ->middleware('auth')
-        ->middleware('role:SUPER_ADMIN,ADMIN_TU,WALI_SANTRI')
+        ->middleware('role:SUPER_ADMIN,ADMINISTRASI,BENDAHARA,WALI_SANTRI')
         ->name('admin.receipts.show');
 
     Route::get('/payment/pay/{billingId}', [\App\Http\Controllers\DuitkuController::class, 'createInvoice'])->name('duitku.pay');

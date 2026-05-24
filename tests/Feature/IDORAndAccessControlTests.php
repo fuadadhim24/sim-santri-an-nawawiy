@@ -44,7 +44,7 @@ class IDORAndAccessControlTests extends TestCase
      */
     public function test_admin_can_view_all_receipts()
     {
-        $admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
         $guardian = User::factory()->create(['role' => 'WALI_SANTRI']);
 
         $guardianData = Guardian::factory()->create();
@@ -73,11 +73,11 @@ class IDORAndAccessControlTests extends TestCase
     }
 
     /**
-     * NEGATIVE TEST 4: Admin TU cannot access Super Admin routes
+     * NEGATIVE TEST 4: Administrasi cannot access Super Admin routes
      */
-    public function test_admin_tu_cannot_access_super_admin_routes()
+    public function test_ADMINISTRASI_cannot_access_super_admin_routes()
     {
-        $adminTu = User::factory()->create(['role' => 'ADMIN_TU']);
+        $adminTu = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         // Try to access Super Admin only routes
         $response = $this->actingAs($adminTu)
@@ -110,7 +110,7 @@ class IDORAndAccessControlTests extends TestCase
      */
     public function test_admin_cannot_escalate_own_role()
     {
-        $admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         $response = $this->actingAs($admin)
             ->patch("/admin/users/{$admin->id}", [

@@ -108,6 +108,7 @@
                     </p>
                 </div>
 
+                @if (in_array(Auth::user()->role, ['SUPER_ADMIN', 'ADMINISTRASI']))
                 <a href="{{ route('admin.guardians') }}"
                     class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.guardians') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
                     <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.guardians') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
@@ -162,7 +163,9 @@
                     </svg>
                     Penerimaan Santri
                 </a>
+                @endif
 
+                @if (in_array(Auth::user()->role, ['SUPER_ADMIN', 'BENDAHARA']))
                 <a href="{{ route('admin.billings') }}"
                     class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.billings*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
                     <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.billings*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
@@ -173,6 +176,7 @@
                     </svg>
                     Tagihan
                 </a>
+                @endif
 
                 @if (Auth::user()->role === 'SUPER_ADMIN')
                     <div class="pt-4 pb-2">

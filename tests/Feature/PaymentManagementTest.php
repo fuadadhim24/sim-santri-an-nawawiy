@@ -19,7 +19,7 @@ class PaymentManagementTest extends TestCase
     {
         parent::setUp();
         
-        $this->admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $this->admin = User::factory()->create(['role' => 'ADMINISTRASI']);
         $this->guardian = User::factory()->create(['role' => 'WALI_SANTRI']);
     }
 

@@ -112,7 +112,7 @@ class AuthenticationTest extends TestCase
      */
     public function test_dashboard_redirects_based_on_role()
     {
-        $adminUser = User::factory()->create(['role' => 'ADMIN_TU']);
+        $adminUser = User::factory()->create(['role' => 'ADMINISTRASI']);
         $guardianUser = User::factory()->create(['role' => 'WALI_SANTRI']);
 
         // Admin should go to admin dashboard

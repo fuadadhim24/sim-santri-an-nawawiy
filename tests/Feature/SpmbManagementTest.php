@@ -89,7 +89,7 @@ class SpmbManagementTest extends TestCase
      */
     public function test_only_super_admin_can_manage_spmb()
     {
-        $adminTu = User::factory()->create(['role' => 'ADMIN_TU']);
+        $adminTu = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         $response = $this->actingAs($adminTu)
             ->get('/admin/spmb-schedules');

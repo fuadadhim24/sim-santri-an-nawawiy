@@ -75,10 +75,10 @@ class RoleBasedAccessTest extends TestCase
         ]);
     }
 
-    // ADMIN_TU Tests
-    public function test_admin_tu_can_access_master_data()
+    // ADMINISTRASI Tests
+    public function test_ADMINISTRASI_can_access_master_data()
     {
-        $adminTU = User::where('role', 'ADMIN_TU')->first();
+        $adminTU = User::where('role', 'ADMINISTRASI')->first();
         
         $this->actingAs($adminTU)
             ->get('/admin/fee-categories')
@@ -89,9 +89,9 @@ class RoleBasedAccessTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function test_admin_tu_can_process_payment()
+    public function test_ADMINISTRASI_can_process_payment()
     {
-        $adminTU = User::where('role', 'ADMIN_TU')->first();
+        $adminTU = User::where('role', 'ADMINISTRASI')->first();
         $billing = Billing::where('status', 'BELUM LUNAS')->first();
 
         // Test cash payment
@@ -105,9 +105,9 @@ class RoleBasedAccessTest extends TestCase
         $this->assertEquals('PAID', $billing->status);
     }
 
-    public function test_admin_tu_can_create_student()
+    public function test_ADMINISTRASI_can_create_student()
     {
-        $adminTU = User::where('role', 'ADMIN_TU')->first();
+        $adminTU = User::where('role', 'ADMINISTRASI')->first();
         $guardian = Guardian::first();
 
         $this->actingAs($adminTU)
@@ -218,7 +218,7 @@ class RoleBasedAccessTest extends TestCase
     // Business Logic Tests
     public function test_billing_status_transitions_correctly()
     {
-        $adminTU = User::where('role', 'ADMIN_TU')->first();
+        $adminTU = User::where('role', 'ADMINISTRASI')->first();
         $billing = Billing::where('status', 'BELUM LUNAS')->first();
         $originalAmount = $billing->amount;
 

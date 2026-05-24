@@ -20,7 +20,7 @@ class PaymentSecurityTests extends TestCase
     {
         parent::setUp();
         $this->paymentService = new SecurePaymentService();
-        $this->admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $this->admin = User::factory()->create(['role' => 'ADMINISTRASI']);
     }
 
     /**

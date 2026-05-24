@@ -56,11 +56,11 @@ class ComprehensiveFeatureTest extends TestCase
     }
 
     /**
-     * ADMIN_TU Tests
+     * ADMINISTRASI Tests
      */
-    public function test_admin_tu_cannot_access_super_admin_only_features()
+    public function test_ADMINISTRASI_cannot_access_super_admin_only_features()
     {
-        $adminTU = User::where('role', 'ADMIN_TU')->first();
+        $adminTU = User::where('role', 'ADMINISTRASI')->first();
         
         // These should be forbidden or redirect
         $response = $this->actingAs($adminTU)->get('/admin/users');
@@ -76,9 +76,9 @@ class ComprehensiveFeatureTest extends TestCase
         $this->assertTrue($response->status() === 403 || $response->status() === 302);
     }
 
-    public function test_admin_tu_can_access_operational_features()
+    public function test_ADMINISTRASI_can_access_operational_features()
     {
-        $adminTU = User::where('role', 'ADMIN_TU')->first();
+        $adminTU = User::where('role', 'ADMINISTRASI')->first();
         
         $this->actingAs($adminTU)->get('/admin/students')->assertStatus(200);
         $this->actingAs($adminTU)->get('/admin/guardians')->assertStatus(200);

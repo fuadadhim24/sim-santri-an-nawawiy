@@ -16,7 +16,7 @@ class GuardianManagementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $this->admin = User::factory()->create(['role' => 'ADMINISTRASI']);
     }
 
     /**

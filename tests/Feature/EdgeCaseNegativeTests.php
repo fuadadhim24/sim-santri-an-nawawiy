@@ -21,7 +21,7 @@ class EdgeCaseNegativeTests extends TestCase
     {
         parent::setUp();
         $this->billingService = new EnhancedBillingService();
-        $this->admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $this->admin = User::factory()->create(['role' => 'ADMINISTRASI']);
     }
 
     /**
@@ -175,16 +175,16 @@ class EdgeCaseNegativeTests extends TestCase
     }
 
     /**
-     * NEGATIVE TEST 9: Admin TU cannot modify Super Admin users
+     * NEGATIVE TEST 9: Administrasi cannot modify Super Admin users
      */
-    public function test_admin_tu_cannot_modify_super_admin()
+    public function test_ADMINISTRASI_cannot_modify_super_admin()
     {
         $superAdmin = User::factory()->create(['role' => 'SUPER_ADMIN']);
-        $adminTu = User::factory()->create(['role' => 'ADMIN_TU']);
+        $adminTu = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         $response = $this->actingAs($adminTu)
             ->patch("/admin/users/{$superAdmin->id}", [
-                'role' => 'ADMIN_TU', // Try to demote
+                'role' => 'ADMINISTRASI', // Try to demote
             ]);
 
         // Should be forbidden
@@ -197,7 +197,7 @@ class EdgeCaseNegativeTests extends TestCase
     public function test_cannot_process_double_payment()
     {
         $billing = Billing::factory()->create(['status' => 'UNPAID']);
-        $admin = User::factory()->create(['role' => 'ADMIN_TU']);
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         // First payment succeeds
         $payment1 = Billing::find($billing->id); // Simulate first payment
