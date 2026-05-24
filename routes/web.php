@@ -71,6 +71,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/spmb-schedules', \App\Livewire\SpmbScheduleIndex::class)->name('admin.spmb-schedules');
         Route::get('/admin/spmb-schedules/create', \App\Livewire\SpmbScheduleForm::class)->name('admin.spmb-schedules.create');
         Route::get('/admin/spmb-schedules/{id}/edit', \App\Livewire\SpmbScheduleForm::class)->name('admin.spmb-schedules.edit');
+
+        Route::get('/admin/faqs', \App\Livewire\FaqIndex::class)->name('admin.faqs');
+        Route::get('/admin/faqs/create', \App\Livewire\FaqForm::class)->name('admin.faqs.create');
+        Route::get('/admin/faqs/{faq}/edit', \App\Livewire\FaqForm::class)->name('admin.faqs.edit');
     });
 
     Route::middleware(['role:SUPER_ADMIN,BENDAHARA'])->group(function () {
@@ -106,10 +110,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/users/create', \App\Livewire\UserForm::class)->name('admin.users.create');
         Route::get('/admin/users/{user}/edit', \App\Livewire\UserForm::class)->name('admin.users.edit');
 
-
-        Route::get('/admin/faqs', \App\Livewire\FaqIndex::class)->name('admin.faqs');
-        Route::get('/admin/faqs/create', \App\Livewire\FaqForm::class)->name('admin.faqs.create');
-        Route::get('/admin/faqs/{faq}/edit', \App\Livewire\FaqForm::class)->name('admin.faqs.edit');
     });
 
 });

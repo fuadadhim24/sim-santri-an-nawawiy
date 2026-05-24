@@ -205,10 +205,10 @@
                     </a>
                 @endif
 
-                @if (Auth::user()->role === 'SUPER_ADMIN')
+                @if (in_array(Auth::user()->role, ['SUPER_ADMIN', 'ADMINISTRASI']))
                     <div class="pt-4 pb-2">
                         <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Sistem
+                            Sistem & Informasi
                         </p>
                     </div>
                     <a href="{{ route('admin.faqs') }}"
