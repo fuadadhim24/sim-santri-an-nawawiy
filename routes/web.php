@@ -77,19 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/billings/archive', \App\Livewire\BillingArchive::class)->name('admin.billings.archive');
         Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
-    });
 
-    Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])
-        ->middleware('auth')
-        ->middleware('role:SUPER_ADMIN,ADMINISTRASI,BENDAHARA,WALI_SANTRI')
-        ->name('admin.receipts.show');
-
-    Route::get('/payment/pay/{billingId}', [\App\Http\Controllers\DuitkuController::class, 'createInvoice'])->name('duitku.pay');
-
-    Route::middleware(['role:SUPER_ADMIN'])->group(function () {
-        Route::get('/admin/users', \App\Livewire\UserIndex::class)->name('admin.users');
-        Route::get('/admin/users/create', \App\Livewire\UserForm::class)->name('admin.users.create');
-        Route::get('/admin/users/{user}/edit', \App\Livewire\UserForm::class)->name('admin.users.edit');
         Route::get('/admin/fee-masters', \App\Livewire\FeeMasterIndex::class)->name('admin.fee-masters');
         Route::get('/admin/fee-masters/create', \App\Livewire\FeeMasterForm::class)->name('admin.fee-masters.create');
         Route::get('/admin/fee-masters/{feeMaster}/edit', \App\Livewire\FeeMasterForm::class)->name('admin.fee-masters.edit');
@@ -104,6 +92,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/discounts/{discount}/edit', \App\Livewire\DiscountForm::class)->name('admin.discounts.edit');
 
         Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
+    });
+
+    Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])
+        ->middleware('auth')
+        ->middleware('role:SUPER_ADMIN,ADMINISTRASI,BENDAHARA,WALI_SANTRI')
+        ->name('admin.receipts.show');
+
+    Route::get('/payment/pay/{billingId}', [\App\Http\Controllers\DuitkuController::class, 'createInvoice'])->name('duitku.pay');
+
+    Route::middleware(['role:SUPER_ADMIN'])->group(function () {
+        Route::get('/admin/users', \App\Livewire\UserIndex::class)->name('admin.users');
+        Route::get('/admin/users/create', \App\Livewire\UserForm::class)->name('admin.users.create');
+        Route::get('/admin/users/{user}/edit', \App\Livewire\UserForm::class)->name('admin.users.edit');
+
 
         Route::get('/admin/faqs', \App\Livewire\FaqIndex::class)->name('admin.faqs');
         Route::get('/admin/faqs/create', \App\Livewire\FaqForm::class)->name('admin.faqs.create');

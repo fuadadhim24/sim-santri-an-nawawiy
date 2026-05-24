@@ -53,7 +53,7 @@
                 @if (Auth::user()->role === 'SUPER_ADMIN')
                     <div class="pt-4 pb-2">
                         <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Data Master
+                            Manajemen Akun
                         </p>
                     </div>
 
@@ -67,6 +67,14 @@
                         </svg>
                         Pengguna
                     </a>
+                @endif
+
+                @if (in_array(Auth::user()->role, ['SUPER_ADMIN', 'BENDAHARA']))
+                    <div class="pt-4 pb-2">
+                        <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Data Master Keuangan
+                        </p>
+                    </div>
 
                     <a href="{{ route('admin.fee-categories') }}"
                         class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.fee-categories*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
@@ -178,7 +186,7 @@
                 </a>
                 @endif
 
-                @if (Auth::user()->role === 'SUPER_ADMIN')
+                @if (in_array(Auth::user()->role, ['SUPER_ADMIN', 'BENDAHARA']))
                     <div class="pt-4 pb-2">
                         <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Laporan
@@ -195,7 +203,14 @@
                         </svg>
                         Laporan Keuangan
                     </a>
+                @endif
 
+                @if (Auth::user()->role === 'SUPER_ADMIN')
+                    <div class="pt-4 pb-2">
+                        <p class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Sistem
+                        </p>
+                    </div>
                     <a href="{{ route('admin.faqs') }}"
                         class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.faqs*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
                         <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.faqs*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
