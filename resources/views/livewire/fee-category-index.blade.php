@@ -82,7 +82,7 @@
                                         class="text-primary hover:text-primary/80 font-medium">Edit</a>
                                     @if(!$category->is_locked)
                                         <button wire:click="delete({{ $category->id }})"
-                                            wire:confirm="Hapus kategori ini? Biaya yang terkait mungkin akan kehilangan kategorinya."
+                                            wire:swal="Hapus kategori ini? Biaya yang terkait mungkin akan kehilangan kategorinya."
                                             class="text-destructive hover:text-destructive/80 font-medium">Hapus</button>
                                     @else
                                         <span class="text-muted-foreground text-xs">Terkunci</span>

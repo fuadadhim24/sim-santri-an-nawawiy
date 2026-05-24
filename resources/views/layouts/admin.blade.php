@@ -246,7 +246,7 @@
 
     <script>
         document.addEventListener('livewire:init', () => {
-            Livewire.directive('confirm', ({ el, directive, component, cleanup }) => {
+            Livewire.directive('swal', ({ el, directive, component, cleanup }) => {
                 let content = directive.expression
 
                 let onClick = e => {

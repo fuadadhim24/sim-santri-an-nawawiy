@@ -171,7 +171,7 @@
 
                                     @if ($billing->status == 'UNPAID')
                                         <button wire:click="processCashPayment({{ $billing->id }})"
-                                            wire:confirm="Apakah Anda yakin ingin memproses pembayaran ini secara Cash? Status tagihan akan langsung menjadi LUNAS."
+                                            wire:swal="Apakah Anda yakin ingin memproses pembayaran ini secara Cash? Status tagihan akan langsung menjadi LUNAS."
                                             class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium ml-2">
                                             Bayar Cash
                                         </button>
@@ -181,7 +181,7 @@
                                             Bayar Cashless
                                         </a>
                                         <button wire:click="delete({{ $billing->id }})"
-                                            wire:confirm="Yakin ingin menghapus / mengarsipkan tagihan ini?"
+                                            wire:swal="Yakin ingin menghapus / mengarsipkan tagihan ini?"
                                             class="px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-xs font-medium ml-2">
                                             Hapus / Arsip
                                         </button>

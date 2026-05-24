@@ -77,7 +77,7 @@
                                     <a href="{{ route('admin.faqs.edit', $faq->id) }}"
                                         class="text-primary hover:text-primary/80 font-medium text-sm">Edit</a>
                                     <button wire:click="delete({{ $faq->id }})"
-                                        wire:confirm="Yakin ingin menghapus FAQ ini?"
+                                        wire:swal="Yakin ingin menghapus FAQ ini?"
                                         class="text-destructive hover:text-destructive/80 font-medium text-sm">Hapus</button>
                                 </div>
                             </td>

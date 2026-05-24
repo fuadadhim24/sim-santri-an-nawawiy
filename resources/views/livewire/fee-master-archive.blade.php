@@ -92,10 +92,10 @@
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm">
                                     <div class="flex items-center space-x-2">
-                                        <button wire:click="restore({{ $fee->id }})" wire:confirm="Apakah Anda yakin ingin me-restore master biaya ini?" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                        <button wire:click="restore({{ $fee->id }})" wire:swal="Apakah Anda yakin ingin me-restore master biaya ini?" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                             Restore
                                         </button>
-                                        <button wire:click="forceDelete({{ $fee->id }})" wire:confirm="Apakah Anda yakin ingin menghapus permanen master biaya ini? Tindakan ini tidak dapat dibatalkan." class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                        <button wire:click="forceDelete({{ $fee->id }})" wire:swal="Apakah Anda yakin ingin menghapus permanen master biaya ini? Tindakan ini tidak dapat dibatalkan." class="text-red-600 hover:text-red-800 text-sm font-medium">
                                             Hapus Permanen
                                         </button>
                                     </div>

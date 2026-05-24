@@ -60,10 +60,10 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <button type="button" wire:click="restore({{ $billing->id }})"
-                                    wire:confirm="Yakin ingin memulihkan tagihan ini?"
+                                    wire:swal="Yakin ingin memulihkan tagihan ini?"
                                     class="text-primary hover:text-primary/80 font-medium mr-2">Restore</button>
                                 <button type="button" wire:click="forceDelete({{ $billing->id }})"
-                                    wire:confirm="Yakin menghapus permanen? Data yang hilang tidak dapat kembali."
+                                    wire:swal="Yakin menghapus permanen? Data yang hilang tidak dapat kembali."
                                     class="text-destructive hover:text-destructive/80 font-medium">Hapus
                                     Permanen</button>
                             </td>
