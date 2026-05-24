@@ -250,6 +250,11 @@
                 let content = directive.expression
 
                 let onClick = e => {
+                    if (el.__is_swal_confirmed) {
+                        el.__is_swal_confirmed = false;
+                        return;
+                    }
+
                     e.preventDefault()
                     e.stopImmediatePropagation()
 
@@ -264,7 +269,7 @@
                         cancelButtonText: 'Batal'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            cleanup()
+                            el.__is_swal_confirmed = true;
                             el.click()
                         }
                     })
