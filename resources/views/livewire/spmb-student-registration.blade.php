@@ -146,8 +146,8 @@
                             <!-- KK -->
                             <div>
                                 <label for="kk" class="block text-sm font-medium text-gray-700">Kartu Keluarga (KK) <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="kk" id="kk"
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="kk" id="kk" accept=".jpg,.jpeg,.png,.webp,.pdf"
                                     class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @if($this->kk && !is_string($this->kk))
                                     <div class="mt-2 flex items-center">
@@ -167,8 +167,8 @@
                             <!-- Foto -->
                             <div>
                                 <label for="foto" class="block text-sm font-medium text-gray-700">Pas Foto <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG (Max: 1MB)</p>
-                                <input type="file" wire:model="foto" id="foto"
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP (Max: 1MB)</p>
+                                <input type="file" wire:model="foto" id="foto" accept=".jpg,.jpeg,.png,.webp"
                                     class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @if($this->foto && !is_string($this->foto))
                                     <div class="mt-2 flex items-center">
@@ -188,8 +188,8 @@
                             <!-- NISN -->
                             <div>
                                 <label for="nisn_document" class="block text-sm font-medium text-gray-700">Kartu NISN (Opsional)</label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="nisn_document" id="nisn_document"
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="nisn_document" id="nisn_document" accept=".jpg,.jpeg,.png,.webp,.pdf"
                                     class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @if($this->nisn_document && !is_string($this->nisn_document))
                                     <div class="mt-2 flex items-center">
@@ -209,8 +209,8 @@
                             <!-- Akta -->
                             <div>
                                 <label for="akta" class="block text-sm font-medium text-gray-700">Akta Kelahiran <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="akta" id="akta"
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="akta" id="akta" accept=".jpg,.jpeg,.png,.webp,.pdf"
                                     class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @if($this->akta && !is_string($this->akta))
                                     <div class="mt-2 flex items-center">
@@ -230,8 +230,8 @@
                             <!-- Ijazah -->
                             <div>
                                 <label for="ijazah" class="block text-sm font-medium text-gray-700">Ijazah Terakhir <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="ijazah" id="ijazah"
+                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
+                                <input type="file" wire:model="ijazah" id="ijazah" accept=".jpg,.jpeg,.png,.webp,.pdf"
                                     class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @if($this->ijazah && !is_string($this->ijazah))
                                     <div class="mt-2 flex items-center">

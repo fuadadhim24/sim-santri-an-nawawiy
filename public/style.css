@@ -34,7 +34,7 @@
 }
 
 .hero {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(image/halaman.JPG);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(image/halaman.jpg);
   background-size: cover;
   background-position: center;
   background-repeat: none;

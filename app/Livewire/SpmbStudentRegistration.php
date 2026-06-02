@@ -33,19 +33,19 @@ class SpmbStudentRegistration extends Component
     #[Rule('nullable|string')]
     public $address = '';
 
-    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    #[Rule('required|file|mimes:jpg,jpeg,png,webp,pdf|max:2048')]
     public $kk = null;
 
-    #[Rule('required|file|mimes:jpg,jpeg,png|max:1024')]
+    #[Rule('required|file|mimes:jpg,jpeg,png,webp|max:1024')]
     public $foto = null;
 
-    #[Rule('nullable|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    #[Rule('nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048')]
     public $nisn_document = null;
 
-    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    #[Rule('required|file|mimes:jpg,jpeg,png,webp,pdf|max:2048')]
     public $akta = null;
 
-    #[Rule('required|file|mimes:jpg,jpeg,png,pdf|max:2048')]
+    #[Rule('required|file|mimes:jpg,jpeg,png,webp,pdf|max:2048')]
     public $ijazah = null;
 
     public function mount()
