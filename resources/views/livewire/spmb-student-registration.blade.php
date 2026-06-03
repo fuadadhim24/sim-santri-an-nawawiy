@@ -146,18 +146,24 @@
                             <!-- KK -->
                             <div>
                                 <label for="kk" class="block text-sm font-medium text-gray-700">Kartu Keluarga (KK) <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="kk" id="kk" accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <p class="text-xs text-gray-500 mb-2">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
                                 @if($this->kk && !is_string($this->kk))
-                                    <div class="mt-2 flex items-center">
-                                        <span class="text-sm text-gray-600 mr-2">{{ $this->kk->getClientOriginalName() }}</span>
-                                        <button type="button" wire:click="removeFile('kk')" class="text-red-500 hover:text-red-700">
+                                    <div class="mb-3 p-3 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="text-sm text-green-700 font-medium">{{ $this->kk->getClientOriginalName() }}</span>
+                                        </div>
+                                        <button type="button" wire:click="removeFile('kk')" class="text-gray-400 hover:text-gray-600">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
                                     </div>
+                                @else
+                                    <input type="file" wire:model="kk" id="kk" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @endif
                                 @error('kk')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -167,18 +173,24 @@
                             <!-- Foto -->
                             <div>
                                 <label for="foto" class="block text-sm font-medium text-gray-700">Pas Foto <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP (Max: 1MB)</p>
-                                <input type="file" wire:model="foto" id="foto" accept=".jpg,.jpeg,.png,.webp"
-                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <p class="text-xs text-gray-500 mb-2">Format: JPG, JPEG, PNG, WEBP (Max: 1MB)</p>
                                 @if($this->foto && !is_string($this->foto))
-                                    <div class="mt-2 flex items-center">
-                                        <span class="text-sm text-gray-600 mr-2">{{ $this->foto->getClientOriginalName() }}</span>
-                                        <button type="button" wire:click="removeFile('foto')" class="text-red-500 hover:text-red-700">
+                                    <div class="mb-3 p-3 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="text-sm text-green-700 font-medium">{{ $this->foto->getClientOriginalName() }}</span>
+                                        </div>
+                                        <button type="button" wire:click="removeFile('foto')" class="text-gray-400 hover:text-gray-600">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
                                     </div>
+                                @else
+                                    <input type="file" wire:model="foto" id="foto" accept=".jpg,.jpeg,.png,.webp"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @endif
                                 @error('foto')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -188,18 +200,24 @@
                             <!-- NISN -->
                             <div>
                                 <label for="nisn_document" class="block text-sm font-medium text-gray-700">Kartu NISN (Opsional)</label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="nisn_document" id="nisn_document" accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <p class="text-xs text-gray-500 mb-2">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
                                 @if($this->nisn_document && !is_string($this->nisn_document))
-                                    <div class="mt-2 flex items-center">
-                                        <span class="text-sm text-gray-600 mr-2">{{ $this->nisn_document->getClientOriginalName() }}</span>
-                                        <button type="button" wire:click="removeFile('nisn_document')" class="text-red-500 hover:text-red-700">
+                                    <div class="mb-3 p-3 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="text-sm text-green-700 font-medium">{{ $this->nisn_document->getClientOriginalName() }}</span>
+                                        </div>
+                                        <button type="button" wire:click="removeFile('nisn_document')" class="text-gray-400 hover:text-gray-600">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
                                     </div>
+                                @else
+                                    <input type="file" wire:model="nisn_document" id="nisn_document" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @endif
                                 @error('nisn_document')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -209,18 +227,24 @@
                             <!-- Akta -->
                             <div>
                                 <label for="akta" class="block text-sm font-medium text-gray-700">Akta Kelahiran <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="akta" id="akta" accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <p class="text-xs text-gray-500 mb-2">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
                                 @if($this->akta && !is_string($this->akta))
-                                    <div class="mt-2 flex items-center">
-                                        <span class="text-sm text-gray-600 mr-2">{{ $this->akta->getClientOriginalName() }}</span>
-                                        <button type="button" wire:click="removeFile('akta')" class="text-red-500 hover:text-red-700">
+                                    <div class="mb-3 p-3 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="text-sm text-green-700 font-medium">{{ $this->akta->getClientOriginalName() }}</span>
+                                        </div>
+                                        <button type="button" wire:click="removeFile('akta')" class="text-gray-400 hover:text-gray-600">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
                                     </div>
+                                @else
+                                    <input type="file" wire:model="akta" id="akta" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @endif
                                 @error('akta')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -230,18 +254,24 @@
                             <!-- Ijazah -->
                             <div>
                                 <label for="ijazah" class="block text-sm font-medium text-gray-700">Ijazah Terakhir <span class="text-red-500">*</span></label>
-                                <p class="text-xs text-gray-500 mb-1">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
-                                <input type="file" wire:model="ijazah" id="ijazah" accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <p class="text-xs text-gray-500 mb-2">Format: JPG, JPEG, PNG, WEBP, PDF (Max: 2MB)</p>
                                 @if($this->ijazah && !is_string($this->ijazah))
-                                    <div class="mt-2 flex items-center">
-                                        <span class="text-sm text-gray-600 mr-2">{{ $this->ijazah->getClientOriginalName() }}</span>
-                                        <button type="button" wire:click="removeFile('ijazah')" class="text-red-500 hover:text-red-700">
+                                    <div class="mb-3 p-3 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="text-sm text-green-700 font-medium">{{ $this->ijazah->getClientOriginalName() }}</span>
+                                        </div>
+                                        <button type="button" wire:click="removeFile('ijazah')" class="text-gray-400 hover:text-gray-600">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
                                     </div>
+                                @else
+                                    <input type="file" wire:model="ijazah" id="ijazah" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                                 @endif
                                 @error('ijazah')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -251,13 +281,9 @@
                     </div>
 
 
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <a href="{{ route('wali.spmb-schedules') }}"
-                            class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                            Batal
-                        </a>
+                    <div class="flex justify-end pt-4">
                         <button type="submit" wire:loading.attr="disabled" wire:target="save"
-                            class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="inline-flex items-center justify-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg wire:loading wire:target="save" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

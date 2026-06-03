@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['role:WALI_SANTRI'])->group(function () {
         Route::get('/my-dashboard', \App\Livewire\GuardianDashboard::class)->name('wali.dashboard');
+        Route::get('/wali/profile', \App\Livewire\GuardianProfileEdit::class)->name('wali.profile.edit');
         Route::get('/spmb-schedules', \App\Livewire\SpmbScheduleSelection::class)->name('wali.spmb-schedules');
         Route::get('/spmb/register', \App\Livewire\SpmbStudentRegistration::class)->name('wali.spmb.register');
         Route::get('/students/{student}', \App\Livewire\StudentDetail::class)->name('wali.students.show');

@@ -11,10 +11,13 @@ class SpmbScheduleFactory extends Factory
 
     public function definition(): array
     {
+        $registrationStart = $this->faker->dateTimeBetween('-1 month', '+1 month');
+        $registrationEnd = $this->faker->dateTimeBetween($registrationStart, '+2 months');
+
         return [
-            'title' => $this->faker->words(3, true),
-            'start_date' => $this->faker->dateThisYear(),
-            'end_date' => $this->faker->dateThisYear(),
+            'name' => $this->faker->words(3, true),
+            'registration_start' => $registrationStart,
+            'registration_end' => $registrationEnd,
             'description' => $this->faker->sentence(),
             'is_active' => true,
         ];
