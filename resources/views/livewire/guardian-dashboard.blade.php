@@ -107,9 +107,16 @@
                                                 <li class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center hover:bg-gray-50 transition">
                                                     <div class="mb-3 sm:mb-0">
                                                         <p class="text-sm font-medium text-gray-900">{{ $bill->title }}</p>
-                                                        <p class="text-xs text-gray-500 mt-1">
-                                                            Tenggat: {{ $bill->created_at->locale('id')->isoFormat('D MMMM Y') }}
-                                                        </p>
+                                                        @php
+                                                            $dueDate = $bill->due_date ?? $bill->created_at->addDays(14);
+                                                            $isOverdue = $dueDate->isPast();
+                                                        @endphp
+                                                         <p class="text-xs text-gray-500 mt-0.5">
+                                                             Tenggat: {{ $dueDate->locale('id')->isoFormat('D MMMM Y') }}
+                                                             @if ($isOverdue)
+                                                                 <span class="text-red-500 font-medium ml-1">(Terlambat)</span>
+                                                             @endif
+                                                         </p>
                                                     </div>
                                                     <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-4">
                                                         <span class="text-sm font-bold text-destructive">

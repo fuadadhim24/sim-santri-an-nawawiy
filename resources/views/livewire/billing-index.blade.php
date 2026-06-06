@@ -118,7 +118,18 @@
                     @forelse ($billings as $billing)
                         <tr class="hover:bg-muted/50 transition-colors">
                             <td class="px-6 py-4 text-muted-foreground">
-                                {{ $billing->created_at->locale('id')->isoFormat('D MMMM Y') }}</td>
+                                @php
+                                    $dueDate = $billing->due_date ?? $billing->created_at->addDays(14);
+                                    $isOverdue = $billing->status == 'UNPAID' && $dueDate->isPast();
+                                @endphp
+                                <div>{{ $billing->created_at->locale('id')->isoFormat('D MMMM Y') }}</div>
+                                <div class="text-[10px] text-muted-foreground mt-0.5" title="Jatuh Tempo">
+                                    Tenggat: {{ $dueDate->locale('id')->isoFormat('D MMMM Y') }}
+                                    @if ($isOverdue)
+                                        <span class="text-destructive font-semibold ml-0.5">(Terlambat)</span>
+                                    @endif
+                                </div>
+                            </td>
                             <td class="px-6 py-4 font-medium text-foreground">
                                 {{ $billing->student->full_name }}
                                 <span class="text-xs text-muted-foreground block">{{ $billing->student->nis }}</span>
@@ -150,9 +161,18 @@
                                         LUNAS
                                     </span>
                                 @elseif ($billing->status == 'UNPAID')
+                                    @php
+                                        $dueDate = $billing->due_date ?? $billing->created_at->addDays(14);
+                                        $isOverdue = $dueDate->isPast();
+                                    @endphp
                                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                         BELUM LUNAS
                                     </span>
+                                    @if ($isOverdue)
+                                        <span class="block text-[9px] text-destructive/90 font-bold mt-1 uppercase tracking-wider">
+                                            TERLAMBAT
+                                        </span>
+                                    @endif
                                 @elseif ($billing->status == 'EXPIRED')
                                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
                                         KADALUARSA
