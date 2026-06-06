@@ -35,6 +35,9 @@
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-card-foreground whitespace-nowrap">Daftar Tagihan</h3>
                 <div class="flex items-center space-x-2">
+                    <a href="{{ route('admin.billings.create') }}"
+                        class="inline-flex items-center justify-center py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 font-semibold whitespace-nowrap flex-none shrink-0">
+                        Buat Tagihan Manual</a>
                     <a href="{{ route('admin.billings.archive') }}"
                         class="inline-flex items-center justify-center py-2 px-4 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 font-semibold whitespace-nowrap flex-none shrink-0">
                         Arsip Tagihan</a>
@@ -180,6 +183,11 @@
                                             class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium ml-2">
                                             Bayar Cashless
                                         </a>
+                                        <button wire:click="openSplitModal({{ $billing->id }})"
+                                            class="px-2 py-1 text-white rounded hover:brightness-90 text-xs font-medium ml-2 transition-all"
+                                            style="background-color: #d97706;">
+                                            Pecah Cicilan
+                                        </button>
                                         <button wire:click="delete({{ $billing->id }})"
                                             wire:swal="Yakin ingin menghapus / mengarsipkan tagihan ini?"
                                             class="px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-xs font-medium ml-2">
@@ -220,4 +228,97 @@
             {{ $billings->links() }}
         </div>
     </div>
+
+    <!-- Modal Pecah Cicilan -->
+    @if($showSplitModal && $billingToSplit)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" wire:click="$set('showSplitModal', false)"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-card border border-border rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form wire:submit.prevent="processSplit">
+                    <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4 space-y-4">
+                        <div class="flex justify-between items-center pb-3 border-b border-border">
+                            <h3 class="text-lg font-bold text-foreground" id="modal-title">
+                                Pecah Tagihan Menjadi Cicilan
+                            </h3>
+                            <button type="button" wire:click="$set('showSplitModal', false)" class="text-muted-foreground hover:text-foreground">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Billing Details -->
+                        <div class="p-3 bg-muted rounded-md text-sm text-foreground space-y-1">
+                            <p><strong>Santri:</strong> {{ $billingToSplit->student->full_name }}</p>
+                            <p><strong>Tagihan:</strong> {{ $billingToSplit->title }}</p>
+                            <p><strong>Total Nominal:</strong> Rp {{ number_format($billingToSplit->final_amount, 0, ',', '.') }}</p>
+                        </div>
+
+                        <!-- Split Count -->
+                        <div>
+                            <label class="block text-sm font-semibold text-foreground mb-1">Jumlah Cicilan</label>
+                            <select wire:model.live="splitCount" class="w-full py-2 px-3 border border-input bg-background rounded-md text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                                <option value="2">2 Kali</option>
+                                <option value="3">3 Kali</option>
+                                <option value="4">4 Kali</option>
+                                <option value="5">5 Kali</option>
+                                <option value="6">6 Kali</option>
+                                <option value="12">12 Kali</option>
+                            </select>
+                        </div>
+
+                        <!-- Installment Details -->
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                            <h4 class="text-sm font-semibold text-foreground border-b border-border pb-1">Detail Rencana Cicilan</h4>
+                            @for ($i = 0; $i < $splitCount; $i++)
+                                <div class="grid grid-cols-3 gap-2 items-center">
+                                    <div class="col-span-2">
+                                        <label class="block text-xs text-muted-foreground">Judul Cicilan {{ $i + 1 }}</label>
+                                        <input type="text" wire:model="splitTitles.{{ $i }}" class="w-full py-1 px-2 border border-input bg-background rounded text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-muted-foreground">Nominal (Rp)</label>
+                                        <input type="number" wire:model.live="splitAmounts.{{ $i }}" class="w-full py-1 px-2 border border-input bg-background rounded text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring">
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
+
+                        <!-- Verification Summary -->
+                        @php
+                            $totalActual = array_sum(array_map('floatval', $splitAmounts));
+                            $totalExpected = (float)$billingToSplit->final_amount;
+                            $diff = $totalExpected - $totalActual;
+                        @endphp
+                        <div class="pt-2 border-t border-border flex justify-between items-center text-xs">
+                            <span class="text-muted-foreground">Total Input: <strong class="text-foreground">Rp {{ number_format($totalActual, 0, ',', '.') }}</strong></span>
+                            @if (abs($diff) > 0.01)
+                                <span class="text-red-500 font-semibold">Selisih: Rp {{ number_format($diff, 0, ',', '.') }}</span>
+                            @else
+                                <span class="text-green-600 font-semibold">✓ Jumlah Sesuai</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="bg-muted px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-border">
+                        <button type="submit" wire:loading.attr="disabled" class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                            @if (abs($diff) > 0.01) disabled @endif>
+                            <svg wire:loading class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Pecah Tagihan</span>
+                        </button>
+                        <button type="button" wire:click="$set('showSplitModal', false)" class="mt-3 w-full inline-flex justify-center rounded-md border border-input shadow-sm px-4 py-2 bg-background text-foreground hover:bg-muted focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

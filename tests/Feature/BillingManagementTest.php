@@ -162,4 +162,74 @@ class BillingManagementTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    /**
+     * Test admin can split unpaid billing into installments (pecah cicilan)
+     */
+    public function test_admin_can_split_unpaid_billing_into_installments()
+    {
+        $feeCategory = FeeCategory::factory()->create();
+        $feeMaster = FeeMaster::factory()->create([
+            'fee_category_id' => $feeCategory->id,
+            'amount' => 1200000,
+        ]);
+
+        $billing = Billing::create([
+            'student_id' => $this->student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Tahunan',
+            'original_amount' => 1200000,
+            'discount_applied' => 0,
+            'final_amount' => 1200000,
+            'status' => 'UNPAID',
+            'price_snapshot' => [],
+            'visible_to_wali' => true,
+            'version' => 1,
+        ]);
+
+        $this->actingAs($this->admin);
+
+        // Test Livewire component split functionality
+        \Livewire\Livewire::test(\App\Livewire\BillingIndex::class)
+            ->call('openSplitModal', $billing->id)
+            ->set('splitCount', 3)
+            ->call('calculateSplits')
+            ->call('processSplit')
+            ->assertHasNoErrors();
+
+        // Original billing should be VOID
+        $billing->refresh();
+        $this->assertEquals('VOID', $billing->status);
+
+        // Should have 3 new billings with split amounts
+        $newBillings = Billing::where('student_id', $this->student->id)
+            ->where('status', 'UNPAID')
+            ->get();
+
+        $this->assertCount(3, $newBillings);
+        foreach ($newBillings as $newBill) {
+            $this->assertEquals(400000, (float)$newBill->final_amount);
+            $this->assertStringContainsString('SPP Tahunan - Cicilan', $newBill->title);
+        }
+    }
+
+    /**
+     * Test student search autocomplete in billing form
+     */
+    public function test_student_search_autocomplete_in_billing_form()
+    {
+        $this->student->update(['is_active' => true]);
+        $this->actingAs($this->admin);
+
+        \Livewire\Livewire::test(\App\Livewire\BillingForm::class)
+            ->set('student_search', substr($this->student->full_name, 0, 3))
+            ->assertSet('student_id', '')
+            ->assertCount('searchResults', 1)
+            ->call('selectStudent', $this->student->id, $this->student->full_name, $this->student->nis)
+            ->assertSet('student_id', $this->student->id)
+            ->assertSet('student_search', $this->student->full_name . ' (' . $this->student->nis . ')')
+            ->call('clearStudentSelection')
+            ->assertSet('student_id', '')
+            ->assertSet('student_search', '');
+    }
 }

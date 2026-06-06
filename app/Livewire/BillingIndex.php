@@ -19,6 +19,13 @@ class BillingIndex extends Component
     public $classFilter = '';      // Kelas
     public $specialFilter = '';    // Golongan: UMUM, ANAK_GURU, YATIM
 
+    // Split Billing / Installment Properties
+    public $showSplitModal = false;
+    public $billingToSplit = null;
+    public $splitCount = 2;
+    public $splitAmounts = [];
+    public $splitTitles = [];
+
     public function updatingSearch()
     {
         $this->resetPage();
@@ -175,6 +182,114 @@ class BillingIndex extends Component
                 // To catch errors like trying to delete paid billing
                 session()->flash('error', $e->getMessage());
             }
+        }
+    }
+
+    public function openSplitModal($billingId)
+    {
+        $billing = Billing::with('student')->find($billingId);
+        if (!$billing || $billing->status !== 'UNPAID') {
+            session()->flash('error', 'Tagihan tidak valid untuk dicicil.');
+            return;
+        }
+
+        $this->billingToSplit = $billing;
+        $this->splitCount = 2;
+        $this->calculateSplits();
+        $this->showSplitModal = true;
+    }
+
+    public function updatedSplitCount()
+    {
+        $this->calculateSplits();
+    }
+
+    public function calculateSplits()
+    {
+        if (!$this->billingToSplit) {
+            return;
+        }
+
+        $total = (float) $this->billingToSplit->final_amount;
+        $count = (int) $this->splitCount;
+
+        if ($count < 2 || $count > 12) {
+            $count = 2;
+            $this->splitCount = 2;
+        }
+
+        $baseAmount = floor($total / $count);
+        $remainder = $total - ($baseAmount * $count);
+
+        $this->splitAmounts = [];
+        $this->splitTitles = [];
+
+        for ($i = 1; $i <= $count; $i++) {
+            $amount = $baseAmount;
+            if ($i === $count) {
+                $amount += $remainder;
+            }
+            $this->splitAmounts[$i - 1] = $amount;
+            $this->splitTitles[$i - 1] = $this->billingToSplit->title . " - Cicilan " . $i;
+        }
+    }
+
+    public function processSplit()
+    {
+        if (!$this->billingToSplit) {
+            return;
+        }
+
+        $totalExpected = (float) $this->billingToSplit->final_amount;
+        $totalActual = array_sum(array_map('floatval', $this->splitAmounts));
+
+        if (abs($totalExpected - $totalActual) > 0.01) {
+            session()->flash('error', 'Jumlah total cicilan (' . number_format($totalActual, 0, ',', '.') . ') harus sama dengan jumlah tagihan asli (' . number_format($totalExpected, 0, ',', '.') . ').');
+            return;
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () {
+                // 1. Mark original billing as VOID
+                $this->billingToSplit->update([
+                    'status' => 'VOID',
+                    'archive_reason' => 'Dipecah menjadi cicilan oleh ' . auth()->user()->name
+                ]);
+
+                // 2. Create new installment billings
+                foreach ($this->splitAmounts as $index => $amount) {
+                    $title = $this->splitTitles[$index] ?? ($this->billingToSplit->title . ' - Cicilan ' . ($index + 1));
+                    
+                    $priceSnapshot = [
+                        [
+                            'item_name' => $title,
+                            'amount' => (float)$amount,
+                            'fee_master_id' => $this->billingToSplit->fee_master_id,
+                        ]
+                    ];
+
+                    Billing::create([
+                        'student_id' => $this->billingToSplit->student_id,
+                        'fee_master_id' => $this->billingToSplit->fee_master_id,
+                        'title' => $title,
+                        'original_amount' => (float)$amount,
+                        'discount_applied' => 0,
+                        'final_amount' => (float)$amount,
+                        'status' => 'UNPAID',
+                        'price_snapshot' => $priceSnapshot,
+                        'billing_period_start' => $this->billingToSplit->billing_period_start,
+                        'billing_period_end' => $this->billingToSplit->billing_period_end,
+                        'visible_to_wali' => true,
+                        'version' => 1,
+                    ]);
+                }
+            });
+
+            session()->flash('message', 'Tagihan berhasil dipecah menjadi ' . $this->splitCount . ' cicilan.');
+            $this->showSplitModal = false;
+            $this->billingToSplit = null;
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal memecah tagihan: ' . $e->getMessage());
         }
     }
 }

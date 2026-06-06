@@ -13,20 +13,54 @@
             </div>
 
             <form wire:submit="save" class="space-y-6">
-                <!-- Student Selection -->
-                <div>
-                    <label for="student_id" class="block text-sm font-medium text-foreground">Santri</label>
-                    <select wire:model.live="student_id" id="student_id"
-                        class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                        <option value="">Pilih Santri</option>
-                        @foreach ($this->students as $student)
-                            <option value="{{ $student->id }}">
-                                {{ $student->full_name }} ({{ $student->nis }})
-                            </option>
-                        @endforeach
-                    </select>
+                <!-- Student Selection with Search Dropdown -->
+                <div class="relative" x-data="{ open: false }" x-on:click.outside="open = false">
+                    <label for="student_search" class="block text-sm font-medium text-foreground">Santri</label>
+                    <div class="relative mt-1">
+                        <input wire:model.live="student_search" type="text" id="student_search"
+                            x-on:focus="open = true"
+                            placeholder="Ketik nama atau NIS santri..."
+                            class="block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm"
+                            autocomplete="off" />
+                        
+                        @if ($student_id)
+                            <button type="button" wire:click="clearStudentSelection" x-on:click="open = false" class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        @endif
+                    </div>
+
+                    <!-- Dropdown Results -->
+                    <div x-show="open"
+                        class="absolute z-10 mt-1 w-full bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
+                        style="display: none;">
+                        @if (count($this->searchResults) > 0)
+                            <ul class="py-1 text-sm text-foreground">
+                                @foreach ($this->searchResults as $student)
+                                    <li>
+                                        <button type="button" x-on:click="open = false" wire:click="selectStudent({{ $student->id }}, '{{ addslashes($student->full_name) }}', '{{ $student->nis }}')"
+                                            class="w-full text-left px-4 py-2 hover:bg-muted focus:bg-muted focus:outline-none transition-colors">
+                                            <span class="font-medium block">{{ $student->full_name }}</span>
+                                            <span class="text-xs text-muted-foreground">NIS: {{ $student->nis }} | Kelas: {{ $student->class_name ?? '-' }}</span>
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="px-4 py-3 text-sm text-muted-foreground text-center">
+                                @if (strlen($student_search) < 2)
+                                    Ketik minimal 2 karakter untuk mencari...
+                                @else
+                                    Santri tidak ditemukan.
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+
                     @error('student_id')
-                        <span class="text-destructive text-sm">{{ $message }}</span>
+                        <span class="text-destructive text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
 

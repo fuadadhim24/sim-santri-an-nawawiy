@@ -17,7 +17,7 @@
                                 class="text-xs text-primary hover:underline">+ Kategori Baru</a>
                         </div>
                         <select wire:model.live="fee_category_id" id="fee_category_id"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Pilih Kategori</option>
                             @foreach ($this->feeCategories as $cat)
                                 <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -67,7 +67,7 @@
                     <div>
                         <label for="recurrence_type" class="block text-sm font-medium text-foreground mb-1">Tipe Siklus Tagihan</label>
                         <select wire:model.live="recurrence_type" id="recurrence_type"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="ONE_TIME">Sekali Bayar (Misal: Uang Pangkal)</option>
                             <option value="MONTHLY">Bulanan (Misal: SPP)</option>
                             <option value="YEARLY">Tahunan (Misal: Daftar Ulang)</option>
@@ -128,7 +128,7 @@
                         <label for="unit_target" class="block text-sm font-medium text-foreground mb-1">Target
                             Unit</label>
                         <select wire:model="unit_target" id="unit_target"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Semua Unit</option>
                             <option value="01">SMP</option>
                             <option value="02">SMA</option>
@@ -139,7 +139,7 @@
                         <label for="residence_target" class="block text-sm font-medium text-foreground mb-1">Target
                             Domisili</label>
                         <select wire:model="residence_target" id="residence_target"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Semua Status Domisili</option>
                             <option value="MONDOK">Mondok</option>
                             <option value="NON_MONDOK">Non Mondok</option>
