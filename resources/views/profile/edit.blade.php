@@ -1,4 +1,8 @@
-@php $isGuardian = auth()->check() && auth()->user()->role === 'WALI_SANTRI'; @endphp
+@php 
+    $user = auth()->user();
+    $isGuardian = $user && $user->role === 'WALI_SANTRI';
+    $isAdmin = $user && in_array($user->role, ['SUPER_ADMIN', 'ADMINISTRASI', 'BENDAHARA']);
+@endphp
 
 @if ($isGuardian)
     @component('layouts.guardian')
@@ -20,6 +24,32 @@
                     <div class="space-y-6">
                         @include('profile.partials.delete-user-form')
                     </div>
+                </div>
+            </div>
+        </div>
+    @endcomponent
+@elseif ($isAdmin)
+    @component('layouts.admin')
+        @slot('header')
+            Profil Saya
+        @endslot
+
+        <div class="space-y-6">
+            <div class="bg-card overflow-hidden shadow-sm sm:rounded-lg border border-border">
+                <div class="p-6 space-y-6">
+                    <div class="max-w-xl">
+                        @include('profile.partials.update-profile-information-form')
+                    </div>
+
+                    <div class="border-t border-border pt-6 max-w-xl">
+                        @include('profile.partials.update-password-form')
+                    </div>
+
+                    @if ($user->role !== 'SUPER_ADMIN')
+                        <div class="border-t border-border pt-6 max-w-xl">
+                            @include('profile.partials.delete-user-form')
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

@@ -61,6 +61,28 @@ class RombelManagementTest extends TestCase
         ]);
     }
 
+    public function test_can_edit_study_group()
+    {
+        $level = ClassLevel::create(['name' => 'Kelas 1', 'order' => 1]);
+        $rombel = StudyGroup::create(['name' => '1-A', 'max_capacity' => 30, 'class_level_id' => $level->id]);
+
+        Livewire::actingAs($this->admin)
+            ->test(RombelManagement::class)
+            ->call('openStudyGroupModal', $level->id, $rombel->id)
+            ->assertSet('studyGroupName', '1-A')
+            ->assertSet('studyGroupCapacity', 30)
+            ->set('studyGroupName', '1-A Edited')
+            ->set('studyGroupCapacity', 25)
+            ->call('saveStudyGroup');
+
+        $this->assertDatabaseHas('study_groups', [
+            'id' => $rombel->id,
+            'name' => '1-A Edited',
+            'max_capacity' => 25,
+            'class_level_id' => $level->id
+        ]);
+    }
+
     public function test_can_move_students_to_rombel()
     {
         $level = ClassLevel::create(['name' => 'Kelas 1', 'order' => 1]);
