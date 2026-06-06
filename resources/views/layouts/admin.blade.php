@@ -22,7 +22,7 @@
     @livewireStyles
 </head>
 
-<body class="font-sans antialiased bg-background text-foreground">
+<body class="font-sans antialiased bg-background text-foreground" x-data="{ openHelp: false }">
     <div class="flex min-h-screen bg-background">
         <!-- Sidebar -->
         <aside id="sidebar"
@@ -329,6 +329,269 @@
             </div>
         </div>
     </div>
+    </div>
+    <!-- Floating Help Drawer Widget -->
+    <div class="relative">
+        <!-- Floating Toggle Button -->
+        <button @click="openHelp = !openHelp" 
+                class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                title="Pusat Bantuan">
+            <svg x-show="!openHelp" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg x-show="openHelp" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <!-- Drawer Panel -->
+        <div x-show="openHelp" 
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             x-cloak
+             class="fixed inset-y-0 right-0 w-80 md:w-96 bg-card border-l border-border shadow-2xl z-[9999] flex flex-col">
+            
+            <!-- Drawer Header -->
+            <div class="p-4 border-b border-border flex items-center justify-between bg-muted/40">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="font-bold text-foreground">Pusat Bantuan SIM</span>
+                </div>
+                <button @click="openHelp = false" class="p-1 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Drawer Body -->
+            <div class="flex-1 overflow-y-auto p-5 space-y-6">
+                @if(request()->routeIs('admin.fee-masters*'))
+                    <!-- Help Content for Fee Masters -->
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Master Biaya</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">
+                            Menu ini digunakan untuk mengatur cetakan tagihan santri.
+                        </p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Tipe Siklus Tagihan</span>
+                                <ul class="list-disc list-inside text-xs text-muted-foreground space-y-1">
+                                    <li><strong>Sekali Bayar:</strong> Tagihan satu kali saja (misal: Uang Pangkal).</li>
+                                    <li><strong>Bulanan:</strong> Digenerate otomatis setiap bulan pada tanggal generate (misal: SPP).</li>
+                                    <li><strong>Tahunan:</strong> Digenerate otomatis setiap tahun (misal: Daftar Ulang).</li>
+                                </ul>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Jatuh Tempo (Hari)</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    Jumlah hari tenggang untuk melunasi tagihan setelah diterbitkan (default: 14 hari).
+                                </p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Target Tagihan</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    Saring sasaran tagihan berdasarkan jenjang sekolah (SMP/SMA/PPTQ) atau status domisili (Mondok/Non Mondok).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.billings*'))
+                    <!-- Help Content for Billings -->
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Kelola Tagihan</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">
+                            Menu ini digunakan untuk memantau, menerima pembayaran, dan memecah tagihan santri.
+                        </p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Cara Entri Tunai (Manual)</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    Klik tombol <strong>Entri Tunai</strong> di baris tagihan, masukkan data pembayaran tunai yang diterima, lalu simpan. Status otomatis berubah menjadi LUNAS.
+                                </p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Cara Pecah Cicilan</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    Klik <strong>Pecah Cicilan</strong> pada tagihan aktif, tentukan jumlah cicilan, lalu sistem akan membagi nominal tagihan tersebut menjadi beberapa sub-tagihan baru secara otomatis.
+                                </p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Buat Tagihan Manual</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    Gunakan tombol <strong>Buat Tagihan Manual</strong> di bagian kanan atas. Cari santri menggunakan kolom pencarian autocomplete, lalu masukkan judul dan nominal tagihan kustom.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.fee-categories*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Kategori Biaya</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Kategori biaya adalah pengelompokan jenis tagihan di pesantren.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Apa itu Kategori Biaya?</span>
+                                <p class="text-xs text-muted-foreground">Kategori biaya adalah induk dari Master Biaya. Contoh: "SPP", "Uang Pangkal", "Kegiatan". Setiap kategori memiliki aturan apakah tagihan otomatis aktif saat santri diterima atau harus dibuat manual.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Mode Aktivasi</span>
+                                <ul class="list-disc list-inside text-xs text-muted-foreground space-y-1">
+                                    <li><strong>Otomatis:</strong> Tagihan langsung dibuat saat santri berstatus diterima.</li>
+                                    <li><strong>Manual:</strong> Tagihan harus dibuat oleh admin/bendahara secara manual.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.discounts*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Diskon / Potongan</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Diskon digunakan untuk memberikan potongan biaya kepada santri berdasarkan status khusus mereka.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Cara Kerja Diskon</span>
+                                <p class="text-xs text-muted-foreground">Diskon ditautkan ke Master Biaya tertentu dan berlaku otomatis untuk santri yang memiliki status khusus (Yatim, Piatu, Yatim Piatu, Dhuafa). Santri berstatus "UMUM" tidak mendapatkan diskon.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Efek pada Tagihan</span>
+                                <p class="text-xs text-muted-foreground">Ketika diskon ditambahkan atau diubah, seluruh tagihan <strong>belum lunas</strong> dari Master Biaya terkait akan otomatis dihitung ulang nominalnya.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.students*') || request()->routeIs('admin.student-acceptance*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Kelola Santri</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola data santri pesantren.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Alur Penerimaan Santri</span>
+                                <p class="text-xs text-muted-foreground">Santri baru masuk dengan status <strong>pending</strong>. Setelah diverifikasi, admin mengubah status menjadi <strong>diterima</strong>. Saat diterima, tagihan-tagihan wajib akan otomatis digenerate sesuai konfigurasi kategori biaya.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Detail Santri</span>
+                                <p class="text-xs text-muted-foreground">Klik nama santri untuk melihat detail profil, riwayat tagihan, dan status pembayaran santri secara lengkap.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Status Khusus</span>
+                                <p class="text-xs text-muted-foreground">Santri dengan status khusus (Yatim, Piatu, Dhuafa) akan otomatis mendapat potongan tagihan jika sudah diatur di menu Diskon.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.guardians*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Kelola Wali Santri</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola data orang tua/wali santri.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Akun Wali Santri</span>
+                                <p class="text-xs text-muted-foreground">Setiap wali santri memiliki akun login sendiri untuk mengakses portal pembayaran. Mereka dapat melihat tagihan dan membayar secara online melalui dashboard wali.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Relasi Wali dan Santri</span>
+                                <p class="text-xs text-muted-foreground">Satu wali bisa memiliki lebih dari satu santri. Semua tagihan anak-anaknya akan tampil di satu dashboard portal wali.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.rombels*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Rombongan Belajar</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola kelas dan penempatan santri.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Apa itu Rombel?</span>
+                                <p class="text-xs text-muted-foreground">Rombel (Rombongan Belajar) adalah pembagian kelas santri. Contoh: Kelas 7A, Kelas 8B, dsb. Anda dapat memindahkan santri antar rombel sesuai kebutuhan.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.spmb-schedules*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Jadwal SPMB</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola jadwal Seleksi Penerimaan Murid Baru.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Cara Membuat Jadwal</span>
+                                <p class="text-xs text-muted-foreground">Klik <strong>Tambah Jadwal</strong>, tentukan tanggal pelaksanaan, kuota peserta, dan jenjang yang dibuka. Wali santri dapat memilih jadwal ini saat mendaftar secara online.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Kuota Otomatis</span>
+                                <p class="text-xs text-muted-foreground">Sistem akan secara otomatis menutup pendaftaran jika kuota peserta pada jadwal tersebut sudah penuh.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.reports*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Laporan Keuangan</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini menampilkan ringkasan dan detail keuangan pesantren.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Filter Laporan</span>
+                                <p class="text-xs text-muted-foreground">Gunakan filter tanggal, jenjang, dan status pembayaran untuk menyaring data laporan sesuai kebutuhan Anda.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Ekspor Data</span>
+                                <p class="text-xs text-muted-foreground">Laporan dapat diekspor untuk keperluan cetak atau pelaporan ke yayasan.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.faqs*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Kelola FAQ</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola pertanyaan yang sering diajukan (FAQ) oleh wali santri.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Tips Efektif</span>
+                                <p class="text-xs text-muted-foreground">Catat pertanyaan yang sering ditanyakan wali santri via WhatsApp, lalu masukkan ke sini. FAQ ini akan tampil otomatis di portal wali santri sehingga mereka dapat menemukan jawaban secara mandiri.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.users*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Kelola Pengguna</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola akun staf pengelola sistem.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Peran Pengguna</span>
+                                <ul class="list-disc list-inside text-xs text-muted-foreground space-y-1">
+                                    <li><strong>Super Admin:</strong> Akses penuh ke seluruh fitur sistem.</li>
+                                    <li><strong>Administrasi:</strong> Mengelola data santri, wali, rombel, dan SPMB.</li>
+                                    <li><strong>Bendahara:</strong> Mengelola keuangan, tagihan, pembayaran, diskon, dan laporan.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('dashboard') || request()->routeIs('admin.dashboard'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Dashboard</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Dashboard menampilkan ringkasan statistik sistem pesantren secara real-time.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Kartu Ringkasan</span>
+                                <p class="text-xs text-muted-foreground">Kartu di bagian atas menampilkan jumlah santri aktif, total tagihan belum lunas, total pendapatan, dan tingkat pelunasan. Data ini diperbarui secara otomatis.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Navigasi Cepat</span>
+                                <p class="text-xs text-muted-foreground">Gunakan menu sidebar di sebelah kiri untuk berpindah antar halaman. Klik tombol <strong>(?)</strong> melayang di pojok kanan bawah kapan saja untuk membuka panduan ini.</p>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Pusat Bantuan SIM Santri</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">
+                            Klik tombol <strong>(?)</strong> melayang di pojok kanan bawah untuk mendapatkan panduan kontekstual di setiap halaman.
+                        </p>
+                        <div class="mt-4 bg-muted/50 rounded-lg p-4 text-center border border-border/50">
+                            <span class="text-xs font-medium text-foreground block mb-2">Butuh Bantuan Lainnya?</span>
+                            <a href="{{ route('admin.faqs') }}" class="inline-flex justify-center items-center px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded hover:bg-primary/90 transition">
+                                Buka FAQ Pengelola
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Drawer Footer -->
+            <div class="p-4 border-t border-border bg-muted/20 text-center">
+                <span class="text-[10px] text-muted-foreground block">SIM-SANTRI AN-NAWAWIY v1.0</span>
+            </div>
+        </div>
     </div>
 </body>
 
