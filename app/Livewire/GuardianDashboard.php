@@ -64,7 +64,7 @@ class GuardianDashboard extends Component
         }
 
         $spmbCategory = FeeCategory::where('code', 'SPMB')->first();
-        $spmbFeeMasters = [];
+        $spmbFeeMasters = collect();
 
         if ($spmbCategory) {
             $spmbFeeMasters = FeeMaster::where('fee_category_id', $spmbCategory->id)

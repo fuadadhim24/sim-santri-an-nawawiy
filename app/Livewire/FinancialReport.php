@@ -35,31 +35,31 @@ class FinancialReport extends Component
 
     public function render()
     {
-        $query = Billing::where('status', 'PAID');
+        $query = \App\Models\Payment::where('status', 'paid');
 
         if ($this->startDate) {
-            $query->whereDate('updated_at', '>=', $this->startDate);
+            $query->whereDate('paid_at', '>=', $this->startDate);
         }
 
         if ($this->endDate) {
-            $query->whereDate('updated_at', '<=', $this->endDate);
+            $query->whereDate('paid_at', '<=', $this->endDate);
         }
 
         if ($this->search) {
-            $query->whereHas('student', function($q) {
+            $query->whereHas('billing.student', function($q) {
                 $q->where('full_name', 'like', '%' . $this->search . '%')
                   ->orWhere('nis', 'like', '%' . $this->search . '%');
             });
         }
 
-        $paidBills = $query->with('student')->orderBy('updated_at', 'desc')->paginate(10);
+        $payments = $query->with(['billing.student'])->orderBy('paid_at', 'desc')->paginate(10);
 
         $statsQuery = clone $query;
-        $totalIncome = (int) $statsQuery->sum('final_amount');
+        $totalIncome = (int) $statsQuery->sum('amount');
         $totalTransactions = $statsQuery->count();
 
         return view('livewire.financial-report', [
-            'paidBills' => $paidBills,
+            'payments' => $payments,
             'totalIncome' => $totalIncome,
             'totalTransactions' => $totalTransactions
         ])->layout('layouts.admin');

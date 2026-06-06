@@ -20,13 +20,13 @@ class DiscountTest extends TestCase
 
         $discount = Discount::create([
             'fee_master_id' => $feeMaster->id,
-            'target_status' => 'PRESTASI',
+            'target_status' => 'YATIM',
             'discount_amount' => 250000,
         ]);
 
         $this->assertDatabaseHas('discounts', [
             'fee_master_id' => $feeMaster->id,
-            'target_status' => 'PRESTASI',
+            'target_status' => 'YATIM',
             'discount_amount' => 250000,
         ]);
     }
@@ -50,7 +50,7 @@ class DiscountTest extends TestCase
     {
         $feeMaster = FeeMaster::factory()->create();
 
-        $statuses = ['PRESTASI', 'KURANG_MAMPU', 'ORPHAN'];
+        $statuses = ['ANAK_GURU', 'YATIM'];
 
         foreach ($statuses as $status) {
             $discount = Discount::create([

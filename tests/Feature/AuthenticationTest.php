@@ -30,7 +30,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response = $this->post('/login', [
-            'email' => 'test@example.com',
+            'identifier' => 'test@example.com',
             'password' => 'password',
         ]);
 
@@ -48,7 +48,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response = $this->post('/login', [
-            'email' => 'test@example.com',
+            'identifier' => 'test@example.com',
             'password' => 'wrongpassword',
         ]);
 
@@ -61,7 +61,7 @@ class AuthenticationTest extends TestCase
     public function test_cannot_login_with_nonexistent_email()
     {
         $response = $this->post('/login', [
-            'email' => 'nonexistent@example.com',
+            'identifier' => 'nonexistent@example.com',
             'password' => 'password',
         ]);
 

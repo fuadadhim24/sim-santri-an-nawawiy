@@ -60,7 +60,9 @@ class EnhancedBillingService
 
         // 4.5 CHECK FOR DUPLICATE BILLING
         $existingBilling = Billing::where('student_id', $student->id)
-            ->where('fee_category_id', $feeCategoryId)
+            ->whereHas('feeMaster', function ($q) use ($feeCategoryId) {
+                $q->where('fee_category_id', $feeCategoryId);
+            })
             ->where('status', '!=', 'VOID')
             ->first();
 

@@ -106,8 +106,9 @@ class EnhancedBillingServiceTest extends TestCase
             'residence_target' => null,
         ]);
 
-        $result = $this->service->generateBillSecurely($student, $category->id, 'Test Billing');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Hanya santri ACTIVE yang dapat ditagih.');
 
-        $this->assertNull($result);
+        $this->service->generateBillSecurely($student, $category->id, 'Test Billing');
     }
 }

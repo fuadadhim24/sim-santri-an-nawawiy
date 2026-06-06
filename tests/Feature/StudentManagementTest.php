@@ -73,12 +73,9 @@ class StudentManagementTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /**
-     * Test guardian can view own student detail
-     */
     public function test_guardian_can_view_own_student_detail()
     {
-        $guardianData = Guardian::factory()->create();
+        $guardianData = Guardian::factory()->create(['user_id' => $this->guardian->id]);
         $student = Student::factory()->create(['guardian_id' => $guardianData->id]);
 
         $response = $this->actingAs($this->guardian)
@@ -104,7 +101,7 @@ class StudentManagementTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->get('/admin/students');
 
-        $response->assertStatus(403);
+        $response->assertRedirect('/my-dashboard');
     }
 
     /**

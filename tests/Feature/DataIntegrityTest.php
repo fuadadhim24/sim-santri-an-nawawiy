@@ -11,7 +11,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class DataIntegrityTests extends TestCase
+class DataIntegrityTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -38,16 +38,16 @@ class DataIntegrityTests extends TestCase
     }
 
     /**
-     * NEGATIVE TEST 2: Soft delete FeeCategory should work
+     * NEGATIVE TEST 2: Delete FeeCategory should work
      */
-    public function test_can_soft_delete_fee_category()
+    public function test_can_delete_fee_category()
     {
         $category = FeeCategory::factory()->create();
         $categoryId = $category->id;
 
         $category->delete();
 
-        $this->assertSoftDeleted('fee_categories', ['id' => $categoryId]);
+        $this->assertDatabaseMissing('fee_categories', ['id' => $categoryId]);
     }
 
     /**
@@ -89,32 +89,32 @@ class DataIntegrityTests extends TestCase
     public function test_prevent_duplicate_billings_same_period()
     {
         $student = Student::factory()->create(['status' => 'ACTIVE']);
-        $feeMaster = FeeMaster::factory()->create();
-
-        $periodStart = now()->startOfMonth();
-
-        // First billing succeeds
-        $billing1 = Billing::factory()->create([
-            'student_id' => $student->id,
-            'fee_master_id' => $feeMaster->id,
-            'billing_period_start' => $periodStart,
-            'status' => 'UNPAID',
+        $feeCategory = FeeCategory::factory()->create();
+        $feeMaster = FeeMaster::factory()->create([
+            'fee_category_id' => $feeCategory->id,
+            'unit_target' => $student->unit_code,
+            'residence_target' => $student->residence_status,
+            'is_active' => true,
         ]);
 
-        // Try to create duplicate for same period
-        try {
-            $billing2 = Billing::factory()->create([
-                'student_id' => $student->id,
-                'fee_master_id' => $feeMaster->id,
-                'billing_period_start' => $periodStart,
-                'status' => 'UNPAID',
-            ]);
+        $service = new \App\Services\EnhancedBillingService();
 
-            // If no exception, it should have failed via unique constraint
-            $this->fail('Expected database constraint violation');
-        } catch (\Exception $e) {
-            $this->assertStringContainsString('unique', strtolower($e->getMessage()));
-        }
+        // First billing succeeds
+        $billing1 = $service->generateBillSecurely(
+            $student,
+            $feeCategory->id,
+            'Tagihan 1'
+        );
+
+        // Try to create duplicate
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('sudah ada');
+
+        $service->generateBillSecurely(
+            $student,
+            $feeCategory->id,
+            'Tagihan 2'
+        );
     }
 
     /**

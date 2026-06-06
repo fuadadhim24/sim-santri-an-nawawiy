@@ -18,11 +18,13 @@ class FeeCategoryTest extends TestCase
     {
         $category = FeeCategory::create([
             'name' => 'Biaya Akademik',
+            'code' => 'ACAD',
             'description' => 'Biaya untuk kegiatan akademik',
         ]);
 
         $this->assertDatabaseHas('fee_categories', [
             'name' => 'Biaya Akademik',
+            'code' => 'ACAD',
         ]);
     }
 
@@ -35,18 +37,18 @@ class FeeCategoryTest extends TestCase
         
         FeeMaster::factory(3)->create(['fee_category_id' => $category->id]);
 
-        $this->assertCount(3, $category->feeMasters ?? []);
+        $this->assertCount(3, $category->fees);
     }
 
     /**
-     * Test fee category soft delete
+     * Test fee category delete
      */
-    public function test_fee_category_can_be_soft_deleted()
+    public function test_fee_category_can_be_deleted()
     {
         $category = FeeCategory::factory()->create();
 
         $category->delete();
 
-        $this->assertSoftDeleted('fee_categories', ['id' => $category->id]);
+        $this->assertDatabaseMissing('fee_categories', ['id' => $category->id]);
     }
 }

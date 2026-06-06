@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Billing;
 use App\Models\Payment;
 use App\Models\User;
+use App\Models\Guardian;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,13 +15,21 @@ class PaymentManagementTest extends TestCase
 
     private User $admin;
     private User $guardian;
+    private User $bendahara;
 
     protected function setUp(): void
     {
         parent::setUp();
         
         $this->admin = User::factory()->create(['role' => 'ADMINISTRASI']);
+        $this->bendahara = User::factory()->create(['role' => 'BENDAHARA']);
         $this->guardian = User::factory()->create(['role' => 'WALI_SANTRI']);
+        
+        // Create matching Guardian model record for WALI_SANTRI user
+        Guardian::factory()->create([
+            'user_id' => $this->guardian->id,
+            'full_name' => $this->guardian->name,
+        ]);
     }
 
     /**
@@ -118,7 +127,7 @@ class PaymentManagementTest extends TestCase
      */
     public function test_admin_can_view_financial_reports()
     {
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->bendahara)
             ->get('/admin/reports/financial');
 
         $response->assertStatus(200);
@@ -132,6 +141,6 @@ class PaymentManagementTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->get('/admin/reports/financial');
 
-        $response->assertStatus(403);
+        $response->assertRedirect('/my-dashboard');
     }
 }

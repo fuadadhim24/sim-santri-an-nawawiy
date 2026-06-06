@@ -105,7 +105,7 @@ class BillingManagementTest extends TestCase
         $response = $this->actingAs($guardian)
             ->get('/admin/billings');
 
-        $response->assertStatus(403);
+        $response->assertRedirect('/my-dashboard');
     }
 
     /**

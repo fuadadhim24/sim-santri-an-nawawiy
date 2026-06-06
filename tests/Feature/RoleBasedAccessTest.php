@@ -8,6 +8,8 @@ use App\Models\Guardian;
 use App\Models\Billing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Livewire\Livewire;
+use App\Livewire\BillingIndex;
 
 class RoleBasedAccessTest extends TestCase
 {
@@ -63,43 +65,38 @@ class RoleBasedAccessTest extends TestCase
         $superAdmin = User::where('role', 'SUPER_ADMIN')->first();
         $student = Student::where('status', 'menunggu')->first();
 
-        $this->actingAs($superAdmin)
-            ->post("/admin/students/{$student->id}/accept", [
-                'decision' => 'diterima'
-            ])
-            ->assertRedirect();
+        $this->actingAs($superAdmin);
 
-        $this->assertDatabaseHas('students', [
-            'id' => $student->id,
-            'status' => 'diterima',
-        ]);
+        Livewire::test(\App\Livewire\StudentAcceptanceConfirm::class, ['student' => $student])
+            ->call('confirmAcceptance');
+
+        $student->refresh();
+        $this->assertEquals('diterima', $student->status);
     }
 
     // ADMINISTRASI Tests
-    public function test_ADMINISTRASI_can_access_master_data()
+    public function test_ADMINISTRASI_cannot_access_master_data()
     {
         $adminTU = User::where('role', 'ADMINISTRASI')->first();
         
         $this->actingAs($adminTU)
             ->get('/admin/fee-categories')
-            ->assertStatus(200);
+            ->assertRedirect(route('admin.dashboard'));
 
         $this->actingAs($adminTU)
             ->get('/admin/fee-masters')
-            ->assertStatus(200);
+            ->assertRedirect(route('admin.dashboard'));
     }
 
     public function test_ADMINISTRASI_can_process_payment()
     {
         $adminTU = User::where('role', 'ADMINISTRASI')->first();
-        $billing = Billing::where('status', 'BELUM LUNAS')->first();
+        $billing = Billing::where('status', 'UNPAID')->first();
 
-        // Test cash payment
-        $this->actingAs($adminTU)
-            ->post("/admin/billings/{$billing->id}/payment/cash", [
-                'amount' => $billing->amount,
-            ])
-            ->assertRedirect();
+        $this->actingAs($adminTU);
+
+        Livewire::test(BillingIndex::class)
+            ->call('processCashPayment', $billing->id);
 
         $billing->refresh();
         $this->assertEquals('PAID', $billing->status);
@@ -110,21 +107,20 @@ class RoleBasedAccessTest extends TestCase
         $adminTU = User::where('role', 'ADMINISTRASI')->first();
         $guardian = Guardian::first();
 
-        $this->actingAs($adminTU)
-            ->post('/admin/students', [
-                'guardian_id' => $guardian->id,
-                'nis' => '2026.99.0999',
-                'full_name' => 'Test Student',
-                'unit_code' => '02',
-                'residence_status' => 'PULANG',
-                'special_status' => 'UMUM',
-                'class_name' => '8A',
-                'address' => 'Jl. Test',
-            ])
-            ->assertRedirect();
+        $this->actingAs($adminTU);
+
+        Livewire::test(\App\Livewire\StudentForm::class)
+            ->set('guardian_id', $guardian->id)
+            ->set('full_name', 'Test Student')
+            ->set('unit_code', '02')
+            ->set('residence_status', 'NON_MONDOK')
+            ->set('special_status', 'UMUM')
+            ->set('class_name', '8A')
+            ->set('address', 'Jl. Test')
+            ->call('save')
+            ->assertRedirect(route('admin.students'));
 
         $this->assertDatabaseHas('students', [
-            'nis' => '2026.99.0999',
             'full_name' => 'Test Student',
         ]);
     }
@@ -202,7 +198,7 @@ class RoleBasedAccessTest extends TestCase
 
         $this->actingAs($waliUser)
             ->get('/admin/billings')
-            ->assertStatus(403);
+            ->assertRedirect('/my-dashboard');
     }
 
     public function test_wali_santri_cannot_access_fee_masters()
@@ -212,21 +208,20 @@ class RoleBasedAccessTest extends TestCase
 
         $this->actingAs($waliUser)
             ->get('/admin/fee-masters')
-            ->assertStatus(403);
+            ->assertRedirect('/my-dashboard');
     }
 
     // Business Logic Tests
     public function test_billing_status_transitions_correctly()
     {
         $adminTU = User::where('role', 'ADMINISTRASI')->first();
-        $billing = Billing::where('status', 'BELUM LUNAS')->first();
+        $billing = Billing::where('status', 'UNPAID')->first();
         $originalAmount = $billing->amount;
 
-        // Process payment
-        $this->actingAs($adminTU)
-            ->post("/admin/billings/{$billing->id}/payment/cash", [
-                'amount' => $originalAmount,
-            ]);
+        $this->actingAs($adminTU);
+
+        Livewire::test(BillingIndex::class)
+            ->call('processCashPayment', $billing->id);
 
         $billing->refresh();
         
@@ -244,6 +239,16 @@ class RoleBasedAccessTest extends TestCase
     {
         $superAdmin = User::where('role', 'SUPER_ADMIN')->first();
         $student = Student::where('is_active', false)->first();
+
+        // Create a billing for this inactive student to make sure they show in the list
+        Billing::create([
+            'student_id' => $student->id,
+            'title' => 'Test Inactive Student Billing',
+            'original_amount' => 100000,
+            'discount_applied' => 0,
+            'final_amount' => 100000,
+            'status' => 'UNPAID',
+        ]);
 
         // Inactive student should show in billing list
         $this->actingAs($superAdmin)

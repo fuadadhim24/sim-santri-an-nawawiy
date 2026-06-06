@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class IDORAndAccessControlTests extends TestCase
+class IDORAndAccessControlTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -83,7 +83,7 @@ class IDORAndAccessControlTests extends TestCase
         $response = $this->actingAs($adminTu)
             ->get('/admin/users');
 
-        $this->assertTrue($response->status() === 403 || $response->status() === 404);
+        $response->assertRedirect(route('admin.dashboard'));
     }
 
     /**
@@ -101,7 +101,7 @@ class IDORAndAccessControlTests extends TestCase
 
         foreach ($routes as $route) {
             $response = $this->actingAs($guardian)->get($route);
-            $this->assertTrue($response->status() === 403 || $response->status() === 404);
+            $response->assertRedirect(route('wali.dashboard'));
         }
     }
 

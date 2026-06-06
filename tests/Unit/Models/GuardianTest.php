@@ -21,6 +21,7 @@ class GuardianTest extends TestCase
         $userData = [
             'name' => 'Bapak Wali',
             'email' => 'wali@example.com',
+            'whatsapp' => '081234567890',
             'password' => bcrypt('password'),
             'role' => 'WALI_SANTRI',
         ];
@@ -29,6 +30,7 @@ class GuardianTest extends TestCase
         $guardian = Guardian::create([
             'user_id' => $user->id,
             'full_name' => 'Bapak Wali',
+            'whatsapp' => '081234567890',
             'phone' => '081234567890',
             'address' => 'Jl. Guardian',
             'occupation' => 'Entrepreneur',

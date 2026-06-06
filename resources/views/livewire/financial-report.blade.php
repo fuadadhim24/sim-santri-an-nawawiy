@@ -70,7 +70,8 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">
                     <tr>
-                        <th class="px-6 py-3">Tanggal</th>
+                        <th class="px-6 py-3">Tanggal Bayar</th>
+                        <th class="px-6 py-3">Metode</th>
                         <th class="px-6 py-3">Santri</th>
                         <th class="px-6 py-3">Deskripsi</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
@@ -78,22 +79,28 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
-                    @forelse ($paidBills as $bill)
+                    @forelse ($payments as $payment)
                         <tr class="hover:bg-muted/50">
-                            <td class="px-6 py-4 text-muted-foreground">
-                                {{ $bill->updated_at->locale('id')->isoFormat('D MMMM Y HH:mm') }}
+                            <td class="px-6 py-4 text-muted-foreground whitespace-nowrap">
+                                {{ $payment->paid_at ? $payment->paid_at->locale('id')->isoFormat('D MMMM Y HH:mm') : '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $payment->method === 'cash' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                    {{ $payment->payment_method }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 font-medium text-foreground">
-                                {{ $bill->student->full_name }}
+                                {{ $payment->billing->student->full_name }}
+                                <span class="block text-xs text-muted-foreground">{{ $payment->billing->student->nis }}</span>
                             </td>
                             <td class="px-6 py-4 text-foreground">
-                                {{ $bill->title }}
+                                {{ $payment->billing->title }}
                             </td>
                             <td class="px-6 py-4 text-right font-mono font-medium text-foreground">
-                                Rp {{ number_format($bill->final_amount, 0, ',', '.') }}
+                                Rp {{ number_format($payment->amount, 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <a href="{{ route('admin.receipts.show', $bill->id) }}" target="_blank"
+                                <a href="{{ route('admin.receipts.show', $payment->billing_id) }}" target="_blank"
                                     class="text-xs text-primary hover:text-primary/80 underline font-medium">
                                     Lihat
                                 </a>
@@ -101,7 +108,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-muted-foreground">
+                            <td colspan="6" class="px-6 py-8 text-center text-muted-foreground">
                                 Tidak ada pembayaran ditemukan pada periode ini.
                             </td>
                         </tr>
@@ -110,7 +117,7 @@
             </table>
         </div>
         <div class="p-4 border-t border-border">
-            {{ $paidBills->links() }}
+            {{ $payments->links() }}
         </div>
     </div>
 </div>

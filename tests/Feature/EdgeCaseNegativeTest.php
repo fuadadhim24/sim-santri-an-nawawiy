@@ -10,7 +10,7 @@ use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class EdgeCaseNegativeTests extends TestCase
+class EdgeCaseNegativeTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -157,17 +157,20 @@ class EdgeCaseNegativeTests extends TestCase
      */
     public function test_idor_guardian_cannot_view_other_billing()
     {
-        $guardian1 = User::factory()->create(['role' => 'WALI_SANTRI']);
-        $guardian2 = User::factory()->create(['role' => 'WALI_SANTRI']);
+        $guardianUser1 = User::factory()->create(['role' => 'WALI_SANTRI']);
+        $guardianUser2 = User::factory()->create(['role' => 'WALI_SANTRI']);
 
-        $student1 = Student::factory()->create(['guardian_id' => 1]);
-        $student2 = Student::factory()->create(['guardian_id' => 2]);
+        $guardian1 = \App\Models\Guardian::factory()->create(['user_id' => $guardianUser1->id]);
+        $guardian2 = \App\Models\Guardian::factory()->create(['user_id' => $guardianUser2->id]);
+
+        $student1 = Student::factory()->create(['guardian_id' => $guardian1->id]);
+        $student2 = Student::factory()->create(['guardian_id' => $guardian2->id]);
 
         $billing1 = Billing::factory()->create(['student_id' => $student1->id]);
         $billing2 = Billing::factory()->create(['student_id' => $student2->id]);
 
         // Guardian1 tries to access Guardian2's billing
-        $response = $this->actingAs($guardian1)
+        $response = $this->actingAs($guardianUser1)
             ->get("/receipts/{$billing2->id}");
 
         // Should be 403 Forbidden

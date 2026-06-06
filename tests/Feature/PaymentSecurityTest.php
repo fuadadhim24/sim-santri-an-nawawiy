@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class PaymentSecurityTests extends TestCase
+class PaymentSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -86,12 +86,20 @@ class PaymentSecurityTests extends TestCase
             'payment_reference' => 'ORDER-123',
         ]);
 
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+        $merchantOrderId = 'ORDER-123';
+        $amount = 1.00;
+        $signature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
+
         // Malicious callback with wrong amount
         $fraudCallback = [
-            'merchantOrderId' => 'ORDER-123',
-            'amount' => 1.00, // Only 1 rupiah!
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
+            'amount' => $amount,
             'reference' => 'DUITKU-FRAUD',
             'resultCode' => '0000',
+            'signature' => $signature,
         ];
 
         $this->expectException(Exception::class);
@@ -111,11 +119,19 @@ class PaymentSecurityTests extends TestCase
             'payment_reference' => 'ORDER-456',
         ]);
 
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+        $merchantOrderId = 'ORDER-456';
+        $amount = 1000000;
+        $signature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
+
         $callback = [
-            'merchantOrderId' => 'ORDER-456',
-            'amount' => 1000000,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
+            'amount' => $amount,
             'reference' => 'DUITKU-456',
             'resultCode' => '0000',
+            'signature' => $signature,
         ];
 
         $this->expectException(Exception::class);
@@ -135,11 +151,19 @@ class PaymentSecurityTests extends TestCase
             'payment_reference' => 'ORDER-789',
         ]);
 
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+        $merchantOrderId = 'ORDER-789';
+        $amount = 1000000;
+        $signature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
+
         $callback = [
-            'merchantOrderId' => 'ORDER-789',
-            'amount' => 1000000,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
+            'amount' => $amount,
             'reference' => 'DUITKU-789',
             'resultCode' => '0000',
+            'signature' => $signature,
         ];
 
         $this->expectException(Exception::class);
@@ -160,11 +184,19 @@ class PaymentSecurityTests extends TestCase
             'expires_at' => now()->subDay(), // Expired yesterday
         ]);
 
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+        $merchantOrderId = 'ORDER-EXP';
+        $amount = 1000000;
+        $signature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
+
         $callback = [
-            'merchantOrderId' => 'ORDER-EXP',
-            'amount' => 1000000,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
+            'amount' => $amount,
             'reference' => 'DUITKU-EXP',
             'resultCode' => '0000',
+            'signature' => $signature,
         ];
 
         $this->expectException(Exception::class);
@@ -178,11 +210,19 @@ class PaymentSecurityTests extends TestCase
      */
     public function test_prevent_payment_for_nonexistent_billing()
     {
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+        $merchantOrderId = 'ORDER-FAKE-999999';
+        $amount = 1000000;
+        $signature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
+
         $callback = [
-            'merchantOrderId' => 'ORDER-FAKE-999999',
-            'amount' => 1000000,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
+            'amount' => $amount,
             'reference' => 'DUITKU-FAKE',
             'resultCode' => '0000',
+            'signature' => $signature,
         ];
 
         $this->expectException(Exception::class);

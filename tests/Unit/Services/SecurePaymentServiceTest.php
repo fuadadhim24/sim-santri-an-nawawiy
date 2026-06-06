@@ -23,12 +23,13 @@ class SecurePaymentServiceTest extends TestCase
     public function test_cash_payment_processed()
     {
         $billing = Billing::factory()->create(['status' => 'UNPAID', 'final_amount' => 100000]);
+        $admin = \App\Models\User::factory()->create();
 
-        $payment = $this->service->processCashPaymentSecurely([
-            'billing_id' => $billing->id,
-            'amount' => $billing->final_amount,
-            'method' => 'TUNAI',
-        ]);
+        $payment = $this->service->processCashPaymentSecurely(
+            $billing,
+            $admin->id,
+            'Test cash payment'
+        );
 
         $this->assertNotNull($payment);
         $this->assertTrue($billing->fresh()->isPaid());
@@ -38,19 +39,31 @@ class SecurePaymentServiceTest extends TestCase
     {
         $billing = Billing::factory()->create(['status' => 'UNPAID', 'final_amount' => 100000]);
         $reference = 'REF-001';
+        $merchantOrderId = 'ORDER-' . $billing->id;
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+
+        // Update payment_reference in billing so we can find it
+        $billing->update(['payment_reference' => $reference]);
+
+        $signature = md5($merchantCode . $billing->final_amount . $merchantOrderId . $merchantKey);
 
         $payment1 = $this->service->processDuitkuPaymentSecurely([
-            'billingId' => $billing->id,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
             'amount' => $billing->final_amount,
             'reference' => $reference,
             'resultCode' => '00',
+            'signature' => $signature,
         ]);
 
         $payment2 = $this->service->processDuitkuPaymentSecurely([
-            'billingId' => $billing->id,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
             'amount' => $billing->final_amount,
             'reference' => $reference,
             'resultCode' => '00',
+            'signature' => $signature,
         ]);
 
         $this->assertEquals($payment1->id, $payment2->id);
@@ -58,20 +71,23 @@ class SecurePaymentServiceTest extends TestCase
 
     public function test_webhook_signature_verified()
     {
-        $merchantKey = config('payment.duitku.merchant_key', 'test_key');
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
         $merchantOrderId = 'ORDER-123';
         $amount = 100000;
 
-        $signature = md5($merchantKey . $merchantOrderId . $amount);
+        $signature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
 
         $reflection = new \ReflectionClass($this->service);
         $method = $reflection->getMethod('verifyDuitkuSignature');
         $method->setAccessible(true);
 
         $result = $method->invoke($this->service, [
+            'merchantCode' => $merchantCode,
             'merchantOrderId' => $merchantOrderId,
             'amount' => $amount,
-        ], $signature);
+            'signature' => $signature,
+        ]);
 
         $this->assertTrue($result);
     }
@@ -83,9 +99,11 @@ class SecurePaymentServiceTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invoke($this->service, [
+            'merchantCode' => 'test_merchant',
             'merchantOrderId' => 'ORDER-123',
             'amount' => 100000,
-        ], 'invalid_signature');
+            'signature' => 'invalid_signature',
+        ]);
 
         $this->assertFalse($result);
     }
@@ -98,19 +116,31 @@ class SecurePaymentServiceTest extends TestCase
         ]);
 
         $reference = 'DUITKU-REF-001';
+        $merchantOrderId = 'ORDER-' . $billing->id;
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+
+        // Update payment_reference in billing so we can find it
+        $billing->update(['payment_reference' => $reference]);
+
+        $signature = md5($merchantCode . $billing->final_amount . $merchantOrderId . $merchantKey);
 
         $payment1 = $this->service->processDuitkuPaymentSecurely([
-            'billingId' => $billing->id,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
             'amount' => $billing->final_amount,
             'reference' => $reference,
             'resultCode' => '00',
+            'signature' => $signature,
         ]);
 
         $payment2 = $this->service->processDuitkuPaymentSecurely([
-            'billingId' => $billing->id,
+            'merchantCode' => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
             'amount' => $billing->final_amount,
             'reference' => $reference,
             'resultCode' => '00',
+            'signature' => $signature,
         ]);
 
         $this->assertEquals($payment1->id, $payment2->id);

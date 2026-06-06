@@ -89,7 +89,7 @@ class Student extends Model
                         'id' => $student->id,
                         'name' => $student->full_name,
                     ]);
-                    return false;
+                    throw new \Exception('Tidak dapat menghapus santri yang memiliki tagihan aktif');
                 }
 
                 // Delete files when force deleting

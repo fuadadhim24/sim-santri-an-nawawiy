@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['role:SUPER_ADMIN,ADMINISTRASI,BENDAHARA'])->group(function () {
         Route::get('/admin/dashboard', \App\Livewire\AdminDashboard::class)->name('admin.dashboard');
+        Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
     });
 
     Route::middleware(['role:SUPER_ADMIN,ADMINISTRASI'])->group(function () {
@@ -80,7 +81,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['role:SUPER_ADMIN,BENDAHARA'])->group(function () {
         Route::get('/admin/billings/archive', \App\Livewire\BillingArchive::class)->name('admin.billings.archive');
-        Route::get('/admin/billings', \App\Livewire\BillingIndex::class)->name('admin.billings');
         Route::get('/admin/billings/create', \App\Livewire\BillingForm::class)->name('admin.billings.create');
 
         Route::get('/admin/fee-masters', \App\Livewire\FeeMasterIndex::class)->name('admin.fee-masters');

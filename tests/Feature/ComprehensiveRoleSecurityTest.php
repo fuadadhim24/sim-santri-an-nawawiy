@@ -90,7 +90,11 @@ class ComprehensiveRoleSecurityTest extends TestCase
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
             ->create();
 
-        $schedule = SpmbSchedule::factory()->state(['is_active' => true])->create();
+        $schedule = SpmbSchedule::factory()->create([
+            'registration_start' => now()->subDays(2),
+            'registration_end' => now()->addDays(2),
+            'is_active' => true,
+        ]);
         session(['selected_spmb_schedule_id' => $schedule->id]);
 
         Livewire::actingAs($guardian->user)

@@ -72,6 +72,40 @@ class SecurePaymentService
     }
 
     /**
+     * SECURE: Find billing for Duitku webhook callback using fallback mechanisms
+     */
+    public function findBillingForDuitku(string $merchantOrderId, ?string $reference = null): ?Billing
+    {
+        // 1. Try by payment_reference matching merchantOrderId
+        $billing = Billing::where('payment_reference', $merchantOrderId)->first();
+        if ($billing) {
+            return $billing;
+        }
+
+        // 2. Try by payment_reference matching reference
+        if ($reference) {
+            $billing = Billing::where('payment_reference', $reference)->first();
+            if ($billing) {
+                return $billing;
+            }
+        }
+
+        // 3. Try to parse billing ID from merchantOrderId
+        $billingId = null;
+        if (str_starts_with($merchantOrderId, 'ORDER-')) {
+            $billingId = substr($merchantOrderId, 6);
+        } elseif (preg_match('/^(\d+)/', $merchantOrderId, $matches)) {
+            $billingId = $matches[1];
+        }
+
+        if ($billingId) {
+            return Billing::find($billingId);
+        }
+
+        return null;
+    }
+
+    /**
      * SECURE: Validate Duitku webhook callback
      * Prevents: Manipulasi nominal via webhook, payment for expired billing
      */
@@ -88,11 +122,12 @@ class SecurePaymentService
         $resultCode = $callbackData['resultCode'] ?? null;
 
         // 2. FIND billing
-        $billing = Billing::where('payment_reference', $merchantOrderId)->first();
+        $billing = $this->findBillingForDuitku($merchantOrderId, $reference);
 
         if (!$billing) {
             Log::warning('Duitku callback: billing not found', [
                 'merchant_order_id' => $merchantOrderId,
+                'reference' => $reference,
             ]);
             throw new Exception('Tagihan tidak ditemukan dalam sistem.');
         }
@@ -148,7 +183,7 @@ class SecurePaymentService
             'billing' => $billing,
             'amount' => $amount,
             'reference' => $reference,
-            'success' => $resultCode === '0000', // Success code in Duitku
+            'success' => in_array($resultCode, ['00', '0000']), // Success code in Duitku
         ];
     }
 
@@ -236,10 +271,11 @@ class SecurePaymentService
         $merchantOrderId = $data['merchantOrderId'] ?? '';
         $amount = $data['amount'] ?? 0;
         $signature = $data['signature'] ?? '';
+        $merchantCode = $data['merchantCode'] ?? (config('payment.duitku.merchant_code') ?: 'test_merchant');
 
-        $merchantKey = config('payment.duitku.merchant_key');
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
 
-        $expectedSignature = md5($merchantKey . $merchantOrderId . $amount);
+        $expectedSignature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
 
         return hash_equals($expectedSignature, $signature);
     }

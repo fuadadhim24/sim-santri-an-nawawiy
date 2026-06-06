@@ -84,11 +84,12 @@ class BillingForm extends Component
             $service = new EnhancedBillingService();
             $student = Student::findOrFail($this->student_id);
 
+            $feeMaster = FeeMaster::findOrFail($this->fee_master_id);
             $billing = $service->generateBillSecurely(
                 $student,
-                $this->fee_master_id,
+                $feeMaster->fee_category_id,
                 $this->title,
-                null,
+                $feeMaster->item_name,
                 $this->period_start ? \Carbon\Carbon::parse($this->period_start) : null,
                 $this->period_end ? \Carbon\Carbon::parse($this->period_end) : null
             );

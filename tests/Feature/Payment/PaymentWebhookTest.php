@@ -13,15 +13,18 @@ class PaymentWebhookTest extends TestCase
 
     public function test_valid_webhook_processes_payment()
     {
+        $this->withoutExceptionHandling();
         $billing = Billing::factory()->create(['status' => 'UNPAID', 'final_amount' => 100000]);
         
-        $merchantKey = config('payment.duitku.merchant_key', 'test_key');
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
         $merchantOrderId = $billing->payment_reference ?? 'ORDER-' . $billing->id;
         $amount = $billing->final_amount;
         
-        $signature = md5($merchantKey . $merchantOrderId . $amount);
+        $signature = md5($merchantCode . $amount . $merchantOrderId . $merchantKey);
 
-        $response = $this->post('/duitku/callback', [
+        $response = $this->post(route('duitku.callback'), [
+            'merchantCode' => $merchantCode,
             'merchantOrderId' => $merchantOrderId,
             'amount' => $amount,
             'reference' => 'REF-123',
@@ -37,8 +40,10 @@ class PaymentWebhookTest extends TestCase
     public function test_invalid_webhook_rejected()
     {
         $billing = Billing::factory()->create(['status' => 'UNPAID', 'final_amount' => 100000]);
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
 
-        $response = $this->post('/duitku/callback', [
+        $response = $this->post(route('duitku.callback'), [
+            'merchantCode' => $merchantCode,
             'merchantOrderId' => 'ORDER-' . $billing->id,
             'amount' => $billing->final_amount,
             'reference' => 'REF-123',
@@ -55,11 +60,13 @@ class PaymentWebhookTest extends TestCase
         $billing = Billing::factory()->create(['status' => 'UNPAID', 'final_amount' => 100000]);
         $reference = 'REF-123';
         
-        $merchantKey = config('payment.duitku.merchant_key', 'test_key');
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
         $merchantOrderId = $billing->payment_reference ?? 'ORDER-' . $billing->id;
-        $signature = md5($merchantKey . $merchantOrderId . $billing->final_amount);
+        $signature = md5($merchantCode . $billing->final_amount . $merchantOrderId . $merchantKey);
 
         $payloadData = [
+            'merchantCode' => $merchantCode,
             'merchantOrderId' => $merchantOrderId,
             'amount' => $billing->final_amount,
             'reference' => $reference,
@@ -68,12 +75,12 @@ class PaymentWebhookTest extends TestCase
             'signature' => $signature,
         ];
 
-        $this->post('/duitku/callback', $payloadData);
+        $this->post(route('duitku.callback'), $payloadData);
 
         $initialPaymentCount = Payment::where('duitku_reference', $reference)->count();
         $this->assertEquals(1, $initialPaymentCount);
 
-        $this->post('/duitku/callback', $payloadData);
+        $this->post(route('duitku.callback'), $payloadData);
 
         $finalPaymentCount = Payment::where('duitku_reference', $reference)->count();
         $this->assertEquals(1, $finalPaymentCount);
@@ -81,7 +88,9 @@ class PaymentWebhookTest extends TestCase
 
     public function test_webhook_missing_required_fields()
     {
-        $response = $this->post('/duitku/callback', [
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
+        $response = $this->post(route('duitku.callback'), [
+            'merchantCode' => $merchantCode,
             'merchantOrderId' => 'ORDER-123',
             // Missing amount, reference, resultCode
         ]);
@@ -93,11 +102,13 @@ class PaymentWebhookTest extends TestCase
     {
         $billing = Billing::factory()->create(['status' => 'UNPAID', 'final_amount' => 100000]);
         
-        $merchantKey = config('payment.duitku.merchant_key', 'test_key');
+        $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
+        $merchantCode = config('payment.duitku.merchant_code') ?: 'test_merchant';
         $merchantOrderId = 'ORDER-' . $billing->id;
-        $signature = md5($merchantKey . $merchantOrderId . $billing->final_amount);
+        $signature = md5($merchantCode . $billing->final_amount . $merchantOrderId . $merchantKey);
 
-        $response = $this->post('/duitku/callback', [
+        $response = $this->post(route('duitku.callback'), [
+            'merchantCode' => $merchantCode,
             'merchantOrderId' => $merchantOrderId,
             'amount' => $billing->final_amount,
             'reference' => 'REF-123',

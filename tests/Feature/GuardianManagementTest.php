@@ -75,6 +75,6 @@ class GuardianManagementTest extends TestCase
         $response = $this->actingAs($guardianUser)
             ->get('/admin/guardians');
 
-        $response->assertStatus(403);
+        $response->assertRedirect('/my-dashboard');
     }
 }

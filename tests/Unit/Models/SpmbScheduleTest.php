@@ -17,15 +17,15 @@ class SpmbScheduleTest extends TestCase
     public function test_can_create_spmb_schedule()
     {
         $schedule = SpmbSchedule::create([
-            'title' => 'SPMB Tahun 2024',
-            'start_date' => now()->addDays(1),
-            'end_date' => now()->addDays(30),
+            'name' => 'SPMB Tahun 2024',
+            'registration_start' => now()->addDays(1),
+            'registration_end' => now()->addDays(30),
             'description' => 'Pendaftaran siswa baru tahun 2024',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('spmb_schedules', [
-            'title' => 'SPMB Tahun 2024',
+            'name' => 'SPMB Tahun 2024',
         ]);
     }
 
@@ -62,22 +62,22 @@ class SpmbScheduleTest extends TestCase
         $endDate = now()->addDays(30);
 
         $schedule = SpmbSchedule::factory()->create([
-            'start_date' => $startDate,
-            'end_date' => $endDate,
+            'registration_start' => $startDate,
+            'registration_end' => $endDate,
         ]);
 
-        $this->assertEquals($startDate->format('Y-m-d'), $schedule->fresh()->start_date->format('Y-m-d'));
+        $this->assertEquals($startDate->format('Y-m-d'), $schedule->fresh()->registration_start->format('Y-m-d'));
     }
 
     /**
-     * Test soft delete on SPMB schedule
+     * Test delete on SPMB schedule
      */
-    public function test_spmb_schedule_can_be_soft_deleted()
+    public function test_spmb_schedule_can_be_deleted()
     {
         $schedule = SpmbSchedule::factory()->create();
 
         $schedule->delete();
 
-        $this->assertSoftDeleted('spmb_schedules', ['id' => $schedule->id]);
+        $this->assertDatabaseMissing('spmb_schedules', ['id' => $schedule->id]);
     }
 }

@@ -75,6 +75,15 @@ class Payment extends Model
         return $this->method === 'duitku';
     }
 
+    public function getPaymentMethodAttribute(): string
+    {
+        return match ($this->method) {
+            'cash' => 'Tunai',
+            'duitku' => 'Duitku (Online)',
+            default => ucfirst($this->method ?? '-'),
+        };
+    }
+
     public function markAsPaidByDuitku(string $reference): bool
     {
         return $this->updateQuietly([

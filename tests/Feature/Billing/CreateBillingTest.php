@@ -9,25 +9,35 @@ use App\Models\FeeCategory;
 use App\Models\FeeMaster;
 use App\Models\Billing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class CreateBillingTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_admin_can_create_billing()
     {
         $admin = User::factory()->create(['role' => 'SUPER_ADMIN']);
         $category = FeeCategory::factory()->create();
         $student = Student::factory()->create(['status' => 'ACTIVE']);
-        $feeMaster = FeeMaster::factory()->create(['fee_category_id' => $category->id]);
+        $feeMaster = FeeMaster::factory()->create([
+            'fee_category_id' => $category->id,
+            'amount' => 10000,
+            'unit_target' => null,
+            'residence_target' => null,
+        ]);
 
-        $this->actingAs($admin)
-            ->post('/admin/billings', [
-                'student_id' => $student->id,
-                'fee_master_id' => $feeMaster->id,
-                'title' => 'Test Billing',
-                'original_amount' => $feeMaster->amount,
-            ])
-            ->assertRedirect();
+        $this->actingAs($admin);
+
+        Livewire::test(\App\Livewire\BillingForm::class)
+            ->set('student_id', $student->id)
+            ->set('fee_master_id', $feeMaster->id)
+            ->set('title', 'Test Billing')
+            ->set('original_amount', $feeMaster->amount)
+            ->set('final_amount', $feeMaster->amount)
+            ->call('save')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('admin.billings'));
 
         $this->assertDatabaseHas('billings', [
             'student_id' => $student->id,
@@ -40,14 +50,22 @@ class CreateBillingTest extends TestCase
         $guardian = User::factory()->create(['role' => 'WALI_SANTRI']);
         $category = FeeCategory::factory()->create();
         $student = Student::factory()->create();
-        $feeMaster = FeeMaster::factory()->create(['fee_category_id' => $category->id]);
+        $feeMaster = FeeMaster::factory()->create([
+            'fee_category_id' => $category->id,
+            'unit_target' => null,
+            'residence_target' => null,
+        ]);
 
-        $this->actingAs($guardian)
-            ->post('/admin/billings', [
-                'student_id' => $student->id,
-                'fee_master_id' => $feeMaster->id,
-            ])
-            ->assertForbidden();
+        $this->actingAs($guardian);
+
+        Livewire::test(\App\Livewire\BillingForm::class)
+            ->set('student_id', $student->id)
+            ->set('fee_master_id', $feeMaster->id)
+            ->set('title', 'Test Billing')
+            ->set('original_amount', $feeMaster->amount)
+            ->set('final_amount', $feeMaster->amount)
+            ->call('save')
+            ->assertStatus(403);
     }
 
     public function test_cannot_create_duplicate_billing()
@@ -55,7 +73,11 @@ class CreateBillingTest extends TestCase
         $admin = User::factory()->create(['role' => 'SUPER_ADMIN']);
         $category = FeeCategory::factory()->create();
         $student = Student::factory()->create(['status' => 'ACTIVE']);
-        $feeMaster = FeeMaster::factory()->create(['fee_category_id' => $category->id]);
+        $feeMaster = FeeMaster::factory()->create([
+            'fee_category_id' => $category->id,
+            'unit_target' => null,
+            'residence_target' => null,
+        ]);
 
         Billing::factory()->create([
             'student_id' => $student->id,
@@ -63,14 +85,18 @@ class CreateBillingTest extends TestCase
             'status' => 'UNPAID'
         ]);
 
-        $this->actingAs($admin)
-            ->post('/admin/billings', [
-                'student_id' => $student->id,
-                'fee_master_id' => $feeMaster->id,
-                'title' => 'Duplicate Billing',
-                'original_amount' => $feeMaster->amount,
-            ])
-            ->assertSessionHasErrors();
+        $this->actingAs($admin);
+
+        Livewire::test(\App\Livewire\BillingForm::class)
+            ->set('student_id', $student->id)
+            ->set('fee_master_id', $feeMaster->id)
+            ->set('title', 'Duplicate Billing')
+            ->set('original_amount', $feeMaster->amount)
+            ->set('final_amount', $feeMaster->amount)
+            ->call('save')
+            ->assertNoRedirect();
+
+        $this->assertEquals(1, Billing::count());
     }
 
     public function test_billing_cannot_be_created_for_inactive_student()
@@ -78,37 +104,41 @@ class CreateBillingTest extends TestCase
         $admin = User::factory()->create(['role' => 'SUPER_ADMIN']);
         $category = FeeCategory::factory()->create();
         $student = Student::factory()->create(['status' => 'GRADUATED']);
-        $feeMaster = FeeMaster::factory()->create(['fee_category_id' => $category->id]);
+        $feeMaster = FeeMaster::factory()->create([
+            'fee_category_id' => $category->id,
+            'unit_target' => null,
+            'residence_target' => null,
+        ]);
 
-        $this->actingAs($admin)
-            ->post('/admin/billings', [
-                'student_id' => $student->id,
-                'fee_master_id' => $feeMaster->id,
-                'title' => 'Test Billing',
-                'original_amount' => $feeMaster->amount,
-            ])
-            ->assertSessionHasErrors();
+        $this->actingAs($admin);
+
+        Livewire::test(\App\Livewire\BillingForm::class)
+            ->set('student_id', $student->id)
+            ->set('fee_master_id', $feeMaster->id)
+            ->set('title', 'Test Billing')
+            ->set('original_amount', $feeMaster->amount)
+            ->set('final_amount', $feeMaster->amount)
+            ->call('save')
+            ->assertNoRedirect();
+
+        $this->assertEquals(0, Billing::count());
     }
 
     public function test_paid_billing_cannot_be_edited()
     {
-        $admin = User::factory()->create(['role' => 'SUPER_ADMIN']);
-        $billing = Billing::factory()->create(['status' => 'PAID']);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Tagihan yang sudah dibayar tidak dapat diubah.');
 
-        $this->actingAs($admin)
-            ->patch("/admin/billings/{$billing->id}", [
-                'title' => 'Updated Title',
-            ])
-            ->assertForbidden();
+        $billing = Billing::factory()->create(['status' => 'PAID']);
+        $billing->update(['title' => 'Updated Title']);
     }
 
     public function test_paid_billing_cannot_be_deleted()
     {
-        $admin = User::factory()->create(['role' => 'SUPER_ADMIN']);
-        $billing = Billing::factory()->create(['status' => 'PAID']);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Tidak dapat menghapus tagihan yang sudah dibayar.');
 
-        $this->actingAs($admin)
-            ->delete("/admin/billings/{$billing->id}")
-            ->assertForbidden();
+        $billing = Billing::factory()->create(['status' => 'PAID']);
+        $billing->delete();
     }
 }

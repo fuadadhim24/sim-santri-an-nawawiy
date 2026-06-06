@@ -18,6 +18,7 @@ class UserTest extends TestCase
         $userData = [
             'name' => 'John Doe',
             'email' => 'john@example.com',
+            'whatsapp' => '081234567890',
             'password' => bcrypt('password123'),
             'role' => 'SUPER_ADMIN',
         ];

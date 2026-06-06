@@ -65,7 +65,7 @@ class BillingIndex extends Component
 
     public function processCashPayment($billingId)
     {
-        if (!Auth::check() || !in_array(Auth::user()->role, ['BENDAHARA', 'SUPER_ADMIN'])) {
+        if (!Auth::check() || !in_array(Auth::user()->role, ['BENDAHARA', 'SUPER_ADMIN', 'ADMINISTRASI'])) {
             session()->flash('error', 'Unauthorized action.');
             $this->showPaymentModal = false;
             return;

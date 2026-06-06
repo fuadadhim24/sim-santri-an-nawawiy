@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class V1_2_IntegrationTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */

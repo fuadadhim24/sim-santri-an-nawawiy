@@ -54,7 +54,7 @@ class BillingServiceTest extends TestCase
      */
     public function test_generate_bill_applies_discount_for_special_student()
     {
-        $student = Student::factory()->create(['special_status' => 'PRESTASI']);
+        $student = Student::factory()->create(['special_status' => 'YATIM']);
         $category = FeeCategory::factory()->create();
         $feeMaster = FeeMaster::factory()->create([
             'fee_category_id' => $category->id,
@@ -65,7 +65,7 @@ class BillingServiceTest extends TestCase
 
         Discount::factory()->create([
             'fee_master_id' => $feeMaster->id,
-            'target_status' => 'PRESTASI',
+            'target_status' => 'YATIM',
             'discount_amount' => 250000,
         ]);
 
@@ -187,7 +187,7 @@ class BillingServiceTest extends TestCase
      */
     public function test_discount_cannot_exceed_original_amount()
     {
-        $student = Student::factory()->create(['special_status' => 'PRESTASI']);
+        $student = Student::factory()->create(['special_status' => 'YATIM']);
         $category = FeeCategory::factory()->create();
         $feeMaster = FeeMaster::factory()->create([
             'fee_category_id' => $category->id,
@@ -198,7 +198,7 @@ class BillingServiceTest extends TestCase
 
         Discount::factory()->create([
             'fee_master_id' => $feeMaster->id,
-            'target_status' => 'PRESTASI',
+            'target_status' => 'YATIM',
             'discount_amount' => 2000000, // Discount lebih besar dari amount
         ]);
 

@@ -73,28 +73,31 @@ class SpmbManagementTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /**
-     * Test guardian can access SPMB registration
-     */
     public function test_guardian_can_access_spmb_registration()
     {
+        $schedule = SpmbSchedule::factory()->create([
+            'registration_start' => now()->subDays(2),
+            'registration_end' => now()->addDays(2),
+            'is_active' => true,
+        ]);
+
         $response = $this->actingAs($this->guardian)
+            ->withSession(['selected_spmb_schedule_id' => $schedule->id])
             ->get('/spmb/register');
 
         $response->assertStatus(200);
     }
 
     /**
-     * Test only super admin can manage SPMB
+     * Test only authorized roles can manage SPMB
      */
-    public function test_only_super_admin_can_manage_spmb()
+    public function test_only_authorized_roles_can_manage_spmb()
     {
-        $adminTu = User::factory()->create(['role' => 'ADMINISTRASI']);
+        $bendahara = User::factory()->create(['role' => 'BENDAHARA']);
 
-        $response = $this->actingAs($adminTu)
-            ->get('/admin/spmb-schedules');
-
-        $response->assertStatus(403);
+        $response = $this->actingAs($bendahara)
+            ->get('/admin/spmb-schedules')
+            ->assertRedirect(route('admin.dashboard'));
     }
 
     /**

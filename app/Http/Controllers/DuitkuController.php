@@ -105,6 +105,8 @@ class DuitkuController extends Controller
     {
         Log::info('Duitku callback received', ['payload' => $request->all()]);
 
+        $_POST = $request->all();
+
         try {
             $callback = Pop::callback($this->duitkuConfig);
             $notif = json_decode($callback);
@@ -115,7 +117,7 @@ class DuitkuController extends Controller
                 'amount' => $notif->amount ?? null,
             ]);
 
-            $billing = Billing::where('payment_reference', $notif->merchantOrderId)->first();
+            $billing = $this->securePaymentService->findBillingForDuitku($notif->merchantOrderId, $notif->reference ?? null);
 
             if (!$billing) {
                 return response()->json(['error' => 'Billing not found'], 404);
@@ -128,7 +130,12 @@ class DuitkuController extends Controller
                     'reference' => $notif->reference,
                     'resultCode' => $notif->resultCode,
                     'paymentCode' => $notif->paymentCode,
+                    'signature' => $notif->signature ?? $request->input('signature'),
                 ]);
+
+                if ($payment->isFailed()) {
+                    return response()->json(['error' => 'Payment failed at gateway'], 422);
+                }
 
                 return response()->json(['success' => true, 'payment' => $payment->id]);
             } catch (Exception $e) {
@@ -140,7 +147,7 @@ class DuitkuController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], 422);
         }
     }
 

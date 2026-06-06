@@ -27,6 +27,26 @@ class FeeCategory extends Model
         'can_generate_before_acceptance' => 'boolean',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (FeeCategory $category) {
+            $hasActiveBillings = \App\Models\Billing::whereIn('fee_master_id', function ($query) use ($category) {
+                $query->select('id')
+                    ->from('fee_masters')
+                    ->where('fee_category_id', $category->id);
+            })
+                ->where('status', 'UNPAID')
+                ->exists();
+
+            if ($hasActiveBillings) {
+                throw new \Exception(
+                    "Tidak dapat menghapus kategori '{$category->name}' " .
+                    "karena masih ada tagihan aktif yang menggunakan kategori ini."
+                );
+            }
+        });
+    }
+
     public function fees(): HasMany
     {
         return $this->hasMany(FeeMaster::class);

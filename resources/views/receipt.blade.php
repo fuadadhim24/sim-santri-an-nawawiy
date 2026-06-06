@@ -97,6 +97,10 @@
                     </h3>
                     <p class="text-muted-foreground">Tanggal Tagihan:
                         {{ $billing->created_at->locale('id')->isoFormat('D MMMM Y') }}</p>
+                    @if ($billing->payments->isNotEmpty() && $billing->payments->first()->paid_at)
+                        <p class="text-muted-foreground">Tanggal Pembayaran:
+                            {{ $billing->payments->first()->paid_at->locale('id')->isoFormat('D MMMM Y H:mm') }} WIB</p>
+                    @endif
                     <p class="text-muted-foreground">Metode:
                         @if ($billing->payments->isNotEmpty())
                             {{ $billing->payments->first()->payment_method }}

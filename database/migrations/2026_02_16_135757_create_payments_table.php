@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('billing_id')->constrained('billings')->onDelete('cascade');
             $table->string('payment_method');
             $table->decimal('amount', 12, 2);
-            $table->timestamp('paid_at');
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
     }
