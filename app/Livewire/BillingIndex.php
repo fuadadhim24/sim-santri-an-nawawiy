@@ -14,6 +14,7 @@ class BillingIndex extends Component
     use WithPagination;
 
     public $search = '';
+    public $showPaymentModal = false;
     public $statusFilter = '';
     public $unitFilter = '';       // Jenjang: 01, 02, 03
     public $classFilter = '';      // Kelas

@@ -111,6 +111,8 @@
                         <th class="px-6 py-3">Deskripsi</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
                         <th class="px-6 py-3">Status</th>
+                        <th class="px-6 py-3">Metode</th>
+                        <th class="px-6 py-3">Tanggal Bayar</th>
                         <th class="px-6 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -156,8 +158,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 @if ($billing->status == 'PAID')
-                                    <span
-                                        class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                         LUNAS
                                     </span>
                                 @elseif ($billing->status == 'UNPAID')
@@ -186,6 +187,12 @@
                                         {{ $billing->status }}
                                     </span>
                                 @endif
+                            </td>
+                            <td class="px-6 py-4 text-xs">
+                                {{ optional($billing->payments->firstWhere('status', 'paid'))->payment_method ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-xs">
+                                {{ optional($billing->payments->firstWhere('status', 'paid'))->paid_at ? $billing->payments->firstWhere('status', 'paid')->paid_at->format('d M Y') : '-' }}
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center space-x-2">
@@ -236,7 +243,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-muted-foreground">
+                            <td colspan="9" class="px-6 py-8 text-center text-muted-foreground">
                                 Tidak ada tagihan ditemukan.
                             </td>
                         </tr>
