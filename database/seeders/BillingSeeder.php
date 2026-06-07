@@ -227,7 +227,7 @@ class BillingSeeder extends Seeder
                 ]);
             }
 
-            // Daftar Ulang — EXPIRED
+            // Daftar Ulang — UNPAID (terlambat, sudah melewati tenggat)
             if ($fmDaftarUlang) {
                 Billing::create([
                     'student_id' => $student6->id,
@@ -236,7 +236,7 @@ class BillingSeeder extends Seeder
                     'original_amount' => $fmDaftarUlang->amount,
                     'discount_applied' => 0,
                     'final_amount' => $fmDaftarUlang->amount,
-                    'status' => 'EXPIRED',
+                    'status' => 'UNPAID',
                     'created_at' => Carbon::parse('2025-12-01'),
                 ]);
             }

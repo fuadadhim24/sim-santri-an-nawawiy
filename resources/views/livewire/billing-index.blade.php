@@ -79,7 +79,6 @@
                     <option value="">Semua Status</option>
                     <option value="UNPAID">Belum Lunas</option>
                     <option value="PAID">Lunas</option>
-                    <option value="EXPIRED">Kadaluarsa</option>
                     <option value="VOID">Dibatalkan</option>
                 </select>
 
@@ -174,25 +173,21 @@
                                             TERLAMBAT
                                         </span>
                                     @endif
-                                @elseif ($billing->status == 'EXPIRED')
-                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
-                                        KADALUARSA
-                                    </span>
                                 @elseif ($billing->status == 'VOID')
                                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                                         DIBATALKAN
                                     </span>
                                 @else
                                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                        {{ $billing->status }}
+                                        {{ strtoupper($billing->status) }}
                                     </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-xs">
-                                {{ optional($billing->payments->firstWhere('status', 'paid'))->payment_method ?? '-' }}
+                                {{ $billing->status == 'PAID' ? (optional($billing->payments->firstWhere('status', 'paid'))->payment_method ?? '-') : '-' }}
                             </td>
                             <td class="px-6 py-4 text-xs">
-                                {{ optional($billing->payments->firstWhere('status', 'paid'))->paid_at ? $billing->payments->firstWhere('status', 'paid')->paid_at->format('d M Y') : '-' }}
+                                {{ $billing->status == 'PAID' ? (optional($billing->payments->firstWhere('status', 'paid'))->paid_at ? $billing->payments->firstWhere('status', 'paid')->paid_at->format('d M Y') : '-') : '-' }}
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center space-x-2">

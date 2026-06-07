@@ -167,16 +167,13 @@ class SecurePaymentService
             );
         }
 
-        // 5. CHECK if billing is expired (optional, based on business rules)
+        // 5. LOG warning if billing is past due date (but still allow payment)
         if ($billing->expires_at && $billing->expires_at->isPast()) {
-            Log::warning('Duitku callback: payment for expired billing', [
+            Log::info('Duitku callback: payment for overdue billing (still accepted)', [
                 'billing_id' => $billing->id,
-                'expired_at' => $billing->expires_at,
+                'due_date' => $billing->expires_at,
             ]);
-
-            throw new Exception(
-                'Tagihan ini sudah kadaluwarsa. Hubungi Admin.'
-            );
+            // Tagihan terlambat tetap boleh dibayar
         }
 
         return [

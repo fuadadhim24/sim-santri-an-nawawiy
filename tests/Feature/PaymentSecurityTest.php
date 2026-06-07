@@ -173,15 +173,15 @@ class PaymentSecurityTest extends TestCase
     }
 
     /**
-     * NEGATIVE TEST: Reject payment for expired billing
+     * POSITIVE TEST: Accept payment for overdue billing (tagihan terlambat tetap bisa dibayar)
      */
-    public function test_reject_payment_for_expired_billing()
+    public function test_accept_payment_for_overdue_billing()
     {
         $billing = Billing::factory()->create([
             'status' => 'UNPAID',
             'final_amount' => 1000000,
             'payment_reference' => 'ORDER-EXP',
-            'expires_at' => now()->subDay(), // Expired yesterday
+            'expires_at' => now()->subDay(), // Past due date
         ]);
 
         $merchantKey = config('payment.duitku.merchant_key') ?: 'test_key';
@@ -199,10 +199,11 @@ class PaymentSecurityTest extends TestCase
             'signature' => $signature,
         ];
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('sudah kadaluwarsa');
+        // Overdue billings should still be accepted — no exception thrown
+        $result = $this->paymentService->validateDuitkuCallback($callback);
 
-        $this->paymentService->validateDuitkuCallback($callback);
+        $this->assertNotNull($result);
+        $this->assertEquals($billing->id, $result['billing']->id);
     }
 
     /**

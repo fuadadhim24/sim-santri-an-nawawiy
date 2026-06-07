@@ -27,6 +27,8 @@ class BillingIndex extends Component
     public $splitAmounts = [];
     public $splitTitles = [];
 
+
+
     public function updatingSearch()
     {
         $this->resetPage();
