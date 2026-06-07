@@ -79,7 +79,7 @@ class Payment extends Model
     {
         return match ($this->method) {
             'cash' => 'Tunai',
-            'duitku' => 'Duitku (Online)',
+            'duitku' => 'Cashless',
             default => ucfirst($this->method ?? '-'),
         };
     }

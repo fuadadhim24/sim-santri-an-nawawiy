@@ -146,4 +146,13 @@ class SecurePaymentServiceTest extends TestCase
         $this->assertEquals($payment1->id, $payment2->id);
         $this->assertEquals(1, Payment::where('duitku_reference', $reference)->count());
     }
+
+    public function test_duitku_payment_method_is_cashless()
+    {
+        $payment = new Payment([
+            'method' => 'duitku'
+        ]);
+
+        $this->assertEquals('Cashless', $payment->payment_method);
+    }
 }
