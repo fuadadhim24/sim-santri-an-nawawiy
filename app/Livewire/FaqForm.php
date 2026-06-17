@@ -94,6 +94,18 @@ class FaqForm extends Component
         return redirect()->route('admin.faqs');
     }
 
+    public function getLatestOrderInfoProperty(): string
+    {
+        $count = Faq::where('category', $this->category)->count();
+        $max = Faq::where('category', $this->category)->max('sort_order');
+
+        if ($count === 0) {
+            return "Kategori ini belum memiliki FAQ. Urutan tampil pertama bisa dimulai dari 0.";
+        }
+
+        return "Saat ini ada {$count} FAQ di kategori ini. Urutan terbesar saat ini: {$max}.";
+    }
+
     public function getCategoryOptionsProperty(): array
     {
         return [

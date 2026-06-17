@@ -50,16 +50,16 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
                                     @if($faq->image_path)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700">
+                                        <a href="{{ asset('storage/' . $faq->image_path) }}" target="_blank" class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                             Gambar
-                                        </span>
+                                        </a>
                                     @endif
                                     @if($faq->pdf_path)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-red-100 text-red-700">
+                                        <a href="{{ asset('storage/' . $faq->pdf_path) }}" target="_blank" class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-red-100 text-red-700 hover:bg-red-200 transition-colors">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                                             PDF
-                                        </span>
+                                        </a>
                                     @endif
                                     @if(!$faq->image_path && !$faq->pdf_path)
                                         <span class="text-xs text-muted-foreground">—</span>

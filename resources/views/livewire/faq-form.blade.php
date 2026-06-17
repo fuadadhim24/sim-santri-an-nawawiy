@@ -20,7 +20,7 @@
                 <!-- Category -->
                 <div>
                     <label for="category" class="block text-sm font-medium text-foreground">Kategori *</label>
-                    <select wire:model="category" id="category"
+                    <select wire:model.live="category" id="category"
                         class="mt-1 block w-full px-3 py-2 pr-8 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @foreach($this->categoryOptions as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
@@ -85,7 +85,10 @@
                         <label for="sort_order" class="block text-sm font-medium text-foreground">Urutan Tampil</label>
                         <input wire:model="sort_order" type="number" id="sort_order" min="0"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                        <p class="mt-1 text-xs text-muted-foreground">Angka kecil = tampil lebih atas.</p>
+                        <p class="mt-1 text-xs text-muted-foreground">
+                            Angka kecil = tampil lebih atas.<br>
+                            <span class="text-primary font-medium">{{ $this->latestOrderInfo }}</span>
+                        </p>
                         @error('sort_order')
                             <span class="text-destructive text-sm">{{ $message }}</span>
                         @enderror

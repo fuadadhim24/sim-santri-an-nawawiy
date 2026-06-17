@@ -101,4 +101,31 @@ class FaqManagementTest extends TestCase
         $this->assertNotNull($faq2);
         $this->assertEquals(99, $faq2->sort_order);
     }
+
+    public function test_faq_latest_order_info_is_correct()
+    {
+        // Create some FAQs in specific category
+        Faq::create([
+            'title' => 'FAQ 1',
+            'content' => 'Content 1',
+            'category' => 'umum',
+            'sort_order' => 5,
+            'is_active' => true,
+        ]);
+
+        Faq::create([
+            'title' => 'FAQ 2',
+            'content' => 'Content 2',
+            'category' => 'umum',
+            'sort_order' => 12,
+            'is_active' => true,
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(\App\Livewire\FaqForm::class)
+            ->set('category', 'umum')
+            ->assertSee('Saat ini ada 2 FAQ di kategori ini. Urutan terbesar saat ini: 12.')
+            ->set('category', 'pendaftaran')
+            ->assertSee('Kategori ini belum memiliki FAQ. Urutan tampil pertama bisa dimulai dari 0.');
+    }
 }

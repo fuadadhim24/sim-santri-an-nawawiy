@@ -430,14 +430,32 @@
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Apa itu Kategori Biaya?</span>
-                                <p class="text-xs text-muted-foreground">Kategori biaya adalah induk dari Master Biaya. Contoh: "SPP", "Uang Pangkal", "Kegiatan". Setiap kategori memiliki aturan apakah tagihan otomatis aktif saat santri diterima atau harus dibuat manual.</p>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Merupakan wadah induk untuk mengelompokkan jenis tagihan (seperti SPP, Pendaftaran, atau Seragam). Setiap kategori memiliki parameter aturan (rules) khusus yang menentukan bagaimana tagihan diterbitkan dan dikunci.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Mode Aktivasi</span>
-                                <ul class="list-disc list-inside text-xs text-muted-foreground space-y-1">
-                                    <li><strong>Otomatis:</strong> Tagihan langsung dibuat saat santri berstatus diterima.</li>
-                                    <li><strong>Manual:</strong> Tagihan harus dibuat oleh admin/bendahara secara manual.</li>
-                                </ul>
+                                <span class="text-xs font-bold text-foreground block mb-1">Mode Aktivasi (Aktivasi Otomatis)</span>
+                                <div class="text-xs text-muted-foreground space-y-2 mt-1">
+                                    <p><strong>1. Otomatis (1 Tagihan Aktif):</strong><br>
+                                    Sistem akan menerbitkan tagihan secara otomatis saat santri diterima. Jika tagihan baru dari kategori yang sama diterbitkan, tagihan lama dari kategori ini otomatis dinonaktifkan. Sangat cocok untuk biaya periodik berulang seperti <em>SPP Bulanan</em>.</p>
+                                    <p><strong>2. Otomatis (Boleh Banyak Tagihan):</strong><br>
+                                    Sistem otomatis menerbitkan tagihan saat santri diterima, dan memperbolehkan santri memiliki beberapa tagihan aktif secara bersamaan dalam kategori ini. Contoh: <em>Daftar Ulang Semester</em>, <em>Uang Saku Tambahan</em>.</p>
+                                    <p><strong>3. Tidak Otomatis (Manual):</strong><br>
+                                    Tagihan tidak diterbitkan secara otomatis oleh sistem saat penerimaan santri baru. Admin/bendahara harus menerbitkannya secara manual satu per satu sesuai kebutuhan. Contoh: <em>Biaya SPMB</em>, <em>Uang Seragam Pindahan</em>.</p>
+                                </div>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Kunci Kategori (Status Kunci)</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    <strong>Terkunci:</strong> Mencegah kategori dihapus atau dimodifikasi oleh admin/bendahara guna menjaga integritas data keuangan.<br>
+                                    <strong>Terbuka:</strong> Kategori bebas diedit atau dihapus jika sudah tidak digunakan lagi.
+                                </p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Buat Tagihan Sebelum Diterima</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    <strong>Iya (Aktif):</strong> Tagihan dari kategori ini dapat dibuat/diterbitkan untuk calon santri yang status pendaftarannya masih <em>Pending</em> (misal: Biaya Formulir Pendaftaran).<br>
+                                    <strong>Tidak (Nonaktif):</strong> Tagihan hanya dapat diterbitkan setelah calon santri resmi diubah statusnya menjadi <em>Diterima</em>.
+                                </p>
                             </div>
                         </div>
                     </div>
