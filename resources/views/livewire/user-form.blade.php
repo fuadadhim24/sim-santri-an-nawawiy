@@ -63,6 +63,21 @@
                     @enderror
                 </div>
 
+                <!-- Status -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input wire:model="is_active" type="checkbox" id="is_active"
+                            class="h-4 w-4 text-primary focus:ring-ring border-input rounded">
+                    </div>
+                    <div class="ml-3">
+                        <label for="is_active" class="block text-sm font-medium text-foreground">Status Aktif</label>
+                        <p class="mt-1 text-xs text-muted-foreground">Jika dinonaktifkan, user tidak akan bisa login ke aplikasi.</p>
+                    </div>
+                </div>
+                @error('is_active')
+                    <span class="text-destructive text-sm block mt-1">{{ $message }}</span>
+                @enderror
+
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.users') }}"
                         class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">

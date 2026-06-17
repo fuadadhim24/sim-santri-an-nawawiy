@@ -26,6 +26,8 @@ class UserForm extends Component
     #[Rule('required|in:SUPER_ADMIN,ADMINISTRASI,BENDAHARA')]
     public $role = 'ADMINISTRASI';
 
+    public $is_active = true;
+
     public $isEdit = false;
 
     public function mount($user = null)
@@ -36,6 +38,7 @@ class UserForm extends Component
             $this->whatsapp = $user->whatsapp;
             $this->email = $user->email;
             $this->role = $user->role;
+            $this->is_active = $user->is_active !== false;
             $this->isEdit = true;
         }
     }
@@ -48,13 +51,20 @@ class UserForm extends Component
             'email' => 'nullable|email|unique:users,email,' . ($this->user ? $this->user->id : 'NULL'),
             'password' => $this->isEdit ? 'nullable|min:6' : 'required|min:6',
             'role' => 'required|in:SUPER_ADMIN,ADMINISTRASI,BENDAHARA',
+            'is_active' => 'boolean',
         ]);
+
+        if ($this->isEdit && auth()->id() === $this->user->id && !$this->is_active) {
+            $this->addError('is_active', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+            return;
+        }
 
         $data = [
             'name' => $this->name,
             'whatsapp' => $this->whatsapp,
             'email' => $this->email ?: null,
             'role' => $this->role,
+            'is_active' => $this->is_active,
         ];
 
         if (!empty($this->password)) {

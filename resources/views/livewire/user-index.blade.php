@@ -14,6 +14,16 @@
                     Tambah Pengguna</a>
             </div>
         </div>
+        @if (session()->has('message'))
+            <div class="p-4 bg-green-100 text-green-700 border-b border-border">
+                {{ session('message') }}
+            </div>
+        @endif
+        @if (session()->has('error'))
+            <div class="p-4 bg-red-100 text-red-700 border-b border-border">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">
@@ -21,6 +31,7 @@
                         <th class="px-6 py-3">Nama</th>
                         <th class="px-6 py-3">Email</th>
                         <th class="px-6 py-3">Peran</th>
+                        <th class="px-6 py-3">Status</th>
                         <th class="px-6 py-3">Terdaftar</th>
                         <th class="px-6 py-3">Aksi</th>
                     </tr>
@@ -35,6 +46,12 @@
                                     class="px-2 py-1 rounded-full text-xs font-medium {{ $user->role === 'SUPER_ADMIN' ? 'bg-primary/20 text-primary' : (in_array($user->role, ['ADMINISTRASI', 'BENDAHARA']) ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700') }}">
                                     {{ $user->role }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <button wire:click="toggleActive({{ $user->id }})"
+                                    class="px-2 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors {{ $user->is_active !== false ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
+                                    {{ $user->is_active !== false ? 'Aktif' : 'Nonaktif' }}
+                                </button>
                             </td>
                             <td class="px-6 py-4 text-muted-foreground">
                                 {{ $user->created_at->locale('id')->isoFormat('D MMMM Y') }}</td>

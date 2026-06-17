@@ -78,6 +78,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Cek status aktif user
+        if (isset($user->is_active) && !$user->is_active) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'identifier' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.',
+            ]);
+        }
+
         // Attempt auth with the resolved user's email or whatsapp
         $authField = $user->email ? 'email' : 'whatsapp';
         $credentials = [

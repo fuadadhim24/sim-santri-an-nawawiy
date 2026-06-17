@@ -12,6 +12,21 @@ class UserIndex extends Component
 
     public $search = '';
 
+    public function toggleActive($userId)
+    {
+        // Prevent users from deactivating themselves
+        if (auth()->id() === (int) $userId) {
+            session()->flash('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+            return;
+        }
+
+        $user = User::findOrFail($userId);
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        session()->flash('message', 'Status pengguna ' . $user->name . ' berhasil diperbarui.');
+    }
+
     public function render()
     {
         return view('livewire.user-index', [

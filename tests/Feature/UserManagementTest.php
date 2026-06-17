@@ -98,4 +98,49 @@ class UserManagementTest extends TestCase
         // Should redirect on success
         $this->assertTrue($response->status() === 302 || $response->status() === 200);
     }
+
+    public function test_super_admin_can_toggle_user_active_status()
+    {
+        $targetUser = User::factory()->create(['is_active' => true]);
+
+        \Livewire\Livewire::actingAs($this->superAdmin)
+            ->test(\App\Livewire\UserIndex::class)
+            ->call('toggleActive', $targetUser->id)
+            ->assertHasNoErrors();
+
+        $this->assertFalse((bool) $targetUser->fresh()->is_active);
+    }
+
+    public function test_user_cannot_deactivate_themselves()
+    {
+        \Livewire\Livewire::actingAs($this->superAdmin)
+            ->test(\App\Livewire\UserIndex::class)
+            ->call('toggleActive', $this->superAdmin->id)
+            ->assertHasNoErrors();
+
+        $this->assertTrue((bool) $this->superAdmin->fresh()->is_active);
+        
+        \Livewire\Livewire::actingAs($this->superAdmin)
+            ->test(\App\Livewire\UserForm::class, ['user' => $this->superAdmin])
+            ->set('is_active', false)
+            ->call('save')
+            ->assertHasErrors(['is_active']);
+    }
+
+    public function test_deactivated_user_cannot_login()
+    {
+        $user = User::factory()->create([
+            'email' => 'inactive@test.com',
+            'password' => bcrypt('password123'),
+            'is_active' => false,
+        ]);
+
+        $response = $this->post('/login', [
+            'identifier' => 'inactive@test.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors('identifier');
+        $this->assertGuest();
+    }
 }
