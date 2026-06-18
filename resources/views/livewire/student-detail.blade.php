@@ -89,6 +89,116 @@
             </div>
         </div>
 
+        <!-- Attachment Documents -->
+        <div class="bg-card rounded-lg shadow-sm border border-border p-6">
+            <h3 class="text-lg font-semibold text-card-foreground mb-4">Dokumen Lampiran</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <!-- KK -->
+                <div class="border border-border rounded-lg p-4 flex flex-col justify-between items-center text-center bg-muted/20 hover:bg-muted/50 transition-colors">
+                    <div class="mb-3">
+                        <svg class="w-10 h-10 text-muted-foreground mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-foreground text-sm">Kartu Keluarga (KK)</h4>
+                        <span class="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium {{ $student->kk ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $student->kk ? 'Sudah Diunggah' : 'Belum Ada' }}
+                        </span>
+                    </div>
+                    @if ($student->kk)
+                        <a href="{{ $student->kk_url }}" target="_blank" class="mt-4 w-full text-center py-1.5 px-3 bg-primary text-primary-foreground text-xs font-medium rounded hover:bg-primary/90 transition-colors">
+                            Lihat Dokumen
+                        </a>
+                    @endif
+                </div>
+
+                <!-- Akta Kelahiran -->
+                <div class="border border-border rounded-lg p-4 flex flex-col justify-between items-center text-center bg-muted/20 hover:bg-muted/50 transition-colors">
+                    <div class="mb-3">
+                        <svg class="w-10 h-10 text-muted-foreground mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-foreground text-sm">Akta Kelahiran</h4>
+                        <span class="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium {{ $student->akta ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $student->akta ? 'Sudah Diunggah' : 'Belum Ada' }}
+                        </span>
+                    </div>
+                    @if ($student->akta)
+                        <a href="{{ $student->akta_url }}" target="_blank" class="mt-4 w-full text-center py-1.5 px-3 bg-primary text-primary-foreground text-xs font-medium rounded hover:bg-primary/90 transition-colors">
+                            Lihat Dokumen
+                        </a>
+                    @endif
+                </div>
+
+                <!-- Ijazah -->
+                <div class="border border-border rounded-lg p-4 flex flex-col justify-between items-center text-center bg-muted/20 hover:bg-muted/50 transition-colors">
+                    <div class="mb-3">
+                        <svg class="w-10 h-10 text-muted-foreground mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-foreground text-sm">Ijazah Terakhir</h4>
+                        <span class="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium {{ $student->ijazah ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $student->ijazah ? 'Sudah Diunggah' : 'Belum Ada' }}
+                        </span>
+                    </div>
+                    @if ($student->ijazah)
+                        <a href="{{ $student->ijazah_url }}" target="_blank" class="mt-4 w-full text-center py-1.5 px-3 bg-primary text-primary-foreground text-xs font-medium rounded hover:bg-primary/90 transition-colors">
+                            Lihat Dokumen
+                        </a>
+                    @endif
+                </div>
+
+                <!-- Dokumen NISN -->
+                <div class="border border-border rounded-lg p-4 flex flex-col justify-between items-center text-center bg-muted/20 hover:bg-muted/50 transition-colors">
+                    <div class="mb-3">
+                        <svg class="w-10 h-10 text-muted-foreground mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-foreground text-sm">Dokumen NISN</h4>
+                        <span class="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium {{ $student->nisn_document ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $student->nisn_document ? 'Sudah Diunggah' : 'Belum Ada' }}
+                        </span>
+                    </div>
+                    @if ($student->nisn_document)
+                        <a href="{{ $student->nisn_document_url }}" target="_blank" class="mt-4 w-full text-center py-1.5 px-3 bg-primary text-primary-foreground text-xs font-medium rounded hover:bg-primary/90 transition-colors">
+                            Lihat Dokumen
+                        </a>
+                    @endif
+                </div>
+
+                <!-- Pas Foto -->
+                <div class="border border-border rounded-lg p-4 flex flex-col justify-between items-center text-center bg-muted/20 hover:bg-muted/50 transition-colors">
+                    <div class="mb-3">
+                        @if ($student->foto)
+                            <img src="{{ $student->foto_url }}" alt="Pas Foto" class="w-12 h-12 object-cover rounded-full mx-auto border border-border">
+                        @else
+                            <svg class="w-10 h-10 text-muted-foreground mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        @endif
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-foreground text-sm">Pas Foto</h4>
+                        <span class="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium {{ $student->foto ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $student->foto ? 'Sudah Diunggah' : 'Belum Ada' }}
+                        </span>
+                    </div>
+                    @if ($student->foto)
+                        <a href="{{ $student->foto_url }}" target="_blank" class="mt-4 w-full text-center py-1.5 px-3 bg-primary text-primary-foreground text-xs font-medium rounded hover:bg-primary/90 transition-colors">
+                            Lihat Dokumen
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <!-- Billing History -->
         <div class="bg-card rounded-lg shadow-sm border border-border">
             <div class="p-6 border-b border-border">

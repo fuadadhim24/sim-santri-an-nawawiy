@@ -49,7 +49,7 @@
                             <td class="px-6 py-4">
                                 <a href="{{ route('admin.students.edit', $student) }}"
                                     class="text-primary hover:text-primary/80 font-medium mr-2">Ubah</a>
-                                <a href="#"
+                                <a href="{{ route('admin.students.show', $student) }}"
                                     class="text-muted-foreground hover:text-foreground font-medium">Lihat</a>
                             </td>
                         </tr>

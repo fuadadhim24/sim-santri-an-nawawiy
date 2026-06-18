@@ -58,6 +58,51 @@
                             <p class="text-sm text-muted-foreground font-medium">Jadwal SPMB</p>
                             <p class="font-semibold text-foreground mt-1">{{ $student->spmbSchedule?->name ?? '-' }}</p>
                         </div>
+                        <div class="border-t border-border pt-3">
+                            <p class="text-sm text-muted-foreground font-medium mb-2">Dokumen Lampiran</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-muted-foreground">Kartu Keluarga (KK)</span>
+                                    @if ($student->kk)
+                                        <a href="{{ $student->kk_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
+                                    @else
+                                        <span class="text-gray-400">Belum Ada</span>
+                                    @endif
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-muted-foreground">Akta Kelahiran</span>
+                                    @if ($student->akta)
+                                        <a href="{{ $student->akta_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
+                                    @else
+                                        <span class="text-gray-400">Belum Ada</span>
+                                    @endif
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-muted-foreground">Ijazah Terakhir</span>
+                                    @if ($student->ijazah)
+                                        <a href="{{ $student->ijazah_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
+                                    @else
+                                        <span class="text-gray-400">Belum Ada</span>
+                                    @endif
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-muted-foreground">Dokumen NISN</span>
+                                    @if ($student->nisn_document)
+                                        <a href="{{ $student->nisn_document_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
+                                    @else
+                                        <span class="text-gray-400">Belum Ada</span>
+                                    @endif
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-muted-foreground">Pas Foto</span>
+                                    @if ($student->foto)
+                                        <a href="{{ $student->foto_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
+                                    @else
+                                        <span class="text-gray-400">Belum Ada</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
