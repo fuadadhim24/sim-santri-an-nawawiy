@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\StudentStatus;
 use App\Models\Student;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -14,12 +15,18 @@ class StudentIndex extends Component
 
     public function render()
     {
+        $query = Student::with('guardian')
+            ->whereNotIn('status', [StudentStatus::PENDING->value, StudentStatus::REJECTED->value]);
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('full_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('nis', 'like', '%' . $this->search . '%');
+            });
+        }
+
         return view('livewire.student-index', [
-            'students' => Student::with('guardian')
-                ->where('full_name', 'like', '%' . $this->search . '%')
-                ->orWhere('nis', 'like', '%' . $this->search . '%')
-                ->latest()
-                ->paginate(5),
+            'students' => $query->latest()->paginate(5),
         ])->layout('layouts.admin');
     }
 }

@@ -24,14 +24,16 @@ class StudentAcceptanceController extends Controller
         }
     }
 
-    public function reject($studentId)
+    public function reject(Request $request, $studentId)
     {
         $student = Student::findOrFail($studentId);
 
         try {
-            // Set is_active to false then soft delete
-            $student->update(['is_active' => false]);
-            $student->delete();
+            $student->update([
+                'is_active' => false,
+                'status' => \App\Enums\StudentStatus::REJECTED->value,
+                'rejection_note' => $request->input('reason'),
+            ]);
 
             return redirect()->route('admin.student-acceptance')
                 ->with('success', 'Santri ' . $student->full_name . ' berhasil ditolak.');

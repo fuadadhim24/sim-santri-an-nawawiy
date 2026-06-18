@@ -60,18 +60,23 @@
                                             {{ $student->getStatusEnum()?->getLabel() ?? 'Menunggu' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{ route('admin.student-acceptance-confirm', $student) }}"
-                                           class="text-primary hover:text-primary/80 font-medium mr-2">
-                                            Terima
-                                        </a>
-                                        <form method="POST" action="{{ route('admin.students.reject', $student) }}" style="display:inline;">
-                                            @csrf
-                                            <button type="button" class="text-muted-foreground hover:text-foreground font-medium" onclick="Swal.fire({title: 'Konfirmasi', text: 'Tolak santri {{ addslashes($student->full_name) }}?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Tolak', cancelButtonText: 'Batal'}).then((result) => { if(result.isConfirmed) this.closest('form').submit(); })">
-                                                Tolak
-                                            </button>
-                                        </form>
-                                    </td>
+                                     <td class="px-6 py-4">
+                                         <button type="button" 
+                                                 class="text-blue-600 hover:text-blue-800 font-medium mr-3"
+                                                 onclick="showDocumentsModal('{{ addslashes($student->full_name) }}', '{{ $student->kk_url }}', '{{ $student->akta_url }}', '{{ $student->ijazah_url }}', '{{ $student->nisn_document_url }}', '{{ $student->foto_url }}')">
+                                             Lihat Berkas
+                                         </button>
+                                         <a href="{{ route('admin.student-acceptance-confirm', $student) }}"
+                                            class="text-primary hover:text-primary/80 font-medium mr-3">
+                                             Tinjau & Terima
+                                         </a>
+                                         <form method="POST" action="{{ route('admin.students.reject', $student) }}" style="display:inline;">
+                                             @csrf
+                                             <button type="button" class="text-muted-foreground hover:text-foreground font-medium" onclick="confirmRejection(this, '{{ addslashes($student->full_name) }}')">
+                                                 Tolak
+                                             </button>
+                                         </form>
+                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -85,4 +90,67 @@
         </div>
     </div>
 
+
+    <script>
+        function confirmRejection(button, studentName) {
+            Swal.fire({
+                title: 'Konfirmasi Penolakan',
+                html: `
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Alasan Template:</label>
+                        <select id="rejection-template" class="swal2-select w-full border border-gray-300 rounded p-2 mb-3" style="display: flex; margin: 0 0 12px 0;">
+                            <option value="Berkas Kartu Keluarga (KK) tidak lengkap atau buram.">Berkas KK tidak lengkap/buram</option>
+                            <option value="Berkas Akta Kelahiran tidak lengkap atau buram.">Berkas Akta Lahir tidak lengkap/buram</option>
+                            <option value="Berkas Ijazah terakhir tidak lengkap atau buram.">Berkas Ijazah tidak lengkap/buram</option>
+                            <option value="Data NISN tidak valid atau tidak terdaftar di sistem.">Data NISN tidak valid/tidak terdaftar</option>
+                            <option value="Pas foto tidak sesuai ketentuan.">Pas foto tidak sesuai ketentuan</option>
+                            <option value="custom">Tulis Alasan Kustom...</option>
+                        </select>
+                        
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Detail Alasan Penolakan:</label>
+                        <textarea id="rejection-reason" class="swal2-textarea w-full border border-gray-300 rounded p-2" style="margin: 0; width: 100%; box-sizing: border-box;" placeholder="Detail alasan penolakan..."></textarea>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Tolak',
+                cancelButtonText: 'Batal',
+                didOpen: () => {
+                    const select = Swal.getHtmlContainer().querySelector('#rejection-template');
+                    const textarea = Swal.getHtmlContainer().querySelector('#rejection-reason');
+                    
+                    // Initialize textarea with first template value
+                    textarea.value = select.value;
+                    
+                    select.addEventListener('change', (e) => {
+                        if (e.target.value === 'custom') {
+                            textarea.value = '';
+                            textarea.focus();
+                        } else {
+                            textarea.value = e.target.value;
+                        }
+                    });
+                },
+                preConfirm: () => {
+                    const textarea = Swal.getHtmlContainer().querySelector('#rejection-reason');
+                    const value = textarea.value.trim();
+                    if (!value) {
+                        Swal.showValidationMessage('Alasan penolakan wajib diisi!');
+                        return false;
+                    }
+                    return value;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let form = button.closest('form');
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'reason';
+                    input.value = result.value;
+                    form.appendChild(input);
+                    form.submit();
+                }
+            });
+        }
+    </script>
 </div>

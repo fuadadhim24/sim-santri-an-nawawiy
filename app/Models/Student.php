@@ -56,6 +56,7 @@ class Student extends Model
         'ijazah',
         'class_level_id',
         'study_group_id',
+        'rejection_note',
     ];
 
     protected $casts = [

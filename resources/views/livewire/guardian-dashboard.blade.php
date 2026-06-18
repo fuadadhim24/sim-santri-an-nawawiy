@@ -41,6 +41,13 @@
                     <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <p class="text-yellow-800 font-medium">Pendaftaran santri Anda sedang menunggu persetujuan admin.</p>
                     </div>
+                @elseif ($hasRejectedStudents)
+                    <div class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-red-800 font-medium flex items-center">
+                            <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            Pendaftaran santri Anda belum dapat disetujui saat ini. Silakan periksa detail catatan di bawah.
+                        </p>
+                    </div>
                 @else
                     <div class="mt-6 bg-muted border border-border rounded-lg p-4">
                         <p class="text-primary font-medium">Anda belum memiliki data santri.</p>
@@ -240,10 +247,10 @@
                 </div>
             </div>
         @else
-            @if ($hasPendingStudents)
-                <!-- Pending Students Section -->
+            @if ($hasPendingStudents || $hasRejectedStudents)
+                <!-- Pending/Rejected Students Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    @foreach ($guardian->students->where('status', 'menunggu') as $pendingStudent)
+                    @foreach ($guardian->students->whereIn('status', ['menunggu', 'ditolak']) as $pendingStudent)
                         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="p-6 border-b border-gray-200">
                                 <div class="flex justify-between items-start mb-4">
@@ -254,9 +261,15 @@
                                             class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">{{ $pendingStudent->unit_code == '01' ? 'SMP' : ($pendingStudent->unit_code == '02' ? 'SMA' : 'PPTQ') }}</span>
                                     </div>
                                     <div class="text-right">
-                                        <span class="px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                            Menunggu Persetujuan
-                                        </span>
+                                        @if ($pendingStudent->status == 'menunggu')
+                                            <span class="px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                                Menunggu Persetujuan
+                                            </span>
+                                        @else
+                                            <span class="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">
+                                                Belum Disetujui
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -274,14 +287,28 @@
                                     @endif
                                 </div>
 
-                                <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                    <p class="text-sm text-yellow-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Pendaftaran Anda sedang diproses. Silakan tunggu konfirmasi dari admin.
-                                    </p>
-                                </div>
+                                @if ($pendingStudent->status == 'menunggu')
+                                    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                        <p class="text-sm text-yellow-800">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Pendaftaran Anda sedang diproses. Silakan tunggu konfirmasi dari admin.
+                                        </p>
+                                    </div>
+                                @else
+                                    <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                        <p class="text-sm text-red-800 font-semibold mb-1 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            Pendaftaran Belum Disetujui
+                                        </p>
+                                        <p class="text-xs text-red-750">
+                                            <strong>Catatan Panitia:</strong> {{ $pendingStudent->rejection_note ?? 'Persyaratan berkas belum lengkap.' }}
+                                        </p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @endforeach

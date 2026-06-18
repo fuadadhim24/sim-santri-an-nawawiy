@@ -90,12 +90,15 @@ class GuardianDashboard extends Component
             ];
         }
 
+        $hasRejectedStudents = $guardian->students->where('status', 'ditolak')->isNotEmpty();
+
         return view('livewire.guardian-dashboard', [
             'guardian' => $guardian,
             'totalUnpaid' => $totalUnpaid,
             'hasStudents' => $hasStudents,
             'hasActiveStudents' => $hasActiveStudents,
             'hasPendingStudents' => $hasPendingStudents,
+            'hasRejectedStudents' => $hasRejectedStudents,
             'spmbFeeMasters' => $spmbFeeMasters,
             'schedulesWithStudents' => $schedulesWithStudents,
         ])->layout('layouts.guardian');
