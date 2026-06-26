@@ -91,9 +91,106 @@
     </div>
 
 
+
+    @script
     <script>
-        function confirmRejection(button, studentName) {
-            Swal.fire({
+        window.showDocumentsModal = function(name, kk, akta, ijazah, nisn, foto) {
+            let htmlContent = `
+                <div class="text-left space-y-4">
+                    <p class="text-sm text-gray-600 mb-4">Berikut adalah berkas lampiran yang telah diunggah oleh calon santri <strong>${name}</strong>:</p>
+                    <div class="space-y-3">
+                        <!-- KK -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-150" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px;">
+                            <div class="flex items-center space-x-3" style="display: flex; align-items: center; gap: 12px;">
+                                <span class="p-1.5 bg-blue-50 text-blue-600 rounded" style="padding: 6px; background-color: #eff6ff; color: #2563eb; border-radius: 4px; display: inline-flex;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-850" style="font-size: 14px; font-weight: 600; margin: 0;">Kartu Keluarga (KK)</p>
+                                </div>
+                            </div>
+                            <div>
+                                ${kk ? `<a href="${kk}" target="_blank" class="inline-flex items-center justify-center px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded hover:bg-primary/95 transition shadow-sm" style="padding: 4px 12px; background-color: #2563eb; color: #ffffff; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600;">Lihat File</a>` : `<span class="px-2.5 py-1 bg-gray-150 text-gray-500 text-xs rounded font-semibold" style="padding: 4px 10px; background-color: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px;">Belum Ada</span>`}
+                            </div>
+                        </div>
+
+                        <!-- Akta -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-150" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px;">
+                            <div class="flex items-center space-x-3" style="display: flex; align-items: center; gap: 12px;">
+                                <span class="p-1.5 bg-blue-50 text-blue-600 rounded" style="padding: 6px; background-color: #eff6ff; color: #2563eb; border-radius: 4px; display: inline-flex;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-850" style="font-size: 14px; font-weight: 600; margin: 0;">Akta Kelahiran</p>
+                                </div>
+                            </div>
+                            <div>
+                                ${akta ? `<a href="${akta}" target="_blank" class="inline-flex items-center justify-center px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded hover:bg-primary/95 transition shadow-sm" style="padding: 4px 12px; background-color: #2563eb; color: #ffffff; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600;">Lihat File</a>` : `<span class="px-2.5 py-1 bg-gray-150 text-gray-500 text-xs rounded font-semibold" style="padding: 4px 10px; background-color: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px;">Belum Ada</span>`}
+                            </div>
+                        </div>
+
+                        <!-- Ijazah -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-150" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px;">
+                            <div class="flex items-center space-x-3" style="display: flex; align-items: center; gap: 12px;">
+                                <span class="p-1.5 bg-blue-50 text-blue-600 rounded" style="padding: 6px; background-color: #eff6ff; color: #2563eb; border-radius: 4px; display: inline-flex;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-850" style="font-size: 14px; font-weight: 600; margin: 0;">Ijazah Terakhir</p>
+                                </div>
+                            </div>
+                            <div>
+                                ${ijazah ? `<a href="${ijazah}" target="_blank" class="inline-flex items-center justify-center px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded hover:bg-primary/95 transition shadow-sm" style="padding: 4px 12px; background-color: #2563eb; color: #ffffff; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600;">Lihat File</a>` : `<span class="px-2.5 py-1 bg-gray-150 text-gray-500 text-xs rounded font-semibold" style="padding: 4px 10px; background-color: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px;">Belum Ada</span>`}
+                            </div>
+                        </div>
+
+                        <!-- NISN Document -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-150" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px;">
+                            <div class="flex items-center space-x-3" style="display: flex; align-items: center; gap: 12px;">
+                                <span class="p-1.5 bg-blue-50 text-blue-600 rounded" style="padding: 6px; background-color: #eff6ff; color: #2563eb; border-radius: 4px; display: inline-flex;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-850" style="font-size: 14px; font-weight: 600; margin: 0;">Dokumen NISN</p>
+                                </div>
+                            </div>
+                            <div>
+                                ${nisn ? `<a href="${nisn}" target="_blank" class="inline-flex items-center justify-center px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded hover:bg-primary/95 transition shadow-sm" style="padding: 4px 12px; background-color: #2563eb; color: #ffffff; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600;">Lihat File</a>` : `<span class="px-2.5 py-1 bg-gray-150 text-gray-500 text-xs rounded font-semibold" style="padding: 4px 10px; background-color: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px;">Belum Ada</span>`}
+                            </div>
+                        </div>
+
+                        <!-- Foto -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-150" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px;">
+                            <div class="flex items-center space-x-3" style="display: flex; align-items: center; gap: 12px;">
+                                <span class="p-1.5 bg-blue-50 text-blue-600 rounded" style="padding: 6px; background-color: #eff6ff; color: #2563eb; border-radius: 4px; display: inline-flex;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-850" style="font-size: 14px; font-weight: 600; margin: 0;">Pas Foto</p>
+                                </div>
+                            </div>
+                            <div>
+                                ${foto ? `<a href="${foto}" target="_blank" class="inline-flex items-center justify-center px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded hover:bg-primary/95 transition shadow-sm" style="padding: 4px 12px; background-color: #2563eb; color: #ffffff; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600;">Lihat File</a>` : `<span class="px-2.5 py-1 bg-gray-150 text-gray-500 text-xs rounded font-semibold" style="padding: 4px 10px; background-color: #f3f4f6; color: #6b7280; border-radius: 4px; font-size: 12px;">Belum Ada</span>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            window.Swal.fire({
+                title: 'Dokumen Lampiran',
+                html: htmlContent,
+                showConfirmButton: false,
+                showCloseButton: true,
+                cancelButtonText: 'Tutup',
+                showCancelButton: true,
+                cancelButtonColor: '#6c757d',
+                width: '500px'
+            });
+        };
+
+        window.confirmRejection = function(button, studentName) {
+            window.Swal.fire({
                 title: 'Konfirmasi Penolakan',
                 html: `
                     <div class="text-left">
@@ -151,6 +248,7 @@
                     form.submit();
                 }
             });
-        }
+        };
     </script>
+    @endscript
 </div>
