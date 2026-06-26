@@ -9,17 +9,14 @@ use App\Models\Student;
 
 class RombelManagement extends Component
 {
-    // Modals State
     public $showClassLevelModal = false;
     public $showStudyGroupModal = false;
     public $showManageStudentsModal = false;
 
-    // Class Level Form
     public $classLevelId;
     public $classLevelName;
     public $classLevelOrder = 0;
 
-    // Study Group Form
     public $studyGroupId;
     public $targetClassLevelId;
     public $studyGroupName;
@@ -106,14 +103,12 @@ class RombelManagement extends Component
         $this->dispatch('swal:success', ['title' => 'Tersimpan!', 'text' => 'Rombel berhasil disimpan.']);
     }
 
-    // Manage Students Modal State
-    public $manageSourceType; // 'unassigned_global', 'unassigned_level', 'rombel'
+    public $manageSourceType; 
     public $manageSourceId;
     public $manageSourceName;
     public $selectedStudentIds = [];
-    public $targetMoveId = ''; // format: 'unassigned_level_X' or 'rombel_Y'
+    public $targetMoveId = '';
 
-    // To prevent heavy queries on every render, we load students when modal opens
     public $modalStudents = [];
 
     public function openManageStudentsModal($type, $id, $name)
@@ -197,23 +192,18 @@ class RombelManagement extends Component
         }
     }
 
-    // Promotion Wizard State
     public $showPromotionWizard = false;
     public $wizardStep = 1;
     
-    // Step 1
     public $sourceLevelId = '';
-    public $destinationLevelId = ''; // id or 'lulus'
+    public $destinationLevelId = ''; 
     
-    // Step 2
-    public $promotionMethod = 'kosong'; // paralel, acak, kosong
-    public $paralelMapping = []; // [source_rombel_id => dest_rombel_id]
-    public $sourceStudyGroups = []; // Rombels of source level
+    public $promotionMethod = 'kosong';
+    public $paralelMapping = []; 
+    public $sourceStudyGroups = [];
     
-    // Step 3 (Draft)
     public $promotionDraft = []; 
-    // Format: [ student_id => ['name' => string, 'old_rombel' => string, 'new_level_id' => int|null, 'new_rombel_id' => int|null, 'skip' => boolean] ]
-    public $destinationStudyGroups = []; // Rombels of destination level
+    public $destinationStudyGroups = []; 
 
     public function openPromotionWizard()
     {
@@ -237,7 +227,6 @@ class RombelManagement extends Component
                 'destinationLevelId.different' => 'Kelas asal dan tujuan tidak boleh sama.'
             ]);
             
-            // Load source and dest rombels for Step 2 Mapping
             $this->sourceStudyGroups = StudyGroup::where('class_level_id', $this->sourceLevelId)->get()->toArray();
             if ($this->destinationLevelId !== 'lulus') {
                 $this->destinationStudyGroups = StudyGroup::where('class_level_id', $this->destinationLevelId)->get()->toArray();
@@ -245,19 +234,15 @@ class RombelManagement extends Component
                 $this->destinationStudyGroups = [];
             }
             
-            // Auto-guess mapping for paralel
             $this->paralelMapping = [];
             if ($this->destinationLevelId !== 'lulus') {
                 foreach ($this->sourceStudyGroups as $sourceRombel) {
                     $sourceName = $sourceRombel['name'];
-                    // Try exact match first
                     $match = collect($this->destinationStudyGroups)->firstWhere('name', $sourceName);
                     
                     if (!$match) {
-                        // Intelligent Guessing: Strip leading numbers/prefixes (e.g. "1-A" -> "A", "VII Abu Bakar" -> "Abu Bakar")
                         $sourceSuffix = preg_replace('/^([0-9IVX]+\s*[-_]?\s*)/i', '', $sourceName);
                         
-                        // Find a destination rombel with the same suffix (e.g. "2-A" -> "A")
                         $match = collect($this->destinationStudyGroups)->first(function($destRombel) use ($sourceSuffix) {
                             $destSuffix = preg_replace('/^([0-9IVX]+\s*[-_]?\s*)/i', '', $destRombel['name']);
                             return strtolower($destSuffix) === strtolower($sourceSuffix);
@@ -268,7 +253,12 @@ class RombelManagement extends Component
                 }
             }
             
-            $this->wizardStep = 2;
+            if ($this->destinationLevelId === 'lulus') {
+                $this->generatePromotionDraft();
+                $this->wizardStep = 3;
+            } else {
+                $this->wizardStep = 2;
+            }
         } elseif ($this->wizardStep === 2) {
             $this->generatePromotionDraft();
             $this->wizardStep = 3;
@@ -278,7 +268,11 @@ class RombelManagement extends Component
     public function wizardPrevStep()
     {
         if ($this->wizardStep > 1) {
-            $this->wizardStep--;
+            if ($this->wizardStep === 3 && $this->destinationLevelId === 'lulus') {
+                $this->wizardStep = 1;
+            } else {
+                $this->wizardStep--;
+            }
         }
     }
 
@@ -302,10 +296,8 @@ class RombelManagement extends Component
         }
 
         if ($this->promotionMethod === 'acak' && !$isLulus) {
-            // Shuffle students
             $students = $students->shuffle();
             
-            // Distribute evenly among destination rombels based on available capacity
             $rombelBuckets = [];
             foreach ($destRombels as $dr) {
                 $available = max(0, $dr->max_capacity - $dr->students_count);
@@ -313,14 +305,13 @@ class RombelManagement extends Component
             }
             
             foreach ($students as $student) {
-                // Find rombel with most available space
                 arsort($rombelBuckets);
                 $targetRombelId = key($rombelBuckets);
                 
                 if ($rombelBuckets[$targetRombelId] > 0) {
                     $rombelBuckets[$targetRombelId]--;
                 } else {
-                    $targetRombelId = null; // No space anywhere, fallback to unassigned
+                    $targetRombelId = null; 
                 }
 
                 $draft[$student->id] = [
@@ -332,12 +323,10 @@ class RombelManagement extends Component
                 ];
             }
         } else {
-            // Paralel or Kosong
             foreach ($students as $student) {
                 $targetRombelId = null;
 
                 if ($this->promotionMethod === 'paralel' && !$isLulus && $student->study_group_id) {
-                    // Use the mapping provided by the user in Step 2
                     $targetRombelId = $this->paralelMapping[$student->study_group_id] ?? null;
                     if ($targetRombelId === '') {
                         $targetRombelId = null;

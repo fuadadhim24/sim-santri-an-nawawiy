@@ -108,4 +108,41 @@ class SpmbManagementTest extends TestCase
         $response = $this->get('/spmb-schedules');
         $response->assertRedirect('/login');
     }
+
+    public function test_guardian_can_register_student_with_class_level()
+    {
+        $schedule = SpmbSchedule::factory()->create([
+            'registration_start' => now()->subDays(2),
+            'registration_end' => now()->addDays(2),
+            'is_active' => true,
+        ]);
+
+        $guardianModel = \App\Models\Guardian::factory()->create(['user_id' => $this->guardian->id]);
+        $classLevel = \App\Models\ClassLevel::create(['name' => 'Kelas 7 SMP', 'level_order' => 1]);
+
+        \Illuminate\Support\Facades\Storage::fake('public');
+        $this->withSession(['selected_spmb_schedule_id' => $schedule->id]);
+
+        \Livewire\Livewire::actingAs($this->guardian)
+            ->test(\App\Livewire\SpmbStudentRegistration::class)
+            ->set('full_name', 'Santri Baru')
+            ->set('unit_code', '01')
+            ->set('residence_status', 'MONDOK')
+            ->set('special_status', 'UMUM')
+            ->set('class_level_id', $classLevel->id)
+            ->set('address', 'Alamat Santri')
+            ->set('kk', \Illuminate\Http\UploadedFile::fake()->create('kk.pdf', 500))
+            ->set('foto', \Illuminate\Http\UploadedFile::fake()->image('foto.jpg'))
+            ->set('akta', \Illuminate\Http\UploadedFile::fake()->create('akta.pdf', 500))
+            ->set('ijazah', \Illuminate\Http\UploadedFile::fake()->create('ijazah.pdf', 500))
+            ->call('save')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('wali.dashboard'));
+
+        $this->assertDatabaseHas('students', [
+            'full_name' => 'Santri Baru',
+            'class_level_id' => $classLevel->id,
+            'guardian_id' => $guardianModel->id,
+        ]);
+    }
 }

@@ -99,6 +99,21 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Class Level -->
+                        <div>
+                            <label for="class_level_id" class="block text-sm font-medium text-gray-700">Pilihan Kelas <span class="text-red-500">*</span></label>
+                            <select wire:model="class_level_id" id="class_level_id"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <option value="">Pilih Kelas...</option>
+                                @foreach($this->classLevels as $level)
+                                    <option value="{{ $level->id }}">{{ $level->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('class_level_id')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <!-- Special Status -->
                         <div>
                             <label for="special_status" class="block text-sm font-medium text-gray-700">Status Khusus <span class="text-red-500">*</span></label>
@@ -112,19 +127,16 @@
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror
                         </div>
+                    </div>
 
-                        <!-- Info about status -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Informasi</label>
-                            <div class="mt-1 p-3 bg-gray-50 rounded-md text-sm text-gray-600">
-                                <p><strong>Status Domisili:</strong></p>
-                                <ul class="list-disc list-inside text-xs mt-1">
-                                    <li>Mondok: Santri tinggal di asrama pesantren</li>
-                                    <li>Non Mondok: Santri pulang pergi</li>
-                                    <li>Ngaji Only: Hanya mengikuti kegiatan mengaji</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <!-- Info box -->
+                    <div class="p-3 bg-gray-50 rounded-md text-sm text-gray-600">
+                        <p><strong>Status Domisili:</strong></p>
+                        <ul class="list-disc list-inside text-xs mt-1">
+                            <li>Mondok: Santri tinggal di asrama pesantren</li>
+                            <li>Non Mondok: Santri pulang pergi</li>
+                            <li>Ngaji Only: Hanya mengikuti kegiatan mengaji</li>
+                        </ul>
                     </div>
 
                     <!-- Address -->

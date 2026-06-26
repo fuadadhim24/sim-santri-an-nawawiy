@@ -267,5 +267,36 @@ class UserSeeder extends Seeder
             'address' => 'Jl. Pahlawan No. 9, Kota Bogor',
             'is_active' => false,
         ]);
+
+        // ──────────────────────────────────────────────
+        // 7. Wali Santri Tanpa Santri (Untuk testing/pembersihan)
+        // ──────────────────────────────────────────────
+        $waliTanpaSantri1 = User::create([
+            'name' => 'Wali Tanpa Santri 1',
+            'whatsapp' => '089999999991',
+            'email' => 'walitanpasantri1@annawawiy.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'WALI_SANTRI',
+        ]);
+
+        Guardian::create([
+            'user_id' => $waliTanpaSantri1->id,
+            'full_name' => 'Wali Tanpa Santri A',
+            'whatsapp' => '089999999991',
+        ]);
+
+        $waliTanpaSantri2 = User::create([
+            'name' => 'Wali Tanpa Santri 2',
+            'whatsapp' => '089999999992',
+            'email' => 'walitanpasantri2@annawawiy.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'WALI_SANTRI',
+        ]);
+
+        Guardian::create([
+            'user_id' => $waliTanpaSantri2->id,
+            'full_name' => 'Wali Tanpa Santri B',
+            'whatsapp' => '089999999992',
+        ]);
     }
 }

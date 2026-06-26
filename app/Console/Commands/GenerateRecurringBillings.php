@@ -33,34 +33,38 @@ class GenerateRecurringBillings extends Command
         
         $lastDayOfMonth = now()->daysInMonth;
         
-        // Find active fee masters that are MONTHLY or YEARLY
         $feeMasters = \App\Models\FeeMaster::where('is_active', true)
-            ->whereIn('recurrence_type', ['MONTHLY', 'YEARLY'])
+            ->whereIn('recurrence_type', ['MONTHLY', 'EVERY_6_MONTHS', 'YEARLY'])
             ->get();
 
         $totalGenerated = 0;
 
         foreach ($feeMasters as $feeMaster) {
-            // Handle edge case: if billing_day is 31 but month has 30 days, trigger it on the 30th.
             $targetDay = $feeMaster->billing_day;
             if ($targetDay > $lastDayOfMonth) {
                 $targetDay = $lastDayOfMonth;
             }
 
-            // Only run if today matches the billing day
             if ($todayDay !== $targetDay) {
                 continue;
             }
 
-            // For YEARLY, we also need to check if it's the correct month to generate
-            if ($feeMaster->recurrence_type === 'YEARLY' && $feeMaster->start_date) {
-                $startMonth = \Carbon\Carbon::parse($feeMaster->start_date)->month;
-                if ($currentMonth !== $startMonth) {
-                    continue; // Not the right month for yearly billing
+            if ($feeMaster->recurrence_type === 'EVERY_6_MONTHS' && $feeMaster->start_date) {
+                $startDate = \Carbon\Carbon::parse($feeMaster->start_date)->startOfMonth();
+                $currentDate = now()->startOfMonth();
+                $diffInMonths = $startDate->diffInMonths($currentDate);
+                if ($diffInMonths % 6 !== 0) {
+                    continue; 
                 }
             }
 
-            // Get students matching the criteria
+            if ($feeMaster->recurrence_type === 'YEARLY' && $feeMaster->start_date) {
+                $startMonth = \Carbon\Carbon::parse($feeMaster->start_date)->month;
+                if ($currentMonth !== $startMonth) {
+                    continue; 
+                }
+            }
+
             $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
             
             if ($feeMaster->unit_target) {
@@ -68,6 +72,9 @@ class GenerateRecurringBillings extends Command
             }
             if ($feeMaster->residence_target) {
                 $query->where('residence_status', $feeMaster->residence_target);
+            }
+            if ($feeMaster->class_level_target_id) {
+                $query->where('class_level_id', $feeMaster->class_level_target_id);
             }
 
             $students = $query->get();
@@ -80,6 +87,8 @@ class GenerateRecurringBillings extends Command
                 if ($feeMaster->recurrence_type === 'MONTHLY') {
                     $billingQuery->whereMonth('created_at', $currentMonth)
                                  ->whereYear('created_at', $currentYear);
+                } elseif ($feeMaster->recurrence_type === 'EVERY_6_MONTHS') {
+                    $billingQuery->where('created_at', '>=', now()->subMonths(5)->startOfMonth());
                 } elseif ($feeMaster->recurrence_type === 'YEARLY') {
                     $billingQuery->whereYear('created_at', $currentYear);
                 }

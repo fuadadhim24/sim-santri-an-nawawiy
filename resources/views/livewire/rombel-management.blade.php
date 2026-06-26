@@ -15,7 +15,7 @@
                     + Tingkat Kelas
                 </button>
                 <button type="button" wire:click="openPromotionWizard" class="inline-flex items-center justify-center py-2 px-4 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 font-semibold whitespace-nowrap flex-none shrink-0 transition shadow-sm">
-                    Kenaikan Kelas Massal
+                    Kenaikan & Kelulusan Massal
                 </button>
             </div>
         </div>
@@ -309,7 +309,7 @@
                 <div class="flex flex-col h-full" style="max-height: 90vh;">
                     <!-- Header -->
                     <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center rounded-t-lg">
-                        <h3 class="text-lg leading-6 font-bold text-gray-900">Wizard Kenaikan Kelas Massal</h3>
+                        <h3 class="text-lg leading-6 font-bold text-gray-900">Wizard Kenaikan & Kelulusan Massal</h3>
                         <button wire:click="$set('showPromotionWizard', false)" class="text-gray-400 hover:text-gray-500">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
@@ -318,21 +318,30 @@
                     <!-- Body -->
                     <div class="px-6 py-4 flex-1 overflow-y-auto bg-white">
                         <!-- Stepper UI -->
-                        <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center justify-between mb-8 max-w-xl mx-auto">
                             <div class="flex-1 text-center">
                                 <div class="w-8 h-8 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">1</div>
-                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 1 ? 'text-primary' : 'text-gray-400' }}">Target</div>
+                                <div class="text-xs font-semibold mt-2 text-primary">Target</div>
                             </div>
-                            <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-primary" style="width: {{ $wizardStep >= 2 ? '100%' : '0%' }}"></div></div>
-                            <div class="flex-1 text-center">
-                                <div class="w-8 h-8 mx-auto {{ $wizardStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold">2</div>
-                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 2 ? 'text-primary' : 'text-gray-400' }}">Metode</div>
-                            </div>
-                            <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-primary" style="width: {{ $wizardStep >= 3 ? '100%' : '0%' }}"></div></div>
-                            <div class="flex-1 text-center">
-                                <div class="w-8 h-8 mx-auto {{ $wizardStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold">3</div>
-                                <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 3 ? 'text-primary' : 'text-gray-400' }}">Review</div>
-                            </div>
+                            
+                            @if($destinationLevelId !== 'lulus')
+                                <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-primary transition-all duration-300" style="width: {{ $wizardStep >= 2 ? '100%' : '0%' }}"></div></div>
+                                <div class="flex-1 text-center">
+                                    <div class="w-8 h-8 mx-auto {{ $wizardStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold transition-colors duration-300">2</div>
+                                    <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 2 ? 'text-primary' : 'text-gray-400' }}">Metode</div>
+                                </div>
+                                <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-primary transition-all duration-300" style="width: {{ $wizardStep >= 3 ? '100%' : '0%' }}"></div></div>
+                                <div class="flex-1 text-center">
+                                    <div class="w-8 h-8 mx-auto {{ $wizardStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold transition-colors duration-300">3</div>
+                                    <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 3 ? 'text-primary' : 'text-gray-400' }}">Review</div>
+                                </div>
+                            @else
+                                <div class="flex-1 h-1 bg-gray-200"><div class="h-full bg-primary transition-all duration-300" style="width: {{ $wizardStep >= 3 ? '100%' : '0%' }}"></div></div>
+                                <div class="flex-1 text-center">
+                                    <div class="w-8 h-8 mx-auto {{ $wizardStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-gray-200 text-gray-500' }} rounded-full flex items-center justify-center font-bold transition-colors duration-300">2</div>
+                                    <div class="text-xs font-semibold mt-2 {{ $wizardStep >= 3 ? 'text-primary' : 'text-gray-400' }}">Review & Kelulusan</div>
+                                </div>
+                            @endif
                         </div>
 
                         @if($wizardStep === 1)
@@ -436,8 +445,14 @@
                             </div>
                         @elseif($wizardStep === 3)
                             <div>
-                                <h4 class="font-bold text-gray-800 mb-2">Review Prediksi Penempatan</h4>
-                                <p class="text-sm text-gray-500 mb-4">Periksa hasil prediksi sistem. Jika ada santri yang **Tinggal Kelas**, silakan **centang/ceklis pada kotak merah "Abaikan"** di sebelahnya.</p>
+                                <h4 class="font-bold text-gray-800 mb-2">
+                                    {{ $destinationLevelId === 'lulus' ? 'Review Prediksi Kelulusan' : 'Review Prediksi Penempatan' }}
+                                </h4>
+                                <p class="text-sm text-gray-500 mb-4">
+                                    {{ $destinationLevelId === 'lulus' 
+                                        ? 'Periksa daftar santri yang akan diluluskan. Jika ada santri yang tidak lulus (tinggal/tetap di kelas lama), silakan centang/ceklis pada kotak merah "Abaikan" di sebelahnya.' 
+                                        : 'Periksa hasil prediksi sistem. Jika ada santri yang tinggal kelas, silakan centang/ceklis pada kotak merah "Abaikan" di sebelahnya.' }}
+                                </p>
                                 
                                 <div class="border rounded-lg overflow-hidden max-h-[50vh] overflow-y-auto">
                                     <table class="min-w-full divide-y divide-gray-200">
@@ -496,7 +511,9 @@
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <span wire:loading.remove wire:target="executePromotion">Eksekusi Kenaikan Kelas!</span>
+                                <span wire:loading.remove wire:target="executePromotion">
+                                    {{ $destinationLevelId === 'lulus' ? 'Eksekusi Kelulusan Santri!' : 'Eksekusi Kenaikan Kelas!' }}
+                                </span>
                                 <span wire:loading wire:target="executePromotion">Memproses...</span>
                             </button>
                         @endif

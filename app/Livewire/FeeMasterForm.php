@@ -30,6 +30,7 @@ class FeeMasterForm extends Component
     public $recurrence_type = 'ONE_TIME';
     public $due_days = 14;
     public $billing_day = 1;
+    public $class_level_target_id = '';
 
     protected function rules(): array
     {
@@ -39,7 +40,8 @@ class FeeMasterForm extends Component
             'fee_category_id' => 'required|exists:fee_categories,id',
             'unit_target' => 'nullable|in:01,02,03',
             'residence_target' => 'nullable|in:MONDOK,NON_MONDOK,NGAJI_ONLY',
-            'recurrence_type' => 'required|in:ONE_TIME,MONTHLY,YEARLY',
+            'class_level_target_id' => 'nullable|exists:class_levels,id',
+            'recurrence_type' => 'required|in:ONE_TIME,MONTHLY,EVERY_6_MONTHS,YEARLY',
             'due_days' => 'required|integer|min:0',
             'billing_day' => 'nullable|integer|min:1|max:31',
             'start_date' => 'nullable|date',
@@ -56,6 +58,7 @@ class FeeMasterForm extends Component
             $this->fee_category_id = $feeMaster->fee_category_id;
             $this->unit_target = $feeMaster->unit_target;
             $this->residence_target = $feeMaster->residence_target;
+            $this->class_level_target_id = $feeMaster->class_level_target_id ?? '';
             $this->recurrence_type = $feeMaster->recurrence_type ?? 'ONE_TIME';
             $this->due_days = $feeMaster->due_days ?? 14;
             $this->billing_day = $feeMaster->billing_day ?? 1;
@@ -77,12 +80,18 @@ class FeeMasterForm extends Component
             if ($this->residence_target) {
                 $query->where('residence_status', $this->residence_target);
             }
+            if ($this->class_level_target_id) {
+                $query->where('class_level_id', $this->class_level_target_id);
+            }
             $studentCount = $query->count();
 
             $feeCategoryName = $this->feeCategories->find($this->fee_category_id)?->name ?? '';
 
-            // Copywriting ramah pengguna: Beri info tambahan jika Bulanan/Tahunan
-            $infoRecurrence = $this->recurrence_type === 'MONTHLY' ? ' (Bulanan)' : ($this->recurrence_type === 'YEARLY' ? ' (Tahunan)' : ' (Sekali Bayar)');
+            $infoRecurrence = $this->recurrence_type === 'MONTHLY' ? ' (Bulanan)' : ($this->recurrence_type === 'EVERY_6_MONTHS' ? ' (Per 6 Bulan)' : ($this->recurrence_type === 'YEARLY' ? ' (Tahunan)' : ' (Sekali Bayar)'));
+
+            $classTargetName = $this->class_level_target_id 
+                ? (\App\Models\ClassLevel::find($this->class_level_target_id)?->name ?? 'Semua Kelas')
+                : 'Semua Kelas';
 
             $this->dispatch('confirm-fee-creation',
                 studentCount: $studentCount,
@@ -91,6 +100,7 @@ class FeeMasterForm extends Component
                 category: $feeCategoryName,
                 unitTarget: $this->unit_target ?? 'Semua Unit',
                 residenceTarget: $this->residence_target ?? 'Semua Status Domisili',
+                classTarget: $classTargetName,
                 startDate: $this->start_date ?: '-',
                 endDate: $this->end_date ?: '-'
             );
@@ -121,9 +131,10 @@ class FeeMasterForm extends Component
             'fee_category_id' => $this->fee_category_id,
             'unit_target' => $this->unit_target ?: null,
             'residence_target' => $this->residence_target ?: null,
+            'class_level_target_id' => $this->class_level_target_id ?: null,
             'recurrence_type' => $this->recurrence_type,
             'due_days' => $this->due_days,
-            'billing_day' => in_array($this->recurrence_type, ['MONTHLY', 'YEARLY']) ? $this->billing_day : null,
+            'billing_day' => in_array($this->recurrence_type, ['MONTHLY', 'EVERY_6_MONTHS', 'YEARLY']) ? $this->billing_day : null,
             'start_date' => $this->start_date ?: null,
             'end_date' => $this->end_date ?: null,
         ];
@@ -138,6 +149,9 @@ class FeeMasterForm extends Component
                 }
                 if ($this->residence_target) {
                     $query->where('residence_status', $this->residence_target);
+                }
+                if ($this->class_level_target_id) {
+                    $query->where('class_level_id', $this->class_level_target_id);
                 }
 
                 $students = $query->get();
@@ -211,6 +225,11 @@ class FeeMasterForm extends Component
     public function getFeeCategoriesProperty()
     {
         return \App\Models\FeeCategory::orderBy('name')->get();
+    }
+
+    public function getClassLevelsProperty()
+    {
+        return \App\Models\ClassLevel::orderBy('level_order')->get();
     }
 
     public function render()

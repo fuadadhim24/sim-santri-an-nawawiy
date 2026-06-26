@@ -34,7 +34,6 @@ class FeeMasterFormTest extends TestCase
     {
         $category = FeeCategory::create(['name' => 'Bulanan', 'type' => 'bulanan', 'code' => 'SPP']);
 
-        // Create 3 students with different statuses
         $activeDiterima = Student::factory()->create(['is_active' => true, 'status' => 'diterima']);
         $activeMenunggu = Student::factory()->create(['is_active' => true, 'status' => 'menunggu']);
         $inactiveLulus = Student::factory()->create(['is_active' => false, 'status' => 'lulus']);
@@ -51,7 +50,6 @@ class FeeMasterFormTest extends TestCase
         $feeMaster = FeeMaster::where('item_name', 'SPP Juli')->first();
         $this->assertNotNull($feeMaster);
 
-        // Assert only the $activeDiterima student received a billing
         $this->assertDatabaseHas('billings', [
             'student_id' => $activeDiterima->id,
             'fee_master_id' => $feeMaster->id
@@ -90,7 +88,6 @@ class FeeMasterFormTest extends TestCase
         $this->assertEquals(10, $feeMaster->billing_day);
         $this->assertEquals(14, $feeMaster->due_days);
 
-        // Assert billing has due date
         $this->assertDatabaseHas('billings', [
             'student_id' => $student->id,
             'fee_master_id' => $feeMaster->id
@@ -98,5 +95,43 @@ class FeeMasterFormTest extends TestCase
         
         $billing = \App\Models\Billing::where('fee_master_id', $feeMaster->id)->first();
         $this->assertNotNull($billing);
+    }
+
+    public function test_target_class_level_and_every_6_months_recurrence()
+    {
+        $category = FeeCategory::create(['name' => 'Semester', 'type' => 'bulanan', 'code' => 'SEM']);
+        
+        $class7 = \App\Models\ClassLevel::create(['name' => 'Kelas 7 SMP', 'level_order' => 1]);
+        $class8 = \App\Models\ClassLevel::create(['name' => 'Kelas 8 SMP', 'level_order' => 2]);
+
+        $studentClass7 = Student::factory()->create(['is_active' => true, 'status' => 'diterima', 'class_level_id' => $class7->id]);
+        $studentClass8 = Student::factory()->create(['is_active' => true, 'status' => 'diterima', 'class_level_id' => $class8->id]);
+
+        Livewire::actingAs($this->admin)
+            ->test(FeeMasterForm::class)
+            ->set('item_name', 'Biaya Ujian')
+            ->set('amount', 300000)
+            ->set('fee_category_id', $category->id)
+            ->set('recurrence_type', 'EVERY_6_MONTHS')
+            ->set('class_level_target_id', $class7->id)
+            ->set('billing_day', 5)
+            ->set('due_days', 10)
+            ->call('processSave')
+            ->assertHasNoErrors();
+
+        $feeMaster = FeeMaster::where('item_name', 'Biaya Ujian')->first();
+        $this->assertNotNull($feeMaster);
+        $this->assertEquals($class7->id, $feeMaster->class_level_target_id);
+        $this->assertEquals('EVERY_6_MONTHS', $feeMaster->recurrence_type);
+
+        $this->assertDatabaseHas('billings', [
+            'student_id' => $studentClass7->id,
+            'fee_master_id' => $feeMaster->id
+        ]);
+
+        $this->assertDatabaseMissing('billings', [
+            'student_id' => $studentClass8->id,
+            'fee_master_id' => $feeMaster->id
+        ]);
     }
 }

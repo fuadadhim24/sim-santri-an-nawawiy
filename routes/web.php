@@ -97,6 +97,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/discounts/{discount}/edit', \App\Livewire\DiscountForm::class)->name('admin.discounts.edit');
 
         Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
+        Route::get('/admin/reports/financial/print', [\App\Http\Controllers\FinancialReportController::class, 'print'])->name('admin.reports.financial.print');
     });
 
     Route::get('/receipts/{billing}', [\App\Http\Controllers\ReceiptController::class, 'show'])

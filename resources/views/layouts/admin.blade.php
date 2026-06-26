@@ -491,6 +491,12 @@
                                 <span class="text-xs font-bold text-foreground block mb-1">Status Khusus</span>
                                 <p class="text-xs text-muted-foreground">Santri dengan status khusus (Yatim, Piatu, Dhuafa) akan otomatis mendapat potongan tagihan jika sudah diatur di menu Diskon.</p>
                             </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Santri Pindahan (Masuk Pertengahan)</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    Saat menambah santri baru secara manual, Anda dapat menyeleksi secara spesifik tagihan awal mana saja yang ingin diterbitkan. Untuk tagihan rutin (bulanan/semesteran), sistem scheduler hanya akan menerbitkan tagihan untuk bulan berjalan sejak santri aktif, sehingga santri tidak ditagih bulan-bulan lampau secara otomatis.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 @elseif(request()->routeIs('admin.guardians*'))

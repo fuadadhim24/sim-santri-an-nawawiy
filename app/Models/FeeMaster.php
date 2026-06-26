@@ -17,6 +17,7 @@ class FeeMaster extends Model
         'fee_category_id',
         'unit_target',
         'residence_target',
+        'class_level_target_id',
         'recurrence_type',
         'start_date',
         'end_date',
@@ -31,11 +32,17 @@ class FeeMaster extends Model
         'end_date' => 'date',
         'amount' => 'integer',
         'is_active' => 'boolean',
+        'class_level_target_id' => 'integer',
     ];
 
     public function discounts(): HasMany
     {
         return $this->hasMany(Discount::class);
+    }
+
+    public function classLevelTarget(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ClassLevel::class, 'class_level_target_id');
     }
 
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo

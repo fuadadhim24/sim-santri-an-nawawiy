@@ -19,6 +19,6 @@ class Discount extends Model
 
     public function feeMaster(): BelongsTo
     {
-        return $this->belongsTo(FeeMaster::class);
+        return $this->belongsTo(FeeMaster::class)->withTrashed();
     }
 }

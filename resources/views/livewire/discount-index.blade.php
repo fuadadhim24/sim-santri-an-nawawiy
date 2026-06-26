@@ -28,9 +28,12 @@
                     @forelse ($discounts as $discount)
                         <tr class="hover:bg-muted/50 transition-colors">
                             <td class="px-6 py-4 font-medium text-foreground">
-                                {{ $discount->feeMaster->item_name }}
+                                {{ $discount->feeMaster?->item_name ?? 'N/A' }}
+                                @if($discount->feeMaster?->trashed())
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-150 text-red-700 ml-1">Terhapus</span>
+                                @endif
                                 <span class="text-xs text-muted-foreground block">
-                                    {{ $discount->feeMaster->category->name ?? 'N/A' }}
+                                    {{ $discount->feeMaster?->category?->name ?? 'N/A' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">

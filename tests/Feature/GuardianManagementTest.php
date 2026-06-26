@@ -77,4 +77,38 @@ class GuardianManagementTest extends TestCase
 
         $response->assertRedirect('/my-dashboard');
     }
+
+    public function test_admin_can_filter_and_delete_guardians_without_students()
+    {
+        $guardianWithStudent = Guardian::factory()->create();
+        $student = \App\Models\Student::factory()->create(['guardian_id' => $guardianWithStudent->id]);
+
+        $guardianWithoutStudent1 = Guardian::factory()->create();
+        $guardianWithoutStudent2 = Guardian::factory()->create();
+
+        \Livewire\Livewire::actingAs($this->admin)
+            ->test(\App\Livewire\GuardianIndex::class)
+            ->assertSee($guardianWithStudent->full_name)
+            ->assertSee($guardianWithoutStudent1->full_name)
+            
+            ->set('filterNoStudents', true)
+            ->assertSee($guardianWithoutStudent1->full_name)
+            ->assertDontSee($guardianWithStudent->full_name)
+
+            ->call('deleteSingle', $guardianWithoutStudent1->id)
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseMissing('guardians', ['id' => $guardianWithoutStudent1->id]);
+        $this->assertDatabaseMissing('users', ['id' => $guardianWithoutStudent1->user_id]);
+
+        \Livewire\Livewire::actingAs($this->admin)
+            ->test(\App\Livewire\GuardianIndex::class)
+            ->call('deleteAllWithoutStudents')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseMissing('guardians', ['id' => $guardianWithoutStudent2->id]);
+        $this->assertDatabaseMissing('users', ['id' => $guardianWithoutStudent2->user_id]);
+
+        $this->assertDatabaseHas('guardians', ['id' => $guardianWithStudent->id]);
+    }
 }

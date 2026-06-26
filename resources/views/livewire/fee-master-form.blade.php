@@ -70,6 +70,7 @@
                             class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="ONE_TIME">Sekali Bayar (Misal: Uang Pangkal)</option>
                             <option value="MONTHLY">Bulanan (Misal: SPP)</option>
+                            <option value="EVERY_6_MONTHS">Per 6 Bulan (Semester)</option>
                             <option value="YEARLY">Tahunan (Misal: Daftar Ulang)</option>
                         </select>
                         @error('recurrence_type')
@@ -123,7 +124,7 @@
                 </div>
 
                 <!-- Targets -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-border">
                     <div>
                         <label for="unit_target" class="block text-sm font-medium text-foreground mb-1">Target
                             Unit</label>
@@ -144,6 +145,17 @@
                             <option value="MONDOK">Mondok</option>
                             <option value="NON_MONDOK">Non Mondok</option>
                             <option value="NGAJI_ONLY">Ngaji Saja</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="class_level_target_id" class="block text-sm font-medium text-foreground mb-1">Target
+                            Kelas</label>
+                        <select wire:model="class_level_target_id" id="class_level_target_id"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            <option value="">Semua Kelas</option>
+                            @foreach($this->classLevels as $level)
+                                <option value="{{ $level->id }}">{{ $level->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -195,6 +207,10 @@
                         <div class="flex justify-between">
                             <span class="text-sm text-gray-600">Target Domisili:</span>
                             <span class="text-sm font-semibold">${data.residenceTarget}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Target Kelas:</span>
+                            <span class="text-sm font-semibold">${data.classTarget}</span>
                         </div>
                         <div class="flex justify-between border-t border-gray-200 pt-2 mt-2">
                             <span class="text-sm font-semibold text-gray-800">Total Tagihan Dibuat:</span>

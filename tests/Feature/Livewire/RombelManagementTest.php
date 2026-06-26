@@ -120,9 +120,8 @@ class RombelManagementTest extends TestCase
             ->set('sourceLevelId', $level->id)
             ->set('destinationLevelId', 'lulus')
             ->set('promotionMethod', 'kosong')
-            ->call('wizardNextStep') // Go to step 2
-            ->call('wizardNextStep') // Go to step 3 (Draft generation)
-            ->call('executePromotion'); // Execute graduation
+            ->call('wizardNextStep') 
+            ->call('executePromotion'); 
 
         $this->assertDatabaseHas('students', [
             'id' => $student->id,
@@ -154,7 +153,7 @@ class RombelManagementTest extends TestCase
             ->set('destinationLevelId', $destLevel->id)
             ->set('promotionMethod', 'paralel')
             ->call('wizardNextStep')
-            ->set('paralelMapping.' . $sourceGroup->id, $destGroup->id) // Map 1-A to 2-A
+            ->set('paralelMapping.' . $sourceGroup->id, $destGroup->id)
             ->call('wizardNextStep')
             ->call('executePromotion');
 
@@ -172,11 +171,9 @@ class RombelManagementTest extends TestCase
         
         $sourceGroup = StudyGroup::create(['name' => '1-A', 'max_capacity' => 30, 'class_level_id' => $sourceLevel->id]);
         
-        // Dest groups with small capacity to test overflow/balancing
         $destGroup1 = StudyGroup::create(['name' => '2-A', 'max_capacity' => 1, 'class_level_id' => $destLevel->id]);
         $destGroup2 = StudyGroup::create(['name' => '2-B', 'max_capacity' => 2, 'class_level_id' => $destLevel->id]);
         
-        // Create 3 students
         $students = Student::factory()->count(3)->create([
             'is_active' => true, 
             'status' => 'diterima',
@@ -193,7 +190,6 @@ class RombelManagementTest extends TestCase
             ->call('wizardNextStep')
             ->call('executePromotion');
 
-        // Since capacities are 1 and 2, and we have 3 students, they should fit exactly.
         $this->assertEquals(1, Student::where('study_group_id', $destGroup1->id)->count());
         $this->assertEquals(2, Student::where('study_group_id', $destGroup2->id)->count());
     }

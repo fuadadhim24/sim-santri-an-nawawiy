@@ -30,6 +30,9 @@ class SpmbStudentRegistration extends Component
     #[Rule('required|in:UMUM,ANAK_GURU,YATIM')]
     public $special_status = 'UMUM';
 
+    #[Rule('required|exists:class_levels,id')]
+    public $class_level_id = '';
+
     #[Rule('nullable|string')]
     public $address = '';
 
@@ -79,6 +82,11 @@ class SpmbStudentRegistration extends Component
         return Guardian::where('user_id', $user->id)->first();
     }
 
+    public function getClassLevelsProperty()
+    {
+        return \App\Models\ClassLevel::orderBy('level_order')->get();
+    }
+
     public function save(NisGeneratorService $nisService)
     {
         $this->validate();
@@ -106,6 +114,7 @@ class SpmbStudentRegistration extends Component
             'unit_code' => $this->unit_code,
             'residence_status' => $this->residence_status,
             'special_status' => $this->special_status,
+            'class_level_id' => $this->class_level_id,
             'address' => $this->address,
             'nis' => $nis,
             'is_active' => false,
