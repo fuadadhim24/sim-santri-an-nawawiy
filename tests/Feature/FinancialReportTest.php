@@ -149,6 +149,6 @@ class FinancialReportTest extends TestCase
         Livewire::actingAs($this->admin)
             ->test(\App\Livewire\FinancialReport::class)
             ->call('exportExcel')
-            ->assertFileDownloaded('laporan-keuangan-' . now()->format('Y-m-d') . '.csv');
+            ->assertFileDownloaded('laporan-keuangan-' . now()->format('Y-m-d') . '.xlsx');
     }
 }

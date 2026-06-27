@@ -6,6 +6,12 @@ use App\Models\Billing;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+
 class FinancialReport extends Component
 {
     use WithPagination;
@@ -59,61 +65,199 @@ class FinancialReport extends Component
         $cashPayments = $payments->where('method', 'cash');
         $cashlessPayments = $payments->where('method', 'duitku');
 
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="laporan-keuangan-' . now()->format('Y-m-d') . '.csv"',
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $sheet->setShowGridLines(true);
+
+        $headerStyle = [
+            'font' => ['bold' => true, 'size' => 10],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'F3F4F6']
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => 'D1D5DB']
+                ]
+            ],
+            'alignment' => [
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'horizontal' => Alignment::HORIZONTAL_LEFT
+            ]
         ];
 
-        $callback = function () use ($cashPayments, $cashlessPayments) {
-            $file = fopen('php://output', 'w');
+        $dataStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => 'E5E7EB']
+                ]
+            ]
+        ];
+
+        $totalStyle = [
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'F9FAFB']
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => 'D1D5DB']
+                ]
+            ]
+        ];
+
+        $currentRow = 1;
+
+        $sheet->setCellValue('A' . $currentRow, 'LAPORAN KEUANGAN SIM SANTRI AN-NAWAWIY');
+        $sheet->getStyle('A' . $currentRow)->getFont()->setBold(true)->setSize(14);
+        $currentRow++;
+
+        $sheet->setCellValue('A' . $currentRow, 'Tanggal Unduh: ' . now()->format('d/m/Y H:i'));
+        $sheet->getStyle('A' . $currentRow)->getFont()->setItalic(true)->setSize(10);
+        $currentRow += 2;
+
+        $sheet->setCellValue('A' . $currentRow, 'BAGIAN 1: PEMBAYARAN TUNAI (CASH)');
+        $sheet->getStyle('A' . $currentRow)->getFont()->setBold(true)->setSize(11);
+        $currentRow++;
+
+        $cashHeaders = ['Tanggal Bayar', 'NIS', 'Nama Santri', 'Deskripsi', 'Jumlah'];
+        foreach ($cashHeaders as $colIdx => $headerTitle) {
+            $colLetter = chr(65 + $colIdx);
+            $sheet->setCellValue($colLetter . $currentRow, $headerTitle);
+        }
+        $sheet->getStyle('A' . $currentRow . ':E' . $currentRow)->applyFromArray($headerStyle);
+        $currentRow++;
+
+        $cashStartRow = $currentRow;
+        foreach ($cashPayments as $payment) {
+            $sheet->setCellValue('A' . $currentRow, $payment->paid_at ? $payment->paid_at->format('d/m/Y H:i') : '-');
             
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            $sheet->setCellValueExplicit(
+                'B' . $currentRow, 
+                $payment->billing->student->nis, 
+                \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+            );
 
-            fputcsv($file, ['LAPORAN KEUANGAN SIM SANTRI AN-NAWAWIY']);
-            fputcsv($file, ['Tanggal Unduh: ' . now()->format('d/m/Y H:i')]);
-            fputcsv($file, []);
-
-            fputcsv($file, ['BAGIAN 1: PEMBAYARAN TUNAI (CASH)']);
-            fputcsv($file, ['Tanggal Bayar', 'NIS', 'Nama Santri', 'Deskripsi', 'Jumlah']);
+            $sheet->setCellValue('C' . $currentRow, $payment->billing->student->full_name);
+            $sheet->setCellValue('D' . $currentRow, $payment->billing->title);
             
-            $totalCash = 0;
-            foreach ($cashPayments as $payment) {
-                fputcsv($file, [
-                    $payment->paid_at ? $payment->paid_at->format('d/m/Y H:i') : '-',
-                    $payment->billing->student->nis,
-                    $payment->billing->student->full_name,
-                    $payment->billing->title,
-                    (int) $payment->amount
-                ]);
-                $totalCash += (int) $payment->amount;
-            }
-            fputcsv($file, ['Total Tunai', '', '', '', $totalCash]);
-            fputcsv($file, []);
+            $sheet->setCellValue('E' . $currentRow, (int) $payment->amount);
+            $sheet->getStyle('E' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0');
 
-            fputcsv($file, ['BAGIAN 2: PEMBAYARAN CASHLESS (DUITKU)']);
-            fputcsv($file, ['Tanggal Bayar', 'NIS', 'Nama Santri', 'Deskripsi', 'Referensi Duitku', 'Jumlah']);
+            $sheet->getStyle('A' . $currentRow . ':E' . $currentRow)->applyFromArray($dataStyle);
+            $currentRow++;
+        }
+        $cashEndRow = $currentRow - 1;
+
+        $sheet->setCellValue('A' . $currentRow, 'Total Tunai');
+        $sheet->mergeCells("A{$currentRow}:D{$currentRow}");
+        $sheet->getStyle("A{$currentRow}:D{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        
+        if ($cashEndRow >= $cashStartRow) {
+            $sheet->setCellValue('E' . $currentRow, "=SUM(E{$cashStartRow}:E{$cashEndRow})");
+        } else {
+            $sheet->setCellValue('E' . $currentRow, 0);
+        }
+        $sheet->getStyle('E' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0');
+        $sheet->getStyle('A' . $currentRow . ':E' . $currentRow)->applyFromArray($totalStyle);
+        
+        $totalCashRowIdx = $currentRow;
+        $currentRow += 3;
+
+        $sheet->setCellValue('A' . $currentRow, 'BAGIAN 2: PEMBAYARAN CASHLESS (DUITKU)');
+        $sheet->getStyle('A' . $currentRow)->getFont()->setBold(true)->setSize(11);
+        $currentRow++;
+
+        $cashlessHeaders = ['Tanggal Bayar', 'NIS', 'Nama Santri', 'Deskripsi', 'Referensi Duitku', 'Jumlah'];
+        foreach ($cashlessHeaders as $colIdx => $headerTitle) {
+            $colLetter = chr(65 + $colIdx);
+            $sheet->setCellValue($colLetter . $currentRow, $headerTitle);
+        }
+        $sheet->getStyle('A' . $currentRow . ':F' . $currentRow)->applyFromArray($headerStyle);
+        $currentRow++;
+
+        $cashlessStartRow = $currentRow;
+        foreach ($cashlessPayments as $payment) {
+            $sheet->setCellValue('A' . $currentRow, $payment->paid_at ? $payment->paid_at->format('d/m/Y H:i') : '-');
             
-            $totalCashless = 0;
-            foreach ($cashlessPayments as $payment) {
-                fputcsv($file, [
-                    $payment->paid_at ? $payment->paid_at->format('d/m/Y H:i') : '-',
-                    $payment->billing->student->nis,
-                    $payment->billing->student->full_name,
-                    $payment->billing->title,
-                    $payment->duitku_reference ?? '-',
-                    (int) $payment->amount
-                ]);
-                $totalCashless += (int) $payment->amount;
-            }
-            fputcsv($file, ['Total Cashless', '', '', '', '', $totalCashless]);
-            fputcsv($file, []);
+            $sheet->setCellValueExplicit(
+                'B' . $currentRow, 
+                $payment->billing->student->nis, 
+                \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+            );
 
-            fputcsv($file, ['GRAND TOTAL PENDAPATAN', '', '', '', '', $totalCash + $totalCashless]);
+            $sheet->setCellValue('C' . $currentRow, $payment->billing->student->full_name);
+            $sheet->setCellValue('D' . $currentRow, $payment->billing->title);
+            $sheet->setCellValue('E' . $currentRow, $payment->duitku_reference ?? '-');
+            
+            $sheet->setCellValue('F' . $currentRow, (int) $payment->amount);
+            $sheet->getStyle('F' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0');
 
-            fclose($file);
+            $sheet->getStyle('A' . $currentRow . ':F' . $currentRow)->applyFromArray($dataStyle);
+            $currentRow++;
+        }
+        $cashlessEndRow = $currentRow - 1;
+
+        $sheet->setCellValue('A' . $currentRow, 'Total Cashless');
+        $sheet->mergeCells("A{$currentRow}:E{$currentRow}");
+        $sheet->getStyle("A{$currentRow}:E{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        
+        if ($cashlessEndRow >= $cashlessStartRow) {
+            $sheet->setCellValue('F' . $currentRow, "=SUM(F{$cashlessStartRow}:F{$cashlessEndRow})");
+        } else {
+            $sheet->setCellValue('F' . $currentRow, 0);
+        }
+        $sheet->getStyle('F' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0');
+        $sheet->getStyle('A' . $currentRow . ':F' . $currentRow)->applyFromArray($totalStyle);
+        
+        $totalCashlessRowIdx = $currentRow;
+        $currentRow += 3;
+
+        $sheet->setCellValue('A' . $currentRow, 'GRAND TOTAL PENDAPATAN');
+        $sheet->mergeCells("A{$currentRow}:E{$currentRow}");
+        $sheet->getStyle("A{$currentRow}:E{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        
+        $sheet->setCellValue('F' . $currentRow, "=E{$totalCashRowIdx}+F{$totalCashlessRowIdx}");
+        $sheet->getStyle('F' . $currentRow)->getNumberFormat()->setFormatCode('Rp#,##0');
+        
+        $grandTotalStyle = [
+            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '10B981']
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_MEDIUM,
+                    'color' => ['rgb' => '047857']
+                ]
+            ]
+        ];
+        $sheet->getStyle('A' . $currentRow . ':F' . $currentRow)->applyFromArray($grandTotalStyle);
+
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'laporan-keuangan-' . now()->format('Y-m-d') . '.xlsx';
+        
+        $callback = function () use ($writer) {
+            $writer->save('php://output');
         };
 
-        return response()->streamDownload($callback, 'laporan-keuangan-' . now()->format('Y-m-d') . '.csv', $headers);
+        $headers = [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Cache-Control' => 'max-age=0',
+        ];
+
+        return response()->streamDownload($callback, $fileName, $headers);
     }
 
     public function render()

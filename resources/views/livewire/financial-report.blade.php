@@ -101,24 +101,27 @@
                 <input wire:model.live="search" type="text" placeholder="Cari santri..."
                     class="px-3 py-1.5 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-xs text-foreground w-40 sm:w-48">
                 
-                <!-- Print PDF Link -->
-                <a href="{{ route('admin.reports.financial.print', ['startDate' => $startDate, 'endDate' => $endDate, 'search' => $search]) }}" 
-                    target="_blank"
-                    class="inline-flex items-center justify-center px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-md hover:bg-primary/90 transition shadow-sm gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Cetak PDF
-                </a>
-                
-                <!-- Export Excel Button -->
-                <button wire:click="exportExcel"
-                    class="inline-flex items-center justify-center px-3 py-1.5 bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 hover:bg-emerald-600/20 text-xs font-semibold rounded-md transition shadow-sm gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Ekspor Excel
-                </button>
+                <!-- Export Actions Group -->
+                <div class="flex items-center gap-2">
+                    <!-- Print PDF Link -->
+                    <a href="{{ route('admin.reports.financial.print', ['startDate' => $startDate, 'endDate' => $endDate, 'search' => $search]) }}" 
+                        target="_blank"
+                        class="inline-flex items-center justify-center px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-md hover:bg-primary/90 transition shadow-sm gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Cetak PDF
+                    </a>
+                    
+                    <!-- Export Excel Button -->
+                    <button wire:click="exportExcel"
+                        class="inline-flex items-center justify-center px-3 py-1.5 bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 hover:bg-emerald-600/20 text-xs font-semibold rounded-md transition shadow-sm gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Ekspor Excel
+                    </button>
+                </div>
             </div>
         </div>
         <div class="overflow-x-auto">
