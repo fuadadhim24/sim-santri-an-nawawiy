@@ -10,6 +10,18 @@
                 class="inline-flex items-center justify-center py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium whitespace-nowrap flex-shrink-0">+
                 Tambah Jadwal</a>
         </div>
+        @if (session()->has('message'))
+            <div class="p-4 mx-6 mt-4 bg-green-150 text-green-800 rounded-md border border-green-200">
+                {{ session('message') }}
+            </div>
+        @endif
+
+        @if (session()->has('error'))
+            <div class="p-4 mx-6 mt-4 bg-red-100 text-red-800 rounded-md border border-red-200">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">

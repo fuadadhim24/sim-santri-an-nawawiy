@@ -33,6 +33,8 @@ class GuardianIndex extends Component
                 $user->delete();
             }
             session()->flash('message', "Wali santri {$guardian->full_name} berhasil dihapus.");
+        } else {
+            session()->flash('error', "Tidak dapat menghapus wali santri {$guardian->full_name} karena masih memiliki santri terdaftar.");
         }
     }
 

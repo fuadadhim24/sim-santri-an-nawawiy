@@ -45,6 +45,12 @@
             </div>
         @endif
 
+        @if (session()->has('error'))
+            <div class="p-4 mx-6 mt-4 bg-red-100 text-red-800 rounded-md border border-red-200">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">

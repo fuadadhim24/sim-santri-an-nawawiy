@@ -63,7 +63,15 @@ class GuardianDashboard extends Component
             }
         }
 
-        $spmbCategory = FeeCategory::where('code', 'SPMB')->first();
+        $spmbCategory = FeeCategory::query()
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->where('code', 'SPMB')
+                  ->orWhere('code', 'spmb')
+                  ->orWhere('code', 'like', '%SPMB%')
+                  ->orWhere('code', 'like', '%spmb%');
+            })
+            ->first();
         $spmbFeeMasters = collect();
 
         if ($spmbCategory) {

@@ -457,6 +457,14 @@
                                     <strong>Tidak (Nonaktif):</strong> Tagihan hanya dapat diterbitkan setelah calon santri resmi diubah statusnya menjadi <em>Diterima</em>.
                                 </p>
                             </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Status Keaktifan Kategori</span>
+                                <div class="text-xs text-muted-foreground space-y-2 mt-1">
+                                    <p><strong>Aktif:</strong> Kategori dapat dipilih saat membuat master biaya baru.</p>
+                                    <p><strong>Non-aktif:</strong> Kategori disembunyikan dari form. Seluruh master biaya terkait akan otomatis diarsipkan (soft-delete) dan dinonaktifkan. Proses pembuatan tagihan rutin baru (seperti SPP bulanan otomatis) akan dihentikan.</p>
+                                    <p><strong>Jika diaktifkan kembali:</strong> Anda dapat memulihkan seluruh master biaya terkait yang sebelumnya terarsip. Sistem hanya akan menerbitkan tagihan untuk bulan/periode berjalan saat ini (aman dari penumpukan tagihan masa lalu). Jika tanggal tagihan bulan ini sudah lewat dan Anda ingin segera menerbitkannya, cukup gunakan tombol <strong>Sinkronisasi</strong> di daftar utama master biaya.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 @elseif(request()->routeIs('admin.discounts*'))

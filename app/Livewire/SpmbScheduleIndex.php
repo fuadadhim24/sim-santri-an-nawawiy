@@ -18,6 +18,12 @@ class SpmbScheduleIndex extends Component
     public function delete($id)
     {
         $schedule = SpmbSchedule::findOrFail($id);
+
+        if ($schedule->students()->exists()) {
+            session()->flash('error', "Jadwal SPMB '{$schedule->name}' tidak dapat dihapus karena sudah memiliki santri yang terdaftar.");
+            return;
+        }
+
         $schedule->delete();
         session()->flash('message', 'Jadwal SPMB berhasil dihapus.');
     }
