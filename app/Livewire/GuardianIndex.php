@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Guardian;
 use Livewire\Component;
 use Livewire\WithPagination;
+use SweetAlert2\Laravel\Swal;
 
 class GuardianIndex extends Component
 {
@@ -32,9 +33,15 @@ class GuardianIndex extends Component
             if ($user) {
                 $user->delete();
             }
-            session()->flash('message', "Wali santri {$guardian->full_name} berhasil dihapus.");
+            Swal::success([
+                'title' => 'Berhasil',
+                'text' => "Wali santri {$guardian->full_name} berhasil dihapus.",
+            ]);
         } else {
-            session()->flash('error', "Tidak dapat menghapus wali santri {$guardian->full_name} karena masih memiliki santri terdaftar.");
+            Swal::error([
+                'title' => 'Gagal Menghapus',
+                'text' => "Tidak dapat menghapus wali santri {$guardian->full_name} karena masih memiliki santri terdaftar.",
+            ]);
         }
     }
 
@@ -51,7 +58,10 @@ class GuardianIndex extends Component
             $deletedCount++;
         }
 
-        session()->flash('message', "Berhasil menghapus {$deletedCount} wali santri tanpa santri.");
+        Swal::success([
+            'title' => 'Berhasil',
+            'text' => "Berhasil menghapus {$deletedCount} wali santri tanpa santri.",
+        ]);
     }
 
     public function getHasGuardiansWithoutStudentsProperty()

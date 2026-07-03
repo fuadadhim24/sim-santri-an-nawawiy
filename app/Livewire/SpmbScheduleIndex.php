@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\SpmbSchedule;
 use Livewire\Component;
+use SweetAlert2\Laravel\Swal;
 
 class SpmbScheduleIndex extends Component
 {
@@ -20,18 +21,27 @@ class SpmbScheduleIndex extends Component
         $schedule = SpmbSchedule::findOrFail($id);
 
         if ($schedule->students()->exists()) {
-            session()->flash('error', "Jadwal SPMB '{$schedule->name}' tidak dapat dihapus karena sudah memiliki santri yang terdaftar.");
+            Swal::error([
+                'title' => 'Gagal Menghapus',
+                'text' => "Jadwal SPMB '{$schedule->name}' tidak dapat dihapus karena sudah memiliki santri yang terdaftar.",
+            ]);
             return;
         }
 
         $schedule->delete();
-        session()->flash('message', 'Jadwal SPMB berhasil dihapus.');
+        Swal::success([
+            'title' => 'Berhasil',
+            'text' => 'Jadwal SPMB berhasil dihapus.',
+        ]);
     }
 
     public function toggleActive($id)
     {
         $schedule = SpmbSchedule::findOrFail($id);
         $schedule->update(['is_active' => !$schedule->is_active]);
-        session()->flash('message', 'Status jadwal SPMB berhasil diperbarui.');
+        Swal::success([
+            'title' => 'Berhasil',
+            'text' => 'Status jadwal SPMB berhasil diperbarui.',
+        ]);
     }
 }
