@@ -22,7 +22,7 @@ class StudentAcceptanceConfirm extends Component
     private function loadAvailableBillings()
     {
         // Get fee categories based on student's unit and domicile
-        $query = FeeCategory::query();
+        $query = FeeCategory::query()->where('is_active', true);
 
         // Filter by student's residence status (domicile)
         $query->where(function ($q) {

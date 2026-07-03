@@ -34,6 +34,9 @@ class GenerateRecurringBillings extends Command
         $lastDayOfMonth = now()->daysInMonth;
         
         $feeMasters = \App\Models\FeeMaster::where('is_active', true)
+            ->whereHas('category', function ($query) {
+                $query->where('is_active', true);
+            })
             ->whereIn('recurrence_type', ['MONTHLY', 'EVERY_6_MONTHS', 'YEARLY'])
             ->get();
 

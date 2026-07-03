@@ -224,7 +224,13 @@ class FeeMasterForm extends Component
 
     public function getFeeCategoriesProperty()
     {
-        return \App\Models\FeeCategory::orderBy('name')->get();
+        return \App\Models\FeeCategory::query()
+            ->where('is_active', true)
+            ->when($this->isEdit && $this->feeMaster?->fee_category_id, function ($query) {
+                $query->orWhere('id', $this->feeMaster->fee_category_id);
+            })
+            ->orderBy('name')
+            ->get();
     }
 
     public function getClassLevelsProperty()

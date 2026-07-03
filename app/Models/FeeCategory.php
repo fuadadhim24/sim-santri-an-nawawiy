@@ -20,11 +20,17 @@ class FeeCategory extends Model
         'unit_target',
         'domicile_target',
         'description',
+        'is_active',
     ];
 
     protected $casts = [
         'is_locked' => 'boolean',
         'can_generate_before_acceptance' => 'boolean',
+        'is_active' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'is_active' => true,
     ];
 
     protected static function booted(): void
@@ -90,6 +96,7 @@ class FeeCategory extends Model
             'is_locked' => ['boolean'],
             'activation_mode' => ['required', 'in:' . implode(',', ActivationMode::values())],
             'can_generate_before_acceptance' => ['boolean'],
+            'is_active' => ['boolean'],
         ];
     }
 }

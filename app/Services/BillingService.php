@@ -421,6 +421,7 @@ class BillingService
         DB::transaction(function () use ($student, &$count) {
             // Get all fee categories that can be generated after acceptance
             $feeCategories = FeeCategory::where('can_generate_before_acceptance', false)
+                ->where('is_active', true)
                 ->where('is_locked', false)
                 ->whereNotIn('activation_mode', ['MANUAL_ONLY'])
                 ->get();
@@ -473,6 +474,7 @@ class BillingService
         DB::transaction(function () use ($student, $feeCategoryIds, &$count) {
             // Get only the selected fee categories
             $feeCategories = FeeCategory::whereIn('id', $feeCategoryIds)
+                ->where('is_active', true)
                 ->where('is_locked', false)
                 ->get();
 

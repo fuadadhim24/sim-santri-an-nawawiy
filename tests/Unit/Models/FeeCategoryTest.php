@@ -51,4 +51,18 @@ class FeeCategoryTest extends TestCase
 
         $this->assertDatabaseMissing('fee_categories', ['id' => $category->id]);
     }
+
+    /**
+     * Test fee category default is_active status
+     */
+    public function test_fee_category_default_is_active()
+    {
+        $category = FeeCategory::create([
+            'name' => 'Biaya Makan',
+            'code' => 'MAKAN',
+            'description' => 'Biaya makan santri',
+        ]);
+
+        $this->assertTrue($category->is_active);
+    }
 }

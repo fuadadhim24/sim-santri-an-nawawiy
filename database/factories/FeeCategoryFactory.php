@@ -17,6 +17,7 @@ class FeeCategoryFactory extends Factory
             'is_locked' => false,
             'activation_mode' => 'multi_active',
             'can_generate_before_acceptance' => true,
+            'is_active' => true,
         ];
     }
 }

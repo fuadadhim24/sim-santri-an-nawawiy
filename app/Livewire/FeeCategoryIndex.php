@@ -20,8 +20,23 @@ class FeeCategoryIndex extends Component
     public function delete($id)
     {
         $category = FeeCategory::findOrFail($id);
-        $category->delete();
-        session()->flash('message', 'Kategori biaya berhasil dihapus.');
+
+        if ($category->is_locked) {
+            session()->flash('error', 'Kategori ini terkunci dan tidak dapat dihapus.');
+            return;
+        }
+
+        if ($category->fees()->exists()) {
+            session()->flash('error', "Kategori '{$category->name}' tidak dapat dihapus karena masih digunakan oleh data master biaya. Silakan non-aktifkan kategori ini.");
+            return;
+        }
+
+        try {
+            $category->delete();
+            session()->flash('message', 'Kategori biaya berhasil dihapus.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menghapus kategori: ' . $e->getMessage());
+        }
     }
 
     public function render()

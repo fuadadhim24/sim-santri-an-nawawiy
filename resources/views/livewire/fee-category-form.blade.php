@@ -77,6 +77,62 @@
                     @enderror
                 </div>
 
+                <!-- Is Active -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input wire:model.live="is_active" type="checkbox" id="is_active"
+                            class="h-4 w-4 text-primary focus:ring-ring border-input rounded">
+                    </div>
+                    <div class="ml-3">
+                        <label for="is_active" class="block text-sm font-medium text-foreground">Status Aktif</label>
+                        <p class="mt-1 text-xs text-muted-foreground">Jika dicentang, kategori ini aktif dan dapat dipilih saat membuat master biaya.</p>
+                    </div>
+                    @error('is_active')
+                        <span class="text-destructive text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Restore Fees Option & Financial Impact Info -->
+                @if($showRestoreOption && $is_active)
+                    <div class="p-4 bg-amber-50/50 border border-amber-200 rounded-md space-y-3">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input wire:model="restore_fees" type="checkbox" id="restore_fees"
+                                    class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-input rounded">
+                            </div>
+                            <div class="ml-3 font-semibold text-amber-800 text-sm">
+                                <label for="restore_fees">
+                                    Pulihkan dan Aktifkan Kembali Master Biaya Terkait
+                                </label>
+                                <p class="mt-1 text-xs text-amber-700 font-normal">
+                                    Ditemukan {{ count($archivedFees) }} master biaya yang sebelumnya diarsipkan ketika kategori ini dinonaktifkan.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pl-7">
+                            <p class="text-xs font-semibold text-amber-800 mb-1">Daftar biaya yang akan pulih:</p>
+                            <ul class="list-disc list-inside text-xs text-amber-700 space-y-1">
+                                @foreach($archivedFees as $fee)
+                                    <li>{{ $fee['item_name'] }} - Rp {{ number_format($fee['amount'], 0, ',', '.') }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        
+                        <!-- Pusat Bantuan / Financial Impact Warning -->
+                        <div class="pl-7 pt-2 border-t border-amber-200/50 text-xs text-amber-800 space-y-1">
+                            <span class="font-bold flex items-center">
+                                <svg class="w-3.5 h-3.5 mr-1 text-amber-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                                Info Dampak Tagihan:
+                            </span>
+                            <p class="text-amber-700">
+                                Mengaktifkan kembali kategori ini hanya akan men-generate tagihan untuk bulan/periode berjalan saat ini dan masa depan. Tagihan pada bulan-bulan lalu saat kategori ini nonaktif <strong>TIDAK</strong> akan otomatis dibuat kembali (aman dari penumpukan tagihan mendadak).
+                            </p>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.fee-categories') }}"
                         class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">

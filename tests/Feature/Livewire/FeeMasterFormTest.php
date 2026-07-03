@@ -134,4 +134,17 @@ class FeeMasterFormTest extends TestCase
             'fee_master_id' => $feeMaster->id
         ]);
     }
+
+    public function test_only_active_categories_are_shown_in_form()
+    {
+        $activeCategory = FeeCategory::create(['name' => 'Active Category', 'code' => 'ACTIVE_CAT', 'is_active' => true]);
+        $inactiveCategory = FeeCategory::create(['name' => 'Inactive Category', 'code' => 'INACTIVE_CAT', 'is_active' => false]);
+
+        Livewire::actingAs($this->admin)
+            ->test(FeeMasterForm::class)
+            ->assertSet('feeCategories', function ($categories) use ($activeCategory, $inactiveCategory) {
+                return $categories->contains('id', $activeCategory->id) 
+                    && !$categories->contains('id', $inactiveCategory->id);
+            });
+    }
 }

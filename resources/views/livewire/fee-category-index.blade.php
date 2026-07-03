@@ -22,6 +22,12 @@
             </div>
         @endif
 
+        @if (session()->has('error'))
+            <div class="p-4 mx-6 mt-4 bg-red-100 text-red-700 rounded-md">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">
@@ -31,6 +37,7 @@
                         <th class="px-6 py-3">Mode Aktivasi</th>
                         <th class="px-6 py-3 text-center">Kunci</th>
                         <th class="px-6 py-3 text-center">Sebelum Diterima</th>
+                        <th class="px-6 py-3 text-center">Status</th>
                         <th class="px-6 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -77,6 +84,17 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center">
+                                @if($category->is_active)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        Non-aktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center space-x-3">
                                     <a href="{{ route('admin.fee-categories.edit', $category->id) }}"
                                         class="text-primary hover:text-primary/80 font-medium">Edit</a>
@@ -88,11 +106,11 @@
                                         <span class="text-muted-foreground text-xs">Terkunci</span>
                                     @endif
                                 </div>
-                            </td>
+                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-muted-foreground">
+                            <td colspan="7" class="px-6 py-8 text-center text-muted-foreground">
                                 Tidak ada kategori ditemukan.
                             </td>
                         </tr>
