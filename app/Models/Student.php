@@ -294,7 +294,7 @@ class Student extends Model
 
     public function isActive(): bool
     {
-        return $this->status === 'ACTIVE';
+        return $this->status === 'ACTIVE' || $this->status === \App\Enums\StudentStatus::ACCEPTED->value;
     }
 
     public function hasJoined(): bool

@@ -90,12 +90,10 @@ class BillingForm extends Component
             $student = Student::findOrFail($this->student_id);
             $feeMaster = FeeMaster::findOrFail($this->fee_master_id);
 
-            // Check if student is active
-            if ($student->status !== 'ACTIVE') {
+            if ($student->status !== 'ACTIVE' && $student->status !== \App\Enums\StudentStatus::ACCEPTED->value) {
                 throw new \Exception("Tidak bisa membuat tagihan. Status santri: {$student->status}. Hanya santri ACTIVE yang dapat ditagih.");
             }
 
-            // Check if student already has a billing for this specific fee master
             $existingBilling = Billing::where('student_id', $student->id)
                 ->where('fee_master_id', $this->fee_master_id)
                 ->where('status', '!=', 'VOID')
@@ -105,7 +103,6 @@ class BillingForm extends Component
                 throw new \Exception('Tagihan untuk jenis biaya ini sudah ada untuk santri tersebut. Tidak bisa membuat duplikat.');
             }
 
-            // Create price snapshot for auditing
             $priceSnapshot = [
                 [
                     'item_name' => $this->title,
@@ -114,7 +111,6 @@ class BillingForm extends Component
                 ]
             ];
 
-            // Defensive final amount check
             $finalAmount = max(0, (float)$this->original_amount - (float)$this->discount_applied);
 
             $billing = Billing::create([

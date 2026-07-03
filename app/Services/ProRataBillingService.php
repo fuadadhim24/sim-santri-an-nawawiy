@@ -50,11 +50,9 @@ class ProRataBillingService
                 throw new Exception('Data santri tidak valid.');
             }
 
-            // Determine effective billing period based on student's join/left dates
             $effectiveStart = $this->getEffectiveStartDate($student, $periodStart);
             $effectiveEnd = $this->getEffectiveEndDate($student, $periodEnd);
 
-            // Calculate days the student is responsible for
             $totalDays = $periodStart->diffInDays($periodEnd) + 1;
             $activeDays = max(0, $effectiveStart->diffInDays($effectiveEnd) + 1);
 
@@ -114,7 +112,6 @@ class ProRataBillingService
      */
     private function getEffectiveStartDate(Student $student, Carbon $periodStart): Carbon
     {
-        // If student joined after period starts, charge from join date
         if ($student->joined_at && $student->joined_at->gt($periodStart)) {
             return $student->joined_at->startOfDay();
         }
@@ -127,7 +124,6 @@ class ProRataBillingService
      */
     private function getEffectiveEndDate(Student $student, Carbon $periodEnd): Carbon
     {
-        // If student left before period ends, charge until left date
         if ($student->left_at && $student->left_at->lt($periodEnd)) {
             return $student->left_at->startOfDay();
         }
@@ -141,7 +137,6 @@ class ProRataBillingService
      */
     private function shouldBeFreeBilling(Student $student, Carbon $periodStart, Carbon $periodEnd): bool
     {
-        // Get attendance records for the period
         $attendanceData = DB::table('attendances')
             ->where('student_id', $student->id)
             ->whereBetween('date', [$periodStart, $periodEnd])
@@ -151,7 +146,6 @@ class ProRataBillingService
         $totalDays = $periodStart->diffInDays($periodEnd) + 1;
         $absentDays = $attendanceData;
 
-        // Free jika absen >15 hari dalam bulan
         return $absentDays > 15;
     }
 
@@ -170,12 +164,10 @@ class ProRataBillingService
         $periodStart = $periodStart ?? now()->startOfMonth();
         $periodEnd = $periodEnd ?? now()->endOfMonth();
 
-        // Validate before creating billing
-        if ($student->status !== 'ACTIVE') {
+        if ($student->status !== 'ACTIVE' && $student->status !== \App\Enums\StudentStatus::ACCEPTED->value) {
             throw new Exception("Hanya santri ACTIVE yang dapat ditagih");
         }
 
-        // Calculate pro-rata
         $calculation = $this->calculateProRataAmount(
             $student,
             $monthlyAmount,
@@ -184,10 +176,9 @@ class ProRataBillingService
         );
 
         $originalAmount = $calculation['amount'];
-        $discountAmount = min($discount ?? 0, $originalAmount); // Prevent negative
+        $discountAmount = min($discount ?? 0, $originalAmount); 
         $finalAmount = max(0, $originalAmount - $discountAmount);
 
-        // Use transaction for atomicity
         return DB::transaction(function () use (
             $student,
             $feeMasterId,
@@ -222,7 +213,6 @@ class ProRataBillingService
                 ]),
             ]);
 
-            // Log untuk audit trail
             Log::info('Pro-rata billing created', [
                 'billing_id' => $billing->id,
                 'student_id' => $student->id,

@@ -28,15 +28,13 @@ class EnhancedBillingService
         ?\DateTimeInterface $billingPeriodStart = null,
         ?\DateTimeInterface $billingPeriodEnd = null
     ) {
-        // 1. VALIDATION: Student must be ACTIVE
-        if ($student->status !== 'ACTIVE') {
+        if ($student->status !== 'ACTIVE' && $student->status !== \App\Enums\StudentStatus::ACCEPTED->value) {
             throw new Exception(
                 "Tidak bisa membuat tagihan. Status santri: {$student->status}. " .
                 "Hanya santri ACTIVE yang dapat ditagih."
             );
         }
 
-        // 2. VALIDATION: Check if student joined before billing period
         if ($billingPeriodStart && $student->joined_at && $student->joined_at->gt($billingPeriodStart)) {
             throw new Exception(
                 "Tidak bisa membuat tagihan untuk periode {$billingPeriodStart->format('M Y')}. " .
@@ -44,7 +42,6 @@ class EnhancedBillingService
             );
         }
 
-        // 3. VALIDATION: Check if student already graduated/left during period
         if ($billingPeriodEnd && $student->left_at && $student->left_at->lt($billingPeriodEnd)) {
             throw new Exception(
                 "Tidak bisa membuat tagihan untuk periode setelah santri keluar " .
@@ -52,13 +49,11 @@ class EnhancedBillingService
             );
         }
 
-        // 4. FIND FEE CATEGORY
         $category = FeeCategory::find($feeCategoryId);
         if (!$category) {
             return null;
         }
 
-        // 4.5 CHECK FOR DUPLICATE BILLING
         $existingBilling = Billing::where('student_id', $student->id)
             ->whereHas('feeMaster', function ($q) use ($feeCategoryId) {
                 $q->where('fee_category_id', $feeCategoryId);
@@ -70,7 +65,6 @@ class EnhancedBillingService
             throw new Exception('Tagihan untuk biaya ini sudah ada untuk santri. Tidak bisa membuat duplikat.');
         }
 
-        // 5. QUERY FEE MASTERS with targeting
         $query = FeeMaster::where('fee_category_id', $feeCategoryId)
             ->where('is_active', true)
             ->where(function ($q) use ($student) {
@@ -92,13 +86,11 @@ class EnhancedBillingService
             throw new Exception("Tidak ada biaya yang sesuai untuk santri ini.");
         }
 
-        // 6. ATOMIC TRANSACTION - Prevent race conditions
         return DB::transaction(function () use ($student, $category, $fees, $title) {
             $totalOriginalAmount = 0;
             $totalDiscount = 0;
-            $priceSnapshot = []; // SNAPSHOT prices at billing time
+            $priceSnapshot = [];
 
-            // Collect price snapshots
             foreach ($fees as $fee) {
                 $priceSnapshot[] = [
                     'item_name' => $fee->item_name,
@@ -108,7 +100,6 @@ class EnhancedBillingService
                 $totalOriginalAmount += $fee->amount;
             }
 
-            // 7. CALCULATE DISCOUNTS (with max 100% cap)
             if ($student->special_status !== 'UMUM') {
                 $feeIds = $fees->pluck('id');
                 $discounts = Discount::whereIn('fee_master_id', $feeIds)
@@ -123,7 +114,6 @@ class EnhancedBillingService
                     }
                 }
 
-                // 8. CAP DISCOUNT at 100%
                 if ($totalDiscount > $totalOriginalAmount) {
                     Log::warning('Discount capped at 100%', [
                         'student_id' => $student->id,
@@ -136,7 +126,6 @@ class EnhancedBillingService
 
             $finalAmount = $totalOriginalAmount - $totalDiscount;
 
-            // 9. CREATE BILLING with IMMUTABLE price snapshot
             $billing = Billing::create([
                 'student_id' => $student->id,
                 'fee_master_id' => $fees->first()->id,
@@ -145,7 +134,7 @@ class EnhancedBillingService
                 'discount_applied' => $totalDiscount,
                 'final_amount' => $finalAmount,
                 'status' => 'UNPAID',
-                'price_snapshot' => json_encode($priceSnapshot), // IMMUTABLE SNAPSHOT
+                'price_snapshot' => json_encode($priceSnapshot), 
             ]);
 
             Log::info('Billing created securely', [
@@ -191,7 +180,7 @@ class EnhancedBillingService
                 ->where('status', 'UNPAID')
                 ->exists();
 
-            if ($activeBillings && $newStatus !== 'ACTIVE') {
+            if ($activeBillings && $newStatus !== 'ACTIVE' && $newStatus !== \App\Enums\StudentStatus::ACCEPTED->value) {
                 throw new Exception(
                     "Tidak dapat mengubah status santri saat masih ada tagihan aktif. " .
                     "Lunasi semua tagihan terlebih dahulu."
