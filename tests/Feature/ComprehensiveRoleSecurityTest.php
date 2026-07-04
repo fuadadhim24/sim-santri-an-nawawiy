@@ -529,4 +529,64 @@ class ComprehensiveRoleSecurityTest extends TestCase
 
         $this->assertTrue(\Illuminate\Support\Facades\Hash::check('newpassword123', $user->fresh()->password));
     }
+
+    /** @test */
+    public function admin_can_create_new_guardian_via_form()
+    {
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
+
+        Livewire::actingAs($admin)
+            ->test('GuardianForm')
+            ->set('full_name', 'Budi Santoso')
+            ->set('whatsapp', '089988776655')
+            ->set('email', 'budi.santoso@example.com')
+            ->set('password', 'password123')
+            ->set('address', 'Jalan Raya Kebon Jeruk No 12')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Budi Santoso',
+            'email' => 'budi.santoso@example.com',
+            'whatsapp' => '089988776655',
+            'role' => 'WALI_SANTRI',
+        ]);
+
+        $this->assertDatabaseHas('guardians', [
+            'full_name' => 'Budi Santoso',
+            'whatsapp' => '089988776655',
+            'address' => 'Jalan Raya Kebon Jeruk No 12',
+        ]);
+    }
+
+    /** @test */
+    public function admin_can_edit_and_accept_student_on_acceptance_confirm_page()
+    {
+        $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
+        $student = Student::factory()->create([
+            'full_name' => 'Original Name',
+            'nisn' => '1234567890',
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
+            'is_active' => false,
+        ]);
+
+        Livewire::actingAs($admin)
+            ->test('StudentAcceptanceConfirm', ['student' => $student])
+            ->set('full_name', 'Updated Name')
+            ->set('nisn', '0987654321')
+            ->set('unit_code', '02')
+            ->set('residence_status', 'NON_MONDOK')
+            ->call('confirmAcceptance')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'full_name' => 'Updated Name',
+            'nisn' => '0987654321',
+            'unit_code' => '02',
+            'residence_status' => 'NON_MONDOK',
+            'is_active' => true,
+        ]);
+    }
 }

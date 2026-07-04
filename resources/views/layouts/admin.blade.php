@@ -482,7 +482,26 @@
                             </div>
                         </div>
                     </div>
-                @elseif(request()->routeIs('admin.students*') || request()->routeIs('admin.student-acceptance*'))
+                @elseif(request()->routeIs('admin.student-acceptance*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Penerimaan Santri</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk memvalidasi dan menerima pendaftaran santri baru.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Syarat Menekan Tombol Terima</span>
+                                <p class="text-xs text-muted-foreground">Tombol <strong>Terima Santri</strong> akan dalam kondisi redup/terkunci jika proses validasi belum selesai. Anda diwajibkan mengklik tombol <strong>Validasi</strong> pada semua baris dokumen fisik (KK, Akta, dll) di kolom tengah sebelum dapat menerima santri.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Edit Data Santri</span>
+                                <p class="text-xs text-muted-foreground">Gunakan tombol <strong>Buka & Edit</strong> di kiri jika Anda menemukan kesalahan ejaan/NISN pada formulir pendaftaran saat mencocokkannya dengan dokumen fisik.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Generate Tagihan Otomatis</span>
+                                <p class="text-xs text-muted-foreground">Kategori tagihan yang tampil di kolom kanan telah difilter otomatis oleh sistem sesuai dengan Unit (SMP/SMA/PPTQ) dan Domisili santri tersebut. Tagihan yang dicentang akan langsung diterbitkan saat Anda menekan tombol Terima Santri.</p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.students*'))
                     <div>
                         <h4 class="font-semibold text-primary mb-2">Panduan Kelola Santri</h4>
                         <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola data santri pesantren.</p>

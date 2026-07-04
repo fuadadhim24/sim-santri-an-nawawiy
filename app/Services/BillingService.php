@@ -145,6 +145,14 @@ class BillingService
         if ($category->isManualOnly()) {
             throw new Exception("Tagihan kategori {$category->name} hanya dapat dibuat secara manual melalui antarmuka admin.");
         }
+
+        if ($category->unit_target && $category->unit_target !== $student->unit_code) {
+            throw new Exception("Kategori {$category->name} diperuntukkan bagi unit {$category->unit_target}, sementara siswa berada di unit {$student->unit_code}.");
+        }
+
+        if ($category->domicile_target && $category->domicile_target !== $student->residence_status) {
+            throw new Exception("Kategori {$category->name} diperuntukkan bagi domisili {$category->domicile_target}, sementara siswa berstatus {$student->residence_status}.");
+        }
     }
 
     /**
@@ -424,6 +432,14 @@ class BillingService
                 ->where('is_active', true)
                 ->where('is_locked', false)
                 ->whereNotIn('activation_mode', ['MANUAL_ONLY'])
+                ->where(function ($q) use ($student) {
+                    $q->where('unit_target', $student->unit_code)
+                      ->orWhereNull('unit_target');
+                })
+                ->where(function ($q) use ($student) {
+                    $q->where('domicile_target', $student->residence_status)
+                      ->orWhereNull('domicile_target');
+                })
                 ->get();
 
             foreach ($feeCategories as $category) {
@@ -476,6 +492,14 @@ class BillingService
             $feeCategories = FeeCategory::whereIn('id', $feeCategoryIds)
                 ->where('is_active', true)
                 ->where('is_locked', false)
+                ->where(function ($q) use ($student) {
+                    $q->where('unit_target', $student->unit_code)
+                      ->orWhereNull('unit_target');
+                })
+                ->where(function ($q) use ($student) {
+                    $q->where('domicile_target', $student->residence_status)
+                      ->orWhereNull('domicile_target');
+                })
                 ->get();
 
             foreach ($feeCategories as $category) {

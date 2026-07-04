@@ -20,7 +20,7 @@
                         <!-- NISN Input (Edit mode side-by-side with NIS if desired, but let's just use standard flow) -->
                         <div>
                             <label for="nisn" class="block text-sm font-medium text-foreground">NISN <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
-                            <input wire:model="nisn" type="text" id="nisn" placeholder="Masukkan NISN (opsional)"
+                            <input wire:model="nisn" type="text" id="nisn" placeholder="Contoh: 0123456789 (10 digit)" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             @error('nisn')
                                 <span class="text-destructive text-sm">{{ $message }}</span>
@@ -31,7 +31,7 @@
                     <!-- NISN Input (Create mode) -->
                     <div>
                         <label for="nisn" class="block text-sm font-medium text-foreground">NISN <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
-                        <input wire:model="nisn" type="text" id="nisn" placeholder="Masukkan NISN (opsional)"
+                        <input wire:model="nisn" type="text" id="nisn" placeholder="Contoh: 0123456789 (10 digit)" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('nisn')
                             <span class="text-destructive text-sm">{{ $message }}</span>
@@ -130,6 +130,108 @@
                     @error('address')
                         <span class="text-destructive text-sm">{{ $message }}</span>
                     @enderror
+                </div>
+
+                <!-- Document Upload Section -->
+                <div class="border-t border-border pt-6 mt-6">
+                    <h4 class="text-sm font-semibold text-foreground mb-4 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Berkas Dokumen Pendukung
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Kartu Keluarga (KK) -->
+                        <div class="space-y-1.5">
+                            <label for="kk_file" class="block text-xs font-semibold text-foreground flex justify-between items-center">
+                                <span>Kartu Keluarga (KK) <span class="text-red-500">*</span></span>
+                                @if($isEdit && $student->kk)
+                                    <a href="{{ asset('storage/' . $student->kk) }}" target="_blank" class="text-primary hover:underline text-[10px] flex items-center">
+                                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        Lihat Berkas saat ini
+                                    </a>
+                                @endif
+                            </label>
+                            <input type="file" wire:model="kk_file" id="kk_file" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
+                            @error('kk_file')
+                                <span class="text-destructive text-[11px] mt-0.5 block font-medium">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Foto Santri -->
+                        <div class="space-y-1.5">
+                            <label for="foto_file" class="block text-xs font-semibold text-foreground flex justify-between items-center">
+                                <span>Pas Foto <span class="text-red-500">*</span></span>
+                                @if($isEdit && $student->foto)
+                                    <a href="{{ asset('storage/' . $student->foto) }}" target="_blank" class="text-primary hover:underline text-[10px] flex items-center">
+                                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        Lihat Berkas saat ini
+                                    </a>
+                                @endif
+                            </label>
+                            <input type="file" wire:model="foto_file" id="foto_file" accept=".jpg,.jpeg,.png,.webp"
+                                class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
+                            @error('foto_file')
+                                <span class="text-destructive text-[11px] mt-0.5 block font-medium">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Akta Kelahiran -->
+                        <div class="space-y-1.5">
+                            <label for="akta_file" class="block text-xs font-semibold text-foreground flex justify-between items-center">
+                                <span>Akta Kelahiran <span class="text-red-500">*</span></span>
+                                @if($isEdit && $student->akta)
+                                    <a href="{{ asset('storage/' . $student->akta) }}" target="_blank" class="text-primary hover:underline text-[10px] flex items-center">
+                                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        Lihat Berkas saat ini
+                                    </a>
+                                @endif
+                            </label>
+                            <input type="file" wire:model="akta_file" id="akta_file" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
+                            @error('akta_file')
+                                <span class="text-destructive text-[11px] mt-0.5 block font-medium">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Ijazah Terakhir -->
+                        <div class="space-y-1.5">
+                            <label for="ijazah_file" class="block text-xs font-semibold text-foreground flex justify-between items-center">
+                                <span>Ijazah Terakhir <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></span>
+                                @if($isEdit && $student->ijazah)
+                                    <a href="{{ asset('storage/' . $student->ijazah) }}" target="_blank" class="text-primary hover:underline text-[10px] flex items-center">
+                                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        Lihat Berkas saat ini
+                                    </a>
+                                @endif
+                            </label>
+                            <input type="file" wire:model="ijazah_file" id="ijazah_file" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
+                            @error('ijazah_file')
+                                <span class="text-destructive text-[11px] mt-0.5 block font-medium">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Dokumen NISN -->
+                        <div class="space-y-1.5">
+                            <label for="nisn_document_file" class="block text-xs font-semibold text-foreground flex justify-between items-center">
+                                <span>Dokumen NISN <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></span>
+                                @if($isEdit && $student->nisn_document)
+                                    <a href="{{ asset('storage/' . $student->nisn_document) }}" target="_blank" class="text-primary hover:underline text-[10px] flex items-center">
+                                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        Lihat Berkas saat ini
+                                    </a>
+                                @endif
+                            </label>
+                            <input type="file" wire:model="nisn_document_file" id="nisn_document_file" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
+                            @error('nisn_document_file')
+                                <span class="text-destructive text-[11px] mt-0.5 block font-medium">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 @if (!$isEdit && $this->matchingFeeMasters->isNotEmpty())

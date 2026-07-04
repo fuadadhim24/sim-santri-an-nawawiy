@@ -3,198 +3,459 @@
         Konfirmasi Penerimaan Santri
     </x-slot>
 
-    <div class="max-w-4xl">
-        <!-- Back Button -->
-        <div class="mb-8">
-            <a href="{{ route('admin.student-acceptance') }}" class="text-primary hover:text-primary/80 text-sm font-medium mb-4 inline-flex items-center gap-2">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" x-data='{ 
+        isEditing: false,
+        verified: [],
+        totalRequired: 5,
+        toggleAll() {
+            if (this.verified.length === this.totalRequired) {
+                this.verified = [];
+            } else {
+                this.verified = ["kk", "akta", "ijazah", "nisn_document", "foto"];
+            }
+        },
+        toggleVerify(doc) {
+            if (this.verified.includes(doc)) {
+                this.verified = this.verified.filter(item => item !== doc);
+            } else {
+                this.verified.push(doc);
+            }
+        }
+    }'>
+        <!-- Header Actions (Back & Submit) -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <a href="{{ route('admin.student-acceptance') }}" class="text-primary hover:text-primary/80 text-sm font-medium inline-flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
                 Kembali ke Daftar Penerimaan
             </a>
+
+            <div class="flex items-center gap-3">
+                <button type="button" 
+                        wire:click="rejectAcceptance"
+                        onclick="confirm('Apakah Anda yakin ingin MENOLAK pendaftaran santri ini?') || event.stopImmediatePropagation()"
+                        class="inline-flex justify-center items-center px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg text-xs font-semibold hover:bg-destructive hover:text-destructive-foreground transition-all shadow-sm">
+                    Tolak
+                </button>
+                <button type="button" 
+                        @click="if(verified.length !== totalRequired) { Swal.fire({icon: 'warning', title: 'Validasi Belum Lengkap', text: 'Harap selesaikan proses validasi (centang) semua berkas fisik terlebih dahulu sebelum menerima santri.'}) } else { $wire.confirmAcceptance() }"
+                        :class="{'opacity-50 cursor-not-allowed': verified.length !== totalRequired}"
+                        wire:loading.attr="disabled" wire:target="confirmAcceptance, rejectAcceptance"
+                        class="inline-flex justify-center items-center px-6 py-2 bg-primary text-primary-foreground text-sm rounded-lg font-bold hover:bg-primary/90 transition-all shadow-sm">
+                    <svg wire:loading wire:target="confirmAcceptance" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span wire:loading.remove wire:target="confirmAcceptance">Terima Santri</span>
+                    <span wire:loading wire:target="confirmAcceptance">Proses...</span>
+                </button>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Student Info Card -->
-            <div class="lg:col-span-1">
-                <div class="bg-card rounded-lg shadow-sm border border-border p-6">
-                    <h2 class="text-lg font-semibold text-card-foreground mb-4">Data Santri</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <p class="text-sm text-muted-foreground font-medium">Nama</p>
-                            <p class="font-semibold text-foreground mt-1">{{ $student->full_name }}</p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+            <!-- Kolom 1: Data Santri & Koreksi (Kiri) -->
+            <div class="flex flex-col space-y-6">
+                <div class="bg-card rounded-xl shadow-sm border border-border overflow-hidden flex flex-col h-full max-h-[600px] overflow-y-auto">
+                    <div class="border-b border-border bg-muted/30 px-5 py-4">
+                        <div class="flex items-center justify-between w-full">
+                            <h2 class="text-base font-semibold text-card-foreground flex items-center gap-2">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                Data Santri
+                            </h2>
+                            <button @click="isEditing = !isEditing" type="button" class="text-[10px] font-bold px-2 py-1.5 rounded-md bg-background border border-border shadow-sm text-muted-foreground flex items-center gap-1 hover:bg-muted transition-colors">
+                                <svg x-show="!isEditing" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                <svg x-show="isEditing" style="display: none;" class="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                                <span x-text="isEditing ? 'Tutup Edit' : 'Buka & Edit'"></span>
+                            </button>
                         </div>
-                        <div class="border-t border-border pt-3">
-                            <p class="text-sm text-muted-foreground font-medium">No. Pendaftaran</p>
-                            <p class="font-semibold text-foreground mt-1">{{ $student->registration_number ?? '-' }}</p>
-                        </div>
-                        <div class="border-t border-border pt-3">
-                            <p class="text-sm text-muted-foreground font-medium">Unit</p>
-                            <p class="font-semibold text-foreground mt-1">
-                                @switch($student->unit_code)
-                                    @case('01') SMP @break
-                                    @case('02') SMA @break
-                                    @case('03') PPTQ @break
-                                    @default -
-                                @endswitch
-                            </p>
-                        </div>
-                        <div class="border-t border-border pt-3">
-                            <p class="text-sm text-muted-foreground font-medium">Domisili</p>
-                            <p class="font-semibold text-foreground mt-1">
-                                @switch($student->residence_status)
-                                    @case('MONDOK') Mondok @break
-                                    @case('NON_MONDOK') Non-Mondok @break
-                                    @case('NGAJI_ONLY') Ngaji Only @break
-                                    @default -
-                                @endswitch
-                            </p>
-                        </div>
-                        <div class="border-t border-border pt-3">
-                            <p class="text-sm text-muted-foreground font-medium">Penjaga</p>
-                            <p class="font-semibold text-foreground mt-1">{{ $student->guardian?->full_name ?? '-' }}</p>
-                        </div>
-                        <div class="border-t border-border pt-3">
-                            <p class="text-sm text-muted-foreground font-medium">Jadwal SPMB</p>
-                            <p class="font-semibold text-foreground mt-1">{{ $student->spmbSchedule?->name ?? '-' }}</p>
-                        </div>
-                        <div class="border-t border-border pt-3">
-                            <p class="text-sm text-muted-foreground font-medium mb-2">Dokumen Lampiran</p>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center text-xs">
-                                    <span class="text-muted-foreground">Kartu Keluarga (KK)</span>
-                                    @if ($student->kk)
-                                        <a href="{{ $student->kk_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
-                                    @else
-                                        <span class="text-gray-400">Belum Ada</span>
-                                    @endif
+                    </div>
+                    <div class="p-5" x-data="{
+                            full_name: @entangle('full_name'),
+                            nisn: @entangle('nisn'),
+                            unit_code: @entangle('unit_code'),
+                            residence_status: @entangle('residence_status'),
+                            spmb_schedule_id: @entangle('spmb_schedule_id')
+                        }">
+                        
+                        @if (session()->has('success_field'))
+                            <div class="p-3 mb-4 text-xs text-green-800 bg-green-100 border border-green-200 rounded-lg flex items-center shadow-sm">
+                                <svg class="w-4 h-4 mr-2 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>{{ session('success_field') }}</span>
+                            </div>
+                        @endif
+
+                        <!-- View Mode (Locked) -->
+                        <div x-show="!isEditing" class="space-y-4">
+                            <div>
+                                <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Nama Lengkap</label>
+                                <p class="font-semibold text-foreground text-sm border-b border-dashed border-border pb-1" x-text="full_name || '-'"></p>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">NISN</label>
+                                <p class="font-mono text-foreground text-sm border-b border-dashed border-border pb-1" x-text="nisn || '-'"></p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Unit</label>
+                                    <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
+                                        <span x-text="unit_code === '01' ? 'SMP' : (unit_code === '02' ? 'SMA' : 'PPTQ')"></span>
+                                    </p>
                                 </div>
-                                <div class="flex justify-between items-center text-xs">
-                                    <span class="text-muted-foreground">Akta Kelahiran</span>
-                                    @if ($student->akta)
-                                        <a href="{{ $student->akta_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
-                                    @else
-                                        <span class="text-gray-400">Belum Ada</span>
-                                    @endif
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Domisili</label>
+                                    <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
+                                        <span x-text="residence_status === 'MONDOK' ? 'Mondok' : (residence_status === 'NON_MONDOK' ? 'Non-Mondok' : 'Ngaji Only')"></span>
+                                    </p>
                                 </div>
-                                <div class="flex justify-between items-center text-xs">
-                                    <span class="text-muted-foreground">Ijazah Terakhir</span>
-                                    @if ($student->ijazah)
-                                        <a href="{{ $student->ijazah_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
-                                    @else
-                                        <span class="text-gray-400">Belum Ada</span>
-                                    @endif
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Jadwal SPMB</label>
+                                <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
+                                    {{ $student->spmbSchedule ? $student->spmbSchedule->name : '-' }}
+                                </p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">No. Pendaftaran</label>
+                                    <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
+                                        {{ $student->registration_number ?? '-' }}
+                                    </p>
                                 </div>
-                                <div class="flex justify-between items-center text-xs">
-                                    <span class="text-muted-foreground">Dokumen NISN</span>
-                                    @if ($student->nisn_document)
-                                        <a href="{{ $student->nisn_document_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
-                                    @else
-                                        <span class="text-gray-400">Belum Ada</span>
-                                    @endif
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Wali Santri</label>
+                                    <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
+                                        {{ $student->guardian?->full_name ?? '-' }}
+                                    </p>
                                 </div>
-                                <div class="flex justify-between items-center text-xs">
-                                    <span class="text-muted-foreground">Pas Foto</span>
-                                    @if ($student->foto)
-                                        <a href="{{ $student->foto_url }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
-                                    @else
-                                        <span class="text-gray-400">Belum Ada</span>
-                                    @endif
+                            </div>
+                        </div>
+
+                        <!-- Edit Mode (Unlocked) -->
+                        <div x-show="isEditing" style="display: none;" class="space-y-4">
+                            <div class="p-2 mb-2 bg-primary/10 border border-primary/20 rounded-md">
+                                <p class="text-[10px] text-primary font-medium flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Silakan edit data sesuai dengan dokumen fisik.
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Nama Lengkap</label>
+                                <input type="text" wire:model="full_name" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                                @error('full_name') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NISN</label>
+                                <input type="text" wire:model="nisn" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="10 digit angka">
+                                @error('nisn') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Unit</label>
+                                    <select wire:model.live="unit_code" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                                        <option value="01">SMP</option>
+                                        <option value="02">SMA</option>
+                                        <option value="03">PPTQ</option>
+                                    </select>
+                                    @error('unit_code') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
                                 </div>
+
+                                <div>
+                                    <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Domisili</label>
+                                    <select wire:model.live="residence_status" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                                        <option value="MONDOK">Mondok</option>
+                                        <option value="NON_MONDOK">Non-Mondok</option>
+                                        <option value="NGAJI_ONLY">Ngaji Only</option>
+                                    </select>
+                                    @error('residence_status') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Jadwal Seleksi SPMB</label>
+                                <select wire:model="spmb_schedule_id" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                                    <option value="">-- Pilih Jadwal --</option>
+                                    @foreach($schedules as $schedule)
+                                        <option value="{{ $schedule->id }}">{{ $schedule->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('spmb_schedule_id') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Billing Selection Card -->
-            <div class="lg:col-span-2">
-                <div class="bg-card rounded-lg shadow-sm border border-border p-6">
-                    <h2 class="text-lg font-semibold text-card-foreground mb-2">
-                        Pilih Tagihan yang Akan Dibuat
-                    </h2>
-                    <p class="text-sm text-muted-foreground mb-6">
-                        Tagihan yang tersedia berdasarkan: <span class="font-semibold text-foreground">Unit dan Domisili</span>
-                    </p>
-
-                    @if (empty($availableBillings))
-                        <div class="p-6 bg-muted/50 border border-border rounded-lg text-center">
-                            <svg class="w-12 h-12 mx-auto text-muted-foreground mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M7.08 6.47A9 9 0 1119.02 19.02M7.08 6.47L5.6 5"></path>
-                            </svg>
-                            <p class="font-semibold text-foreground">Tidak ada tagihan yang tersedia</p>
-                            <p class="text-muted-foreground text-sm mt-2">Tidak ada kategori tagihan yang sesuai dengan unit dan domisili santri ini.</p>
+            <!-- Kolom 2: Verifikasi Berkas Fisik (Tengah) -->
+            <div class="flex flex-col space-y-6">
+                <div class="bg-card rounded-xl shadow-sm border border-border overflow-hidden flex flex-col h-full max-h-[600px]">
+                    <div class="border-b border-border bg-muted/30 px-5 py-4">
+                        <div class="flex items-center justify-between w-full">
+                            <h2 class="text-base font-semibold text-card-foreground flex items-center gap-2">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                Validasi Berkas
+                            </h2>
+                            <button @click="toggleAll()" type="button" class="px-2 py-1 bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-bold rounded-md shadow-sm transition-all focus:ring-2 focus:ring-offset-1 focus:ring-primary flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Centang Semua
+                            </button>
                         </div>
-                    @else
-                        <form wire:submit.prevent="confirmAcceptance">
-                            <!-- Select All Checkbox -->
-                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-border">
-                                <label class="inline-flex items-center text-sm font-semibold text-foreground cursor-pointer select-none">
-                                    <input type="checkbox" 
-                                           wire:click="toggleSelectAll" 
-                                           {{ count($selectedBillings) === count($availableBillings) ? 'checked' : '' }}
-                                           class="rounded border-input text-primary focus:ring-primary mr-2">
-                                    Pilih Semua Tagihan
-                                </label>
-                                <span class="text-xs text-muted-foreground font-medium">
-                                    Terpilih: {{ count($selectedBillings) }} dari {{ count($availableBillings) }}
-                                </span>
-                            </div>
+                    </div>
 
-                            <div class="space-y-3 mb-6">
-                                @foreach ($availableBillings as $billing)
-                                    <label class="flex items-start p-4 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
-                                           :class="{ 'bg-accent/10 border-accent': $selectedBillings.includes({{ $billing['id'] }}) }">
-                                        <input type="checkbox"
-                                               wire:model.live="selectedBillings"
-                                               value="{{ $billing['id'] }}"
-                                               class="mt-1 rounded border-input">
-                                        <div class="ml-3 flex-1">
-                                            <div class="font-semibold text-foreground">{{ $billing['name'] }}</div>
-                                            @if ($billing['description'])
-                                                <p class="text-sm text-muted-foreground mt-1">{{ $billing['description'] }}</p>
-                                            @endif
-                                            <div class="flex gap-2 mt-2 flex-wrap">
-                                                @if ($billing['unit'])
-                                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-primary/10 text-primary">
-                                                        Unit: {{ $billing['unit'] }}
-                                                    </span>
-                                                @endif
-                                                @if ($billing['domicile'])
-                                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-accent/10 text-accent">
-                                                        Domisili: {{ $billing['domicile'] }}
-                                                    </span>
-                                                @endif
+                    <div class="p-5 space-y-3 flex-1 overflow-y-auto">
+                        <!-- KK -->
+                        <div class="p-3 bg-background border border-border rounded-lg flex items-center justify-between hover:border-primary/30 hover:shadow-sm transition-all">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-1.5 bg-blue-50 text-blue-600 rounded-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="text-sm font-semibold text-foreground">Kartu Keluarga</h4>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">Validasi Nama</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                @if($student->kk)
+                                    <a href="{{ $student->kk_url }}" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors" title="Lihat Berkas">
+                                        Lihat
+                                    </a>
+                                @else
+                                    <span class="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-semibold">Fisik</span>
+                                @endif
+                                <button type="button" @click="toggleVerify('kk')" 
+                                    :class="verified.includes('kk') ? 'bg-green-600 text-white border-green-600 shadow-sm' : 'bg-background text-muted-foreground border-border hover:border-green-600 hover:text-green-600'"
+                                    class="border px-2.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center justify-center min-w-[70px]">
+                                    <span x-text="verified.includes('kk') ? 'Sesuai' : 'Validasi'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Akta Kelahiran -->
+                        <div class="p-3 bg-background border border-border rounded-lg flex items-center justify-between hover:border-primary/30 hover:shadow-sm transition-all">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-1.5 bg-pink-50 text-pink-600 rounded-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c0.563-0.186 1-0.701 1-1.303V4.281c0-0.818-0.812-1.428-1.597-1.18L12.5 5.5v15l8.5-4.954zM2.062 19.32L10.5 20.5v-15L2.597 3.101C1.812 2.853 1 3.463 1 4.281v9.962c0 0.602 0.437 1.117 1 1.303l0.062 0.02z"/></svg>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="text-sm font-semibold text-foreground">Akta Kelahiran</h4>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">TTL & Ejaan</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                @if($student->akta)
+                                    <a href="{{ $student->akta_url }}" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-pink-600 bg-pink-50 hover:bg-pink-100 rounded-md transition-colors" title="Lihat Berkas">
+                                        Lihat
+                                    </a>
+                                @else
+                                    <span class="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-semibold">Fisik</span>
+                                @endif
+                                <button type="button" @click="toggleVerify('akta')" 
+                                    :class="verified.includes('akta') ? 'bg-green-600 text-white border-green-600 shadow-sm' : 'bg-background text-muted-foreground border-border hover:border-green-600 hover:text-green-600'"
+                                    class="border px-2.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center justify-center min-w-[70px]">
+                                    <span x-text="verified.includes('akta') ? 'Sesuai' : 'Validasi'"></span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Dokumen NISN -->
+                        <div class="p-3 bg-background border border-border rounded-lg flex items-center justify-between hover:border-primary/30 hover:shadow-sm transition-all">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-1.5 bg-indigo-50 text-indigo-600 rounded-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="text-sm font-semibold text-foreground">Dokumen NISN</h4>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">Validasi NISN</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                @if($student->nisn_document)
+                                    <a href="{{ $student->nisn_document_url }}" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors" title="Lihat Berkas">
+                                        Lihat
+                                    </a>
+                                @else
+                                    <span class="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-semibold">Fisik</span>
+                                @endif
+                                <button type="button" @click="toggleVerify('nisn_document')" 
+                                    :class="verified.includes('nisn_document') ? 'bg-green-600 text-white border-green-600 shadow-sm' : 'bg-background text-muted-foreground border-border hover:border-green-600 hover:text-green-600'"
+                                    class="border px-2.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center justify-center min-w-[70px]">
+                                    <span x-text="verified.includes('nisn_document') ? 'Sesuai' : 'Validasi'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Ijazah Terakhir -->
+                        <div class="p-3 bg-background border border-border rounded-lg flex items-center justify-between hover:border-primary/30 hover:shadow-sm transition-all">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-1.5 bg-purple-50 text-purple-600 rounded-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="text-sm font-semibold text-foreground">Ijazah</h4>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">Asal Sekolah</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                @if($student->ijazah)
+                                    <a href="{{ $student->ijazah_url }}" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-md transition-colors" title="Lihat Berkas">
+                                        Lihat
+                                    </a>
+                                @else
+                                    <span class="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-semibold">Fisik</span>
+                                @endif
+                                <button type="button" @click="toggleVerify('ijazah')" 
+                                    :class="verified.includes('ijazah') ? 'bg-green-600 text-white border-green-600 shadow-sm' : 'bg-background text-muted-foreground border-border hover:border-green-600 hover:text-green-600'"
+                                    class="border px-2.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center justify-center min-w-[70px]">
+                                    <span x-text="verified.includes('ijazah') ? 'Sesuai' : 'Validasi'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pas Foto -->
+                        <div class="p-3 bg-background border border-border rounded-lg flex items-center justify-between hover:border-primary/30 hover:shadow-sm transition-all">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-1.5 bg-yellow-50 text-yellow-600 rounded-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="text-sm font-semibold text-foreground">Pas Foto</h4>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">Kerapian Wajah</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                @if($student->foto)
+                                    <a href="{{ $student->foto_url }}" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-yellow-600 bg-yellow-50 hover:bg-yellow-100 rounded-md transition-colors" title="Lihat Berkas">
+                                        Lihat
+                                    </a>
+                                @else
+                                    <span class="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-semibold">Fisik</span>
+                                @endif
+                                <button type="button" @click="toggleVerify('foto')" 
+                                    :class="verified.includes('foto') ? 'bg-green-600 text-white border-green-600 shadow-sm' : 'bg-background text-muted-foreground border-border hover:border-green-600 hover:text-green-600'"
+                                    class="border px-2.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center justify-center min-w-[70px]">
+                                    <span x-text="verified.includes('foto') ? 'Sesuai' : 'Validasi'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom 3: Pilihan Tagihan & Aksi (Kanan) -->
+            <div class="flex flex-col space-y-6">
+                <div class="bg-card rounded-xl shadow-sm border border-border overflow-hidden flex flex-col h-full max-h-[600px]">
+                    <div class="border-b border-border bg-muted/30 px-5 py-4">
+                        <h2 class="text-base font-semibold text-card-foreground flex items-center gap-2">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Pilih Tagihan
+                        </h2>
+                        <p class="text-xs text-muted-foreground mt-1">Disesuaikan otomatis dengan Unit & Domisili.</p>
+                    </div>
+
+                    <div class="p-5 flex-1 overflow-y-auto">
+                        @if (empty($availableBillings))
+                            <div class="py-8 bg-muted/20 border border-dashed border-border rounded-lg text-center h-full flex flex-col items-center justify-center">
+                                <div class="w-12 h-12 bg-muted/50 rounded-full flex items-center justify-center mb-3">
+                                    <svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M7.08 6.47A9 9 0 1119.02 19.02M7.08 6.47L5.6 5"></path>
+                                    </svg>
+                                </div>
+                                <p class="font-semibold text-sm text-foreground">Tidak ada tagihan</p>
+                                <p class="text-muted-foreground text-xs mt-1">Ganti Unit atau Domisili untuk memuat ulang.</p>
+                            </div>
+                        @else
+                            <form wire:submit.prevent="confirmAcceptance" class="flex flex-col h-full">
+                                <div class="flex items-center justify-between mb-4">
+                                    <label class="inline-flex items-center text-sm font-semibold text-foreground cursor-pointer select-none hover:text-primary transition-colors group">
+                                        <input type="checkbox" 
+                                               wire:click="toggleSelectAll" 
+                                               {{ count($selectedBillings) === count($availableBillings) ? 'checked' : '' }}
+                                               class="rounded border-input text-primary focus:ring-primary mr-2 transition-all group-hover:border-primary">
+                                        Pilih Semua Paket Tagihan
+                                    </label>
+                                    <span class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+                                        {{ count($selectedBillings) }}/{{ count($availableBillings) }}
+                                    </span>
+                                </div>
+
+                                <div class="space-y-4 flex-1">
+                                    @foreach ($availableBillings as $billing)
+                                        <div x-data="{ expanded: false }" class="border border-border rounded-lg hover:border-primary/40 transition-all overflow-hidden"
+                                             :class="{ 'ring-1 ring-primary/20 border-primary shadow-sm': $selectedBillings.includes({{ $billing['id'] }}) }">
+                                            
+                                            <!-- Accordion Header -->
+                                            <div class="flex items-start p-3 bg-background hover:bg-primary/5 transition-colors"
+                                                   :class="{ 'bg-primary/5': $selectedBillings.includes({{ $billing['id'] }}) }">
+                                                <div class="pt-0.5">
+                                                    <input type="checkbox"
+                                                           wire:model.live="selectedBillings"
+                                                           value="{{ $billing['id'] }}"
+                                                           class="rounded border-input text-primary focus:ring-primary transition-all cursor-pointer">
+                                                </div>
+                                                <div class="ml-3 flex-1 cursor-pointer select-none" @click="expanded = !expanded">
+                                                    <div class="flex justify-between items-start">
+                                                        <div>
+                                                            <div class="text-[10px] text-primary font-bold uppercase tracking-wider mb-0.5">Kategori / Paket Tagihan</div>
+                                                            <div class="font-semibold text-sm text-foreground leading-tight">{{ $billing['name'] }}</div>
+                                                        </div>
+                                                        <button type="button" class="text-muted-foreground p-1 hover:bg-muted rounded-md transition-colors" :class="{ 'rotate-180': expanded }">
+                                                            <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div class="text-xs font-medium text-foreground mt-1 font-mono">
+                                                        Total: Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}
+                                                    </div>
+                                                    <div class="flex gap-1.5 mt-2 flex-wrap">
+                                                        @if ($billing['unit'])
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-700">
+                                                                UNIT: {{ $billing['unit'] }}
+                                                            </span>
+                                                        @endif
+                                                        @if ($billing['domicile'])
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700">
+                                                                DOM: {{ $billing['domicile'] }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Preview Dropdown List -->
+                                            <div class="bg-muted/30 p-3 border-t border-border" x-show="expanded" x-transition style="display: none;">
+                                                <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Rincian Komponen:</p>
+                                                <ul class="space-y-2">
+                                                    @foreach ($billing['fees'] as $fee)
+                                                        <li class="flex justify-between items-start text-xs border-b border-dashed border-border/50 pb-1.5 last:border-0 last:pb-0">
+                                                            <div class="flex flex-col flex-1 pr-2">
+                                                                <span class="text-foreground font-medium flex items-center">
+                                                                    <svg class="w-3 h-3 mr-1 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                                                    {{ $fee['item_name'] }}
+                                                                </span>
+                                                                <span class="text-[9px] text-muted-foreground pl-4 mt-0.5">
+                                                                    {{ $fee['recurrence_type'] === 'MONTHLY' ? 'Bulanan' : ($fee['recurrence_type'] === 'ONETIME' ? 'Sekali Bayar' : $fee['recurrence_type']) }}
+                                                                </span>
+                                                            </div>
+                                                            <span class="font-mono font-semibold text-muted-foreground whitespace-nowrap pt-0.5">
+                                                                Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                            </span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
                                             </div>
                                         </div>
-                                    </label>
-                                @endforeach
-                            </div>
-
-                            <div class="flex gap-3 pt-6 border-t border-border">
-                                <button type="button"
-                                        wire:click="cancel"
-                                        class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-border rounded-lg text-foreground font-medium hover:bg-muted transition-colors">
-                                    Batal
-                                </button>
-                                <button type="submit" wire:loading.attr="disabled" wire:target="confirmAcceptance"
-                                        class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <svg wire:loading.remove wire:target="confirmAcceptance" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    <svg wire:loading wire:target="confirmAcceptance" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span wire:loading.remove wire:target="confirmAcceptance">Terima & Buat Tagihan</span>
-                                    <span wire:loading wire:target="confirmAcceptance">Memproses...</span>
-                                </button>
-                            </div>
-                        </form>
-                    @endif
+                                    @endforeach
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
+
+    </div>
 </div>

@@ -9,8 +9,12 @@ use App\Services\NisGeneratorService;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 
+use Livewire\WithFileUploads;
+
 class StudentForm extends Component
 {
+    use WithFileUploads;
+
     public ?Student $student = null;
 
     #[Rule('required|exists:guardians,id')]
@@ -34,8 +38,15 @@ class StudentForm extends Component
     #[Rule('nullable|string')]
     public $address = '';
 
-    #[Rule('nullable|string|max:20')]
+    #[Rule('nullable|numeric|digits:10')]
     public $nisn = '';
+
+    // File properties
+    public $kk_file;
+    public $foto_file;
+    public $akta_file;
+    public $ijazah_file;
+    public $nisn_document_file;
 
     public $selectedFeeMasters = [];
     public $generatedNis = null;
@@ -126,6 +137,17 @@ class StudentForm extends Component
     public function save(NisGeneratorService $nisService, \App\Services\BillingService $billingService)
     {
         $this->validate();
+        $kkRule = ($this->isEdit && $this->student && $this->student->kk) ? 'nullable' : 'required';
+        $fotoRule = ($this->isEdit && $this->student && $this->student->foto) ? 'nullable' : 'required';
+        $aktaRule = ($this->isEdit && $this->student && $this->student->akta) ? 'nullable' : 'required';
+
+        $this->validate([
+            'kk_file' => "$kkRule|file|mimes:jpg,jpeg,png,webp,pdf|max:2048",
+            'foto_file' => "$fotoRule|file|mimes:jpg,jpeg,png,webp|max:2048",
+            'akta_file' => "$aktaRule|file|mimes:jpg,jpeg,png,webp,pdf|max:2048",
+            'ijazah_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+            'nisn_document_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+        ]);
 
         $data = [
             'guardian_id' => $this->guardian_id,
@@ -138,6 +160,42 @@ class StudentForm extends Component
             'nisn' => $this->nisn,
             'is_active' => $this->is_active,
         ];
+
+        // File handling
+        if ($this->kk_file) {
+            if ($this->isEdit && $this->student->kk) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($this->student->kk);
+            }
+            $data['kk'] = $this->kk_file->store('student-documents/kk', 'public');
+        }
+
+        if ($this->foto_file) {
+            if ($this->isEdit && $this->student->foto) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($this->student->foto);
+            }
+            $data['foto'] = $this->foto_file->store('student-documents/foto', 'public');
+        }
+
+        if ($this->akta_file) {
+            if ($this->isEdit && $this->student->akta) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($this->student->akta);
+            }
+            $data['akta'] = $this->akta_file->store('student-documents/akta', 'public');
+        }
+
+        if ($this->ijazah_file) {
+            if ($this->isEdit && $this->student->ijazah) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($this->student->ijazah);
+            }
+            $data['ijazah'] = $this->ijazah_file->store('student-documents/ijazah', 'public');
+        }
+
+        if ($this->nisn_document_file) {
+            if ($this->isEdit && $this->student->nisn_document) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($this->student->nisn_document);
+            }
+            $data['nisn_document'] = $this->nisn_document_file->store('student-documents/nisn', 'public');
+        }
 
         if ($this->isEdit) {
             $this->student->update($data);

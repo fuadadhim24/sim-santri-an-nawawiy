@@ -53,6 +53,16 @@
                     @enderror
                 </div>
 
+                <!-- Address -->
+                <div>
+                    <label for="address" class="block text-sm font-medium text-foreground">Alamat Lengkap <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
+                    <textarea wire:model="address" id="address" rows="3" placeholder="Alamat lengkap wali santri..."
+                        class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm resize-none"></textarea>
+                    @error('address')
+                        <span class="text-destructive text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <div class="flex justify-end space-x-3 pt-4">
                     <a href="{{ route('admin.guardians') }}"
                         class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">

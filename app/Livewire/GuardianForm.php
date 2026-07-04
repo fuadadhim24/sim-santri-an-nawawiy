@@ -24,6 +24,9 @@ class GuardianForm extends Component
     #[Rule('nullable|min:6')]
     public $password = '';
 
+    #[Rule('nullable|min:10')]
+    public $address = '';
+
     public $isEdit = false;
 
     public function mount($guardian = null)
@@ -33,6 +36,7 @@ class GuardianForm extends Component
             $this->full_name = $guardian->full_name;
             $this->whatsapp = $guardian->whatsapp;
             $this->email = $guardian->user->email;
+            $this->address = $guardian->address;
             $this->isEdit = true;
         }
     }
@@ -41,8 +45,14 @@ class GuardianForm extends Component
     {
         $this->validate([
             'email' => 'required|email|unique:users,email,' . ($this->guardian ? $this->guardian->user_id : 'NULL'),
-            'whatsapp' => 'required|numeric|unique:guardians,whatsapp,' . ($this->guardian ? $this->guardian->id : 'NULL'),
+            'whatsapp' => [
+                'required',
+                'numeric',
+                'unique:guardians,whatsapp,' . ($this->guardian ? $this->guardian->id : 'NULL'),
+                'unique:users,whatsapp,' . ($this->guardian ? $this->guardian->user_id : 'NULL'),
+            ],
             'full_name' => 'required|min:3',
+            'address' => 'nullable|min:10',
             'password' => $this->isEdit ? 'nullable|min:6' : 'required|min:6',
         ]);
 
@@ -51,6 +61,7 @@ class GuardianForm extends Component
             $user->update([
                 'name' => $this->full_name, // Sync name
                 'email' => $this->email,
+                'whatsapp' => $this->whatsapp, // Sync login whatsapp
             ]);
 
             if (!empty($this->password)) {
@@ -60,6 +71,7 @@ class GuardianForm extends Component
             $this->guardian->update([
                 'full_name' => $this->full_name,
                 'whatsapp' => $this->whatsapp,
+                'address' => $this->address,
             ]);
 
             session()->flash('message', 'Guardian updated successfully.');
@@ -67,6 +79,7 @@ class GuardianForm extends Component
             $user = User::create([
                 'name' => $this->full_name,
                 'email' => $this->email,
+                'whatsapp' => $this->whatsapp, // Required for login identifier
                 'password' => Hash::make($this->password),
                 'role' => 'WALI_SANTRI',
             ]);
@@ -75,6 +88,7 @@ class GuardianForm extends Component
                 'user_id' => $user->id,
                 'full_name' => $this->full_name,
                 'whatsapp' => $this->whatsapp,
+                'address' => $this->address,
             ]);
 
             session()->flash('message', 'Guardian created successfully.');

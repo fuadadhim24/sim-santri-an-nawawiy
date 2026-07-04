@@ -33,7 +33,8 @@ class GenerateRecurringBillings extends Command
         
         $lastDayOfMonth = now()->daysInMonth;
         
-        $feeMasters = \App\Models\FeeMaster::where('is_active', true)
+        $feeMasters = \App\Models\FeeMaster::with('category')
+            ->where('is_active', true)
             ->whereHas('category', function ($query) {
                 $query->where('is_active', true);
             })
@@ -70,6 +71,15 @@ class GenerateRecurringBillings extends Command
 
             $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
             
+            // Apply category-level targets
+            if ($feeMaster->category->unit_target) {
+                $query->where('unit_code', $feeMaster->category->unit_target);
+            }
+            if ($feeMaster->category->domicile_target) {
+                $query->where('residence_status', $feeMaster->category->domicile_target);
+            }
+
+            // Apply item-level targets
             if ($feeMaster->unit_target) {
                 $query->where('unit_code', $feeMaster->unit_target);
             }

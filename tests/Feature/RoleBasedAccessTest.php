@@ -112,6 +112,10 @@ class RoleBasedAccessTest extends TestCase
 
         $this->actingAs($adminTU);
 
+        $kk = \Illuminate\Http\UploadedFile::fake()->image('kk.jpg');
+        $foto = \Illuminate\Http\UploadedFile::fake()->image('foto.jpg');
+        $akta = \Illuminate\Http\UploadedFile::fake()->image('akta.jpg');
+
         Livewire::test(\App\Livewire\StudentForm::class)
             ->set('guardian_id', $guardian->id)
             ->set('full_name', 'Test Student')
@@ -120,6 +124,9 @@ class RoleBasedAccessTest extends TestCase
             ->set('special_status', 'UMUM')
             ->set('class_name', '8A')
             ->set('address', 'Jl. Test')
+            ->set('kk_file', $kk)
+            ->set('foto_file', $foto)
+            ->set('akta_file', $akta)
             ->call('save')
             ->assertRedirect(route('admin.students'));
 
