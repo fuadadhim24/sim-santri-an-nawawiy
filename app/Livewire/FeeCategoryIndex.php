@@ -17,7 +17,7 @@ class FeeCategoryIndex extends Component
         $this->resetPage();
     }
 
-    public function delete($id)
+    public function confirmDelete($id)
     {
         $category = FeeCategory::findOrFail($id);
 
@@ -26,14 +26,97 @@ class FeeCategoryIndex extends Component
             return;
         }
 
-        if ($category->fees()->exists()) {
-            session()->flash('error', "Kategori '{$category->name}' tidak dapat dihapus karena masih digunakan oleh data master biaya. Silakan non-aktifkan kategori ini.");
+        $feeCount = $category->fees()->count();
+        if ($feeCount === 0) {
+            $this->dispatch('swal:confirm-simple-delete', [
+                'id' => $category->id,
+                'name' => $category->name,
+            ]);
             return;
         }
 
+        // Check active unpaid billings using categories
+        $hasActiveBillings = \App\Models\Billing::whereIn('fee_master_id', function ($query) use ($category) {
+            $query->select('id')
+                ->from('fee_masters')
+                ->where('fee_category_id', $category->id);
+        })
+            ->where('status', 'UNPAID')
+            ->exists();
+
+        // Fetch master biaya names for detail list
+        $feeNames = $category->fees()->pluck('item_name')->toArray();
+
+        $this->dispatch('swal:confirm-complex-delete', [
+            'id' => $category->id,
+            'name' => $category->name,
+            'feeCount' => $feeCount,
+            'feeNames' => $feeNames,
+            'hasActiveBillings' => $hasActiveBillings,
+        ]);
+    }
+
+    #[\Livewire\Attributes\On('deactivateCategory')]
+    public function deactivateCategory($id = null)
+    {
+        if (is_array($id)) {
+            $id = $id['id'] ?? null;
+        }
+        if (!$id) return;
+        
+        $category = FeeCategory::findOrFail($id);
+        if ($category->is_locked) return;
+
+        try {
+            $category->update(['is_active' => false]);
+            // Archive active fees under this category
+            $activeFees = $category->fees()->get();
+            foreach ($activeFees as $fee) {
+                $fee->archive();
+            }
+            session()->flash('message', "Kategori '{$category->name}' dan seluruh master biaya terkait berhasil dinonaktifkan.");
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menonaktifkan kategori: ' . $e->getMessage());
+        }
+    }
+
+    #[\Livewire\Attributes\On('forceDeleteCategory')]
+    public function forceDeleteCategory($id = null)
+    {
+        if (is_array($id)) {
+            $id = $id['id'] ?? null;
+        }
+        if (!$id) return;
+
+        $category = FeeCategory::findOrFail($id);
+        if ($category->is_locked) return;
+
+        try {
+            $fees = $category->fees()->get();
+            foreach ($fees as $fee) {
+                $fee->archive();
+            }
+            $category->delete();
+            session()->flash('message', "Kategori '{$category->name}' dan master biaya terkait berhasil dihapus.");
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menghapus kategori: ' . $e->getMessage());
+        }
+    }
+
+    #[\Livewire\Attributes\On('deleteCategoryDirect')]
+    public function deleteCategoryDirect($id = null)
+    {
+        if (is_array($id)) {
+            $id = $id['id'] ?? null;
+        }
+        if (!$id) return;
+
+        $category = FeeCategory::findOrFail($id);
+        if ($category->is_locked) return;
+
         try {
             $category->delete();
-            session()->flash('message', 'Kategori biaya berhasil dihapus.');
+            session()->flash('message', "Kategori '{$category->name}' berhasil dihapus.");
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menghapus kategori: ' . $e->getMessage());
         }

@@ -99,9 +99,19 @@
                                     <a href="{{ route('admin.fee-categories.edit', $category->id) }}"
                                         class="text-primary hover:text-primary/80 font-medium">Edit</a>
                                     @if(!$category->is_locked)
-                                        <button wire:click="delete({{ $category->id }})"
-                                            wire:swal="Hapus kategori ini? Biaya yang terkait mungkin akan kehilangan kategorinya."
-                                            class="text-destructive hover:text-destructive/80 font-medium">Hapus</button>
+                                        <button wire:click="confirmDelete({{ $category->id }})"
+                                            wire:loading.attr="disabled"
+                                            wire:target="confirmDelete({{ $category->id }})"
+                                            class="text-destructive hover:text-destructive/80 font-medium inline-flex items-center">
+                                            <span wire:loading.remove wire:target="confirmDelete({{ $category->id }})">Hapus</span>
+                                            <span wire:loading wire:target="confirmDelete({{ $category->id }})">
+                                                <svg class="animate-spin inline-block align-middle h-3 w-3 mr-1 text-destructive" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                <span class="align-middle">Analisis...</span>
+                                            </span>
+                                        </button>
                                     @else
                                         <span class="text-muted-foreground text-xs">Terkunci</span>
                                     @endif
@@ -122,4 +132,93 @@
             {{ $categories->links() }}
         </div>
     </div>
+
+    @script
+    <script>
+        $wire.on('swal:confirm-simple-delete', (event) => {
+            const data = event[0] || event;
+            window.Swal.fire({
+                title: 'Hapus Kategori?',
+                text: `Apakah Anda yakin ingin menghapus kategori "${data.name}" secara permanen?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $wire.deleteCategoryDirect(data.id);
+                }
+            });
+        });
+
+        $wire.on('swal:confirm-complex-delete', (event) => {
+            const data = event[0] || event;
+
+            const feeListHtml = (data.feeNames && data.feeNames.length)
+                ? `<details style="margin-top:8px;text-align:left;">
+                        <summary style="cursor:pointer;font-size:12px;color:#6b7280;user-select:none;">
+                            Lihat daftar master biaya (${data.feeNames.length})
+                        </summary>
+                        <ul style="margin-top:6px;padding-left:16px;font-size:12px;color:#374151;list-style:disc;">
+                            ${data.feeNames.map(n => `<li>${n}</li>`).join('')}
+                        </ul>
+                    </details>`
+                : '';
+            
+            if (data.hasActiveBillings) {
+                window.Swal.fire({
+                    title: 'Tidak Bisa Dihapus',
+                    html: `
+                        <div class="text-left space-y-3">
+                            <p>Kategori <b>${data.name}</b> memiliki <b>${data.feeCount} Master Biaya</b> dan masih ada <b>Tagihan Aktif (Belum Lunas)</b> pada santri.</p>
+                            ${feeListHtml}
+                            <div class="bg-red-50 p-3 rounded text-red-800 text-xs">
+                                ⚠️ Sesuai integritas data keuangan, kategori ini tidak boleh dihapus agar histori pembayaran santri tidak rusak.
+                            </div>
+                            <p class="text-sm">Solusi aman: Silakan <b>Nonaktifkan Kategori</b> ini untuk menghentikan tagihan baru.</p>
+                        </div>
+                    `,
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#eab308',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Nonaktifkan Kategori',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $wire.deactivateCategory(data.id);
+                    }
+                });
+            } else {
+                window.Swal.fire({
+                    title: 'Pilih Tindakan Pengamanan',
+                    html: `
+                        <div class="text-left space-y-3">
+                            <p>Kategori <b>${data.name}</b> digunakan oleh <b>${data.feeCount} Master Biaya</b>.</p>
+                            ${feeListHtml}
+                            <p class="text-sm">Pilih salah satu tindakan di bawah ini:</p>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    denyButtonColor: '#eab308',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Hapus Kategori & Biayanya',
+                    denyButtonText: 'Nonaktifkan Saja',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $wire.forceDeleteCategory(data.id);
+                    } else if (result.isDenied) {
+                        $wire.deactivateCategory(data.id);
+                    }
+                });
+            }
+        });
+    </script>
+    @endscript
 </div>
