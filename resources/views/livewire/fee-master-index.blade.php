@@ -34,6 +34,7 @@
                         <th class="px-6 py-3">Target Unit</th>
                         <th class="px-6 py-3">Target Tempat Tinggal</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
+                        <th class="px-6 py-3 text-center">Status</th>
                         <th class="px-6 py-3 text-center whitespace-nowrap w-px">Aksi</th>
                     </tr>
                 </thead>
@@ -65,6 +66,17 @@
                             <td class="px-6 py-4 text-right font-mono font-medium text-foreground">
                                 Rp {{ number_format($fee->amount, 0, ',', '.') }}
                             </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($fee->is_active)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        Non-aktif
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-center whitespace-nowrap w-px space-x-2">
                                 <button type="button" 
                                     wire:click="confirmSync({{ $fee->id }})"
@@ -90,7 +102,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-muted-foreground">
+                            <td colspan="8" class="px-6 py-8 text-center text-muted-foreground">
                                 Tidak ada data biaya ditemukan.
                             </td>
                         </tr>

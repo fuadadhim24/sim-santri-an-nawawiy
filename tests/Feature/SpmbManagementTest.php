@@ -144,5 +144,10 @@ class SpmbManagementTest extends TestCase
             'class_level_id' => $classLevel->id,
             'guardian_id' => $guardianModel->id,
         ]);
+
+        $newStudent = \App\Models\Student::where('full_name', 'Santri Baru')->first();
+        $this->assertNull($newStudent->nis);
+        $this->assertNotNull($newStudent->registration_number);
+        $this->assertMatchesRegularExpression('/^\d{4}\.\d{4}$/', $newStudent->registration_number);
     }
 }

@@ -25,8 +25,8 @@
                             <p class="font-semibold text-foreground mt-1">{{ $student->full_name }}</p>
                         </div>
                         <div class="border-t border-border pt-3">
-                            <p class="text-sm text-muted-foreground font-medium">NIS</p>
-                            <p class="font-semibold text-foreground mt-1">{{ $student->nis ?? '-' }}</p>
+                            <p class="text-sm text-muted-foreground font-medium">No. Pendaftaran</p>
+                            <p class="font-semibold text-foreground mt-1">{{ $student->registration_number ?? '-' }}</p>
                         </div>
                         <div class="border-t border-border pt-3">
                             <p class="text-sm text-muted-foreground font-medium">Unit</p>

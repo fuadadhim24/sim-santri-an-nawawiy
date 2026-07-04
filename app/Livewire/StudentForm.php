@@ -134,6 +134,9 @@ class StudentForm extends Component
             $year = date('Y');
             $nis = $nisService->generate($this->unit_code, $year);
             $data['nis'] = $nis;
+            $data['registration_number'] = $nisService->generateRegistrationNumber($year);
+            $data['status'] = \App\Enums\StudentStatus::ACCEPTED->value;
+            $data['joined_at'] = now();
 
             $newStudent = Student::create($data);
 

@@ -70,7 +70,7 @@
                             <td class="px-6 py-4 text-muted-foreground">{{ $guardian->user->email ?? 'N/A' }}</td>
                             <td class="px-6 py-4">
                                 <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs">
-                                    {{ $guardian->students->count() }} Santri
+                                    {{ $guardian->students->whereIn('status', ['diterima', 'lulus'])->count() }} Santri
                                 </span>
                             </td>
                             <td class="px-6 py-4">

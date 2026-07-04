@@ -15,6 +15,7 @@ class StudentFactory extends Factory
         return [
             'guardian_id' => Guardian::factory(),
             'nis' => $this->faker->unique()->regexify('[0-9]{10}'),
+            'registration_number' => $this->faker->unique()->numerify('2026.####'),
             'nisn' => $this->faker->unique()->regexify('[0-9]{10}'),
             'full_name' => $this->faker->name(),
             'unit_code' => $this->faker->randomElement(['01', '02', '03']),

@@ -70,10 +70,18 @@
                     </span>
                 </div>
                 <div class="space-y-3 text-sm">
-                    <div class="grid grid-cols-3">
-                        <span class="text-muted-foreground">NIS</span>
-                        <span class="col-span-2 font-mono text-foreground">{{ $student->nis }}</span>
-                    </div>
+                    @if ($student->nis)
+                        <div class="grid grid-cols-3">
+                            <span class="text-muted-foreground">NIS</span>
+                            <span class="col-span-2 font-mono text-foreground">{{ $student->nis }}</span>
+                        </div>
+                    @endif
+                    @if ($student->registration_number)
+                        <div class="grid grid-cols-3">
+                            <span class="text-muted-foreground">No. Pendaftaran</span>
+                            <span class="col-span-2 font-mono text-foreground">{{ $student->registration_number }}</span>
+                        </div>
+                    @endif
                     <div class="grid grid-cols-3">
                         <span class="text-muted-foreground">Nama Lengkap</span>
                         <span class="col-span-2 font-medium text-foreground">{{ $student->full_name }}</span>

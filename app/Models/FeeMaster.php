@@ -11,6 +11,18 @@ class FeeMaster extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::deleting(function ($feeMaster) {
+            $feeMaster->is_active = false;
+            $feeMaster->saveQuietly();
+        });
+
+        static::restoring(function ($feeMaster) {
+            $feeMaster->is_active = true;
+        });
+    }
+
     protected $fillable = [
         'item_name',
         'amount',

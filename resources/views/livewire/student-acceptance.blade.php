@@ -40,7 +40,7 @@
                     <table class="w-full text-sm text-left">
                         <thead class="text-xs text-muted-foreground uppercase bg-muted">
                             <tr>
-                                <th class="px-6 py-3">NIS</th>
+                                <th class="px-6 py-3">No. Pendaftaran</th>
                                 <th class="px-6 py-3">Nama</th>
                                 <th class="px-6 py-3">Wali</th>
                                 <th class="px-6 py-3">Tanggal Daftar</th>
@@ -51,7 +51,7 @@
                         <tbody class="divide-y divide-border">
                             @foreach ($students as $student)
                                 <tr class="hover:bg-muted/50 transition-colors">
-                                    <td class="px-6 py-4 font-mono text-muted-foreground">{{ $student->nis }}</td>
+                                    <td class="px-6 py-4 font-mono text-muted-foreground">{{ $student->registration_number ?? '-' }}</td>
                                     <td class="px-6 py-4 font-medium text-foreground">{{ $student->full_name }}</td>
                                     <td class="px-6 py-4 text-muted-foreground">{{ $student->guardian->full_name ?? '-' }}</td>
                                     <td class="px-6 py-4 text-muted-foreground">{{ $student->created_at->format('d/m/Y') }}</td>

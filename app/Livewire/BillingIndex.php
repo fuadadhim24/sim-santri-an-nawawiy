@@ -110,7 +110,8 @@ class BillingIndex extends Component
             $query->where(function ($q) {
                 $q->whereHas('student', function ($sq) {
                     $sq->where('full_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('nis', 'like', '%' . $this->search . '%');
+                        ->orWhere('nis', 'like', '%' . $this->search . '%')
+                        ->orWhere('registration_number', 'like', '%' . $this->search . '%');
                 })->orWhere('title', 'like', '%' . $this->search . '%');
             });
         }

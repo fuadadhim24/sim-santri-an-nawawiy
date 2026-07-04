@@ -54,16 +54,18 @@ class LoginRequest extends FormRequest
             $user = \App\Models\User::where('email', $identifier)->first();
         }
 
-        // 3. Coba via NIS santri → resolve ke user wali
-        if (!$user) {
-            $student = \App\Models\Student::where('nis', $identifier)->first();
+        // 3. Coba via NIS santri atau No. Pendaftaran → resolve ke user wali
+        if (!$user && !empty($identifier)) {
+            $student = \App\Models\Student::where('nis', $identifier)
+                ->orWhere('registration_number', $identifier)
+                ->first();
             if ($student && $student->guardian && $student->guardian->user) {
                 $user = $student->guardian->user;
             }
         }
 
         // 4. Fallback: coba via WhatsApp guardian (backward compat)
-        if (!$user) {
+        if (!$user && !empty($identifier)) {
             $guardian = \App\Models\Guardian::where('whatsapp', $identifier)->first();
             if ($guardian && $guardian->user) {
                 $user = $guardian->user;

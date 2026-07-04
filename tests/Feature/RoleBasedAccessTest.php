@@ -64,6 +64,7 @@ class RoleBasedAccessTest extends TestCase
     {
         $superAdmin = User::where('role', 'SUPER_ADMIN')->first();
         $student = Student::where('status', 'menunggu')->first();
+        $student->update(['nis' => null]);
 
         $this->actingAs($superAdmin);
 
@@ -72,6 +73,8 @@ class RoleBasedAccessTest extends TestCase
 
         $student->refresh();
         $this->assertEquals('diterima', $student->status);
+        $this->assertNotNull($student->nis);
+        $this->assertMatchesRegularExpression('/^\d{4}\.\d{2}\.\d{4}$/', $student->nis);
     }
 
     // ADMINISTRASI Tests

@@ -45,6 +45,7 @@ class Student extends Model
         'spmb_schedule_id',
         'school_class_id',
         'nis',
+        'registration_number',
         'unit_code',
         'residence_status',
         'special_status',
@@ -352,11 +353,18 @@ class Student extends Model
 
     public function markAsAccepted(): void
     {
-        // when a student is accepted, also make them active
-        $this->update([
+        $updateData = [
             'status' => StudentStatus::ACCEPTED->value,
             'is_active' => true,
-        ]);
+        ];
+
+        if (!$this->nis) {
+            $year = date('Y');
+            $nisService = app(\App\Services\NisGeneratorService::class);
+            $updateData['nis'] = $nisService->generate($this->unit_code, $year);
+        }
+
+        $this->update($updateData);
     }
 
     public function markAsPending(): void

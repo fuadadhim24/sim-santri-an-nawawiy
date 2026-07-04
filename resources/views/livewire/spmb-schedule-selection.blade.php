@@ -107,7 +107,7 @@
                                             </div>
                                             <div>
                                                 <p class="text-sm font-medium text-gray-900">{{ $student->full_name }}</p>
-                                                <p class="text-xs text-gray-500">NIS: {{ $student->nis }}</p>
+                                                <p class="text-xs text-gray-500">{{ $student->nis ? 'NIS: ' . $student->nis : 'No. Pendaftaran: ' . $student->registration_number }}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-center">

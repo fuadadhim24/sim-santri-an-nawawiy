@@ -56,7 +56,8 @@ class FinancialReport extends Component
         if ($search) {
             $query->whereHas('billing.student', function($q) use ($search) {
                 $q->where('full_name', 'like', '%' . $search . '%')
-                  ->orWhere('nis', 'like', '%' . $search . '%');
+                  ->orWhere('nis', 'like', '%' . $search . '%')
+                  ->orWhere('registration_number', 'like', '%' . $search . '%');
             });
         }
 
@@ -275,7 +276,8 @@ class FinancialReport extends Component
         if ($this->search) {
             $query->whereHas('billing.student', function($q) {
                 $q->where('full_name', 'like', '%' . $this->search . '%')
-                  ->orWhere('nis', 'like', '%' . $this->search . '%');
+                  ->orWhere('nis', 'like', '%' . $this->search . '%')
+                  ->orWhere('registration_number', 'like', '%' . $this->search . '%');
             });
         }
 

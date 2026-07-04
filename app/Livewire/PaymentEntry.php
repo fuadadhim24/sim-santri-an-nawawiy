@@ -105,6 +105,7 @@ class PaymentEntry extends Component
         if (strlen($this->search) >= 3) {
             $students = Student::where('full_name', 'like', '%' . $this->search . '%')
                 ->orWhere('nis', 'like', '%' . $this->search . '%')
+                ->orWhere('registration_number', 'like', '%' . $this->search . '%')
                 ->take(5)
                 ->get();
         }

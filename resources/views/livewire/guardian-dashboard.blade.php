@@ -256,7 +256,7 @@
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <h3 class="text-xl font-bold text-gray-800">{{ $pendingStudent->full_name }}</h3>
-                                        <span class="text-sm text-gray-500">NIS: {{ $pendingStudent->nis }}</span>
+                                        <span class="text-sm text-gray-500">No. Pendaftaran: {{ $pendingStudent->registration_number }}</span>
                                         <span
                                             class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">{{ $pendingStudent->unit_code == '01' ? 'SMP' : ($pendingStudent->unit_code == '02' ? 'SMA' : 'PPTQ') }}</span>
                                     </div>
@@ -542,7 +542,7 @@
                                                     <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                                                         <div>
                                                             <p class="font-medium text-gray-900">{{ $student->full_name }}</p>
-                                                            <p class="text-xs text-gray-500">NIS: {{ $student->nis }}</p>
+                                                            <p class="text-xs text-gray-500">{{ $student->nis ? 'NIS: ' . $student->nis : 'No. Pendaftaran: ' . $student->registration_number }}</p>
                                                         </div>
                                                         <div class="flex items-center space-x-2">
                                                             <span class="px-2 py-1 rounded text-xs font-semibold

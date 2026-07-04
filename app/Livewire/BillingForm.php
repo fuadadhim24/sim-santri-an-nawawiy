@@ -156,7 +156,8 @@ class BillingForm extends Component
         return Student::where('is_active', true)
             ->where(function ($query) {
                 $query->where('full_name', 'like', '%' . $this->student_search . '%')
-                      ->orWhere('nis', 'like', '%' . $this->student_search . '%');
+                      ->orWhere('nis', 'like', '%' . $this->student_search . '%')
+                      ->orWhere('registration_number', 'like', '%' . $this->student_search . '%');
             })
             ->orderBy('full_name')
             ->take(10)

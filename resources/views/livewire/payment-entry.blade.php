@@ -23,7 +23,7 @@
                                                 class="w-full text-left px-4 py-2 text-sm text-popover-foreground hover:bg-muted focus:outline-none">
                                                 <span class="font-medium">{{ $student->full_name }}</span>
                                                 <span
-                                                    class="block text-xs text-muted-foreground">{{ $student->nis }}</span>
+                                                    class="block text-xs text-muted-foreground">{{ $student->nis ? 'NIS: ' . $student->nis : 'No. Pendaftaran: ' . $student->registration_number }}</span>
                                             </button>
                                         </li>
                                     @endforeach
@@ -41,7 +41,7 @@
                 @if ($selectedStudent)
                     <div class="mt-6 p-4 bg-muted rounded-md">
                         <h4 class="font-medium text-foreground">{{ $selectedStudent->full_name }}</h4>
-                        <p class="text-sm text-muted-foreground">NIS: {{ $selectedStudent->nis }}</p>
+                        <p class="text-sm text-muted-foreground">{{ $selectedStudent->nis ? 'NIS: ' . $selectedStudent->nis : 'No. Pendaftaran: ' . $selectedStudent->registration_number }}</p>
                         <p class="text-sm text-muted-foreground mt-1">
                             {{ $selectedStudent->unit_code == '01' ? 'SMP' : ($selectedStudent->unit_code == '02' ? 'SMA' : 'PPTQ') }}
                             - {{ $selectedStudent->residence_status }}

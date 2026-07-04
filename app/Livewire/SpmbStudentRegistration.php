@@ -99,7 +99,7 @@ class SpmbStudentRegistration extends Component
         }
 
         $year = date('Y');
-        $nis = $nisService->generate($this->unit_code, $year);
+        $regNumber = $nisService->generateRegistrationNumber($year);
 
         $kkPath = $this->kk ? $this->kk->store('student-documents/kk', 'public') : null;
         $fotoPath = $this->foto ? $this->foto->store('student-documents/foto', 'public') : null;
@@ -116,7 +116,8 @@ class SpmbStudentRegistration extends Component
             'special_status' => $this->special_status,
             'class_level_id' => $this->class_level_id,
             'address' => $this->address,
-            'nis' => $nis,
+            'nis' => null,
+            'registration_number' => $regNumber,
             'is_active' => false,
             'status' => StudentStatus::PENDING->value,
             'kk' => $kkPath,
@@ -131,7 +132,7 @@ class SpmbStudentRegistration extends Component
         session()->forget('selected_spmb_schedule_id');
         session()->forget('selected_spmb_schedule_name');
 
-        session()->flash('message', 'Pendaftaran santri baru berhasil! NIS: ' . $nis . '. Silakan tunggu konfirmasi dari admin.');
+        session()->flash('message', 'Pendaftaran santri baru berhasil! No. Pendaftaran: ' . $regNumber . '. Silakan tunggu konfirmasi dari admin.');
 
         return redirect()->route('wali.dashboard');
     }

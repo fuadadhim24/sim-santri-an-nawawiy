@@ -57,9 +57,9 @@ class StudentAcceptanceConfirm extends Component
     public function confirmAcceptance(BillingService $billingService)
     {
         try {
-            // Activate student dan mark as accepted
             $this->student->update(['is_active' => true]);
             $this->student->markAsAccepted();
+            $this->student->refresh();
 
             // Generate billings for selected categories
             if (!empty($this->selectedBillings)) {

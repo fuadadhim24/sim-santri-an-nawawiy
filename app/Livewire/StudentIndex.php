@@ -21,7 +21,8 @@ class StudentIndex extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('full_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('nis', 'like', '%' . $this->search . '%');
+                    ->orWhere('nis', 'like', '%' . $this->search . '%')
+                    ->orWhere('registration_number', 'like', '%' . $this->search . '%');
             });
         }
 
