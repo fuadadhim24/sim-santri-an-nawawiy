@@ -43,7 +43,14 @@ class DuitkuController extends Controller
 
         $paymentAmount      = $billing->final_amount;
         $email              = $billing->student->guardian?->user?->email ?? 'no-email@example.com';
-        $phoneNumber        = $billing->student->guardian?->whatsapp ?? '081234567890';
+        $rawPhone   = $billing->student->guardian?->whatsapp ?? '081234567890';
+        $phoneDigits = preg_replace('/\D/', '', $rawPhone);
+        if (str_starts_with($phoneDigits, '0')) {
+            $phoneDigits = '62' . substr($phoneDigits, 1);
+        } elseif (!str_starts_with($phoneDigits, '62')) {
+            $phoneDigits = '62' . $phoneDigits;
+        }
+        $phoneNumber = $phoneDigits;
         $productDetails     = "Pembayaran " . $billing->title;
         $merchantOrderId    = $billing->id . '-' . time();
         $customerVaName     = $billing->student->guardian?->full_name ?? $billing->student->full_name;

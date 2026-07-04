@@ -12,6 +12,18 @@ class DiscountIndex extends Component
 
     public $search = '';
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function delete($id)
+    {
+        $discount = Discount::findOrFail($id);
+        $discount->delete();
+        session()->flash('message', 'Diskon berhasil dihapus.');
+    }
+
     public function render()
     {
         return view('livewire.discount-index', [

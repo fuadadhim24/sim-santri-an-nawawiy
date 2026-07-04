@@ -55,4 +55,23 @@ class Guardian extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    /**
+     * Normalize WhatsApp number to international format for wa.me link.
+     * Handles: 08xxx → 628xxx, +628xxx → 628xxx, 628xxx → 628xxx
+     */
+    public function getWaLinkAttribute(): ?string
+    {
+        if (!$this->whatsapp) return null;
+
+        $number = preg_replace('/\D/', '', $this->whatsapp); // strip non-digits
+
+        if (str_starts_with($number, '62')) {
+            return $number; // already correct
+        }
+        if (str_starts_with($number, '0')) {
+            return '62' . substr($number, 1); // 08xxx → 628xxx
+        }
+        return '62' . $number; // fallback: prepend 62
+    }
 }

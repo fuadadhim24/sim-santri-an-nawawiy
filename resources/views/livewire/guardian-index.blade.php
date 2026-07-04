@@ -66,7 +66,16 @@
                     @forelse ($guardians as $guardian)
                         <tr class="hover:bg-muted/50 transition-colors">
                             <td class="px-6 py-4 font-medium text-foreground">{{ $guardian->full_name }}</td>
-                            <td class="px-6 py-4 text-muted-foreground">{{ $guardian->whatsapp }}</td>
+                            <td class="px-6 py-4">
+                                @if($guardian->wa_link)
+                                    <a href="https://wa.me/{{ $guardian->wa_link }}" target="_blank"
+                                        class="text-green-600 hover:text-green-700 font-mono inline-flex items-center gap-1 font-medium">
+                                        📱 {{ $guardian->whatsapp }}
+                                    </a>
+                                @else
+                                    <span class="text-muted-foreground">{{ $guardian->whatsapp ?? '-' }}</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-muted-foreground">{{ $guardian->user->email ?? 'N/A' }}</td>
                             <td class="px-6 py-4">
                                 <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs">

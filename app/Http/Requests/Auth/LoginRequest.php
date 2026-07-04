@@ -46,8 +46,25 @@ class LoginRequest extends FormRequest
         $identifier = $this->input('identifier');
         $password = $this->input('password');
 
+        // Normalize WhatsApp number: support 08xxx, 628xxx, +628xxx formats
+        $normalizedWa = $identifier;
+        $strippedDigits = preg_replace('/\D/', '', $identifier);
+        if ($strippedDigits) {
+            if (str_starts_with($strippedDigits, '62')) {
+                $normalizedWa = $strippedDigits;               // 628xxx → 628xxx
+                $altWa = '0' . substr($strippedDigits, 2);    // also try 08xxx
+            } elseif (str_starts_with($strippedDigits, '0')) {
+                $normalizedWa = '62' . substr($strippedDigits, 1); // 08xxx → 628xxx
+                $altWa = $strippedDigits;                          // also try 08xxx
+            } else {
+                $normalizedWa = '62' . $strippedDigits;
+                $altWa = '0' . $strippedDigits;
+            }
+        }
+        $waVariants = array_unique([$identifier, $normalizedWa, $altWa ?? $identifier]);
+
         // 1. Coba cari user langsung via WhatsApp di tabel users
-        $user = \App\Models\User::where('whatsapp', $identifier)->first();
+        $user = \App\Models\User::whereIn('whatsapp', $waVariants)->first();
 
         // 2. Coba via email
         if (!$user && filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
@@ -66,7 +83,7 @@ class LoginRequest extends FormRequest
 
         // 4. Fallback: coba via WhatsApp guardian (backward compat)
         if (!$user && !empty($identifier)) {
-            $guardian = \App\Models\Guardian::where('whatsapp', $identifier)->first();
+            $guardian = \App\Models\Guardian::whereIn('whatsapp', $waVariants)->first();
             if ($guardian && $guardian->user) {
                 $user = $guardian->user;
             }

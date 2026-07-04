@@ -20,6 +20,7 @@
                     <tr>
                         <th class="px-6 py-3">NIS</th>
                         <th class="px-6 py-3">Nama Lengkap</th>
+                        <th class="px-6 py-3">Wali / WhatsApp</th>
                         <th class="px-6 py-3">Unit</th>
                         <th class="px-6 py-3">Tempat Tinggal</th>
                         <th class="px-6 py-3">Kelas</th>
@@ -30,8 +31,17 @@
                 <tbody class="divide-y divide-border">
                     @foreach ($students as $student)
                         <tr class="hover:bg-muted/50 transition-colors">
-                            <td class="px-6 py-4 font-mono text-muted-foreground">{{ $student->nis }}</td>
+                            <td class="px-6 py-4 font-mono text-muted-foreground">{{ $student->nis ?? '-' }}</td>
                             <td class="px-6 py-4 font-medium text-foreground">{{ $student->full_name }}</td>
+                            <td class="px-6 py-4">
+                                <span class="block font-medium text-foreground text-sm">{{ $student->guardian->full_name ?? '-' }}</span>
+                                @if($student->guardian?->wa_link)
+                                    <a href="https://wa.me/{{ $student->guardian->wa_link }}" target="_blank"
+                                        class="text-xs text-green-600 hover:text-green-700 font-mono">
+                                        📱 {{ $student->guardian->whatsapp }}
+                                    </a>
+                                @endif
+                            </td>
                             <td class="px-6 py-4">
                                 <span
                                     class="px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
