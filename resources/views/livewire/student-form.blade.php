@@ -19,7 +19,7 @@
                         
                         <!-- NISN Input (Edit mode side-by-side with NIS if desired, but let's just use standard flow) -->
                         <div>
-                            <label for="nisn" class="block text-sm font-medium text-foreground">NISN</label>
+                            <label for="nisn" class="block text-sm font-medium text-foreground">NISN <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                             <input wire:model="nisn" type="text" id="nisn" placeholder="Masukkan NISN (opsional)"
                                 class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             @error('nisn')
@@ -30,7 +30,7 @@
                 @else
                     <!-- NISN Input (Create mode) -->
                     <div>
-                        <label for="nisn" class="block text-sm font-medium text-foreground">NISN</label>
+                        <label for="nisn" class="block text-sm font-medium text-foreground">NISN <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                         <input wire:model="nisn" type="text" id="nisn" placeholder="Masukkan NISN (opsional)"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('nisn')
@@ -41,7 +41,7 @@
 
                 <!-- Full Name -->
                 <div>
-                    <label for="full_name" class="block text-sm font-medium text-foreground">Nama Lengkap</label>
+                    <label for="full_name" class="block text-sm font-medium text-foreground">Nama Lengkap <span class="text-red-500">*</span></label>
                     <input wire:model="full_name" type="text" id="full_name"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('full_name')
@@ -51,7 +51,7 @@
 
                 <!-- Guardian -->
                 <div>
-                    <label for="guardian_id" class="block text-sm font-medium text-foreground">Wali Santri</label>
+                    <label for="guardian_id" class="block text-sm font-medium text-foreground">Wali Santri <span class="text-red-500">*</span></label>
                     <select wire:model="guardian_id" id="guardian_id"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         <option value="">Pilih Wali Santri...</option>
@@ -68,7 +68,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Unit -->
                     <div>
-                        <label for="unit_code" class="block text-sm font-medium text-foreground">Unit Sekolah</label>
+                        <label for="unit_code" class="block text-sm font-medium text-foreground">Unit Sekolah <span class="text-red-500">*</span></label>
                         <select wire:model.live="unit_code" id="unit_code"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="01">SMP (01)</option>
@@ -82,7 +82,7 @@
 
                     <!-- Residence Status -->
                     <div>
-                        <label for="residence_status" class="block text-sm font-medium text-foreground">Status Domisili</label>
+                        <label for="residence_status" class="block text-sm font-medium text-foreground">Status Domisili <span class="text-red-500">*</span></label>
                         <select wire:model.live="residence_status" id="residence_status"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="MONDOK">Mondok</option>
@@ -99,7 +99,7 @@
                     <!-- Special Status -->
                     <div>
                         <label for="special_status" class="block text-sm font-medium text-foreground">Status
-                            Khusus</label>
+                            Khusus <span class="text-red-500">*</span></label>
                         <select wire:model="special_status" id="special_status"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="UMUM">Umum</option>
@@ -113,7 +113,7 @@
 
                     <!-- Class Name -->
                     <div>
-                        <label for="class_name" class="block text-sm font-medium text-foreground">Nama Kelas</label>
+                        <label for="class_name" class="block text-sm font-medium text-foreground">Nama Kelas <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                         <input wire:model="class_name" type="text" id="class_name" placeholder="contoh: 7A"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('class_name')
@@ -124,7 +124,7 @@
 
                 <!-- Address -->
                 <div>
-                    <label for="address" class="block text-sm font-medium text-foreground">Alamat</label>
+                    <label for="address" class="block text-sm font-medium text-foreground">Alamat <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                     <textarea wire:model="address" id="address" rows="3"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm"></textarea>
                     @error('address')
@@ -152,6 +152,17 @@
                                     <span class="font-medium text-foreground">Unit {{ $unit_code == '01' ? 'SMP' : ($unit_code == '02' ? 'SMA' : 'PPTQ') }}</span> •
                                     <span class="font-medium text-foreground">{{ $residence_status == 'MONDOK' ? 'Mondok' : ($residence_status == 'NON_MONDOK' ? 'Non Mondok' : 'Ngaji Only') }}</span>
                                 </p>
+
+                                <!-- Select All Checkbox -->
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="inline-flex items-center text-xs font-semibold text-foreground cursor-pointer select-none">
+                                        <input type="checkbox" 
+                                               wire:click="toggleSelectAllFees" 
+                                               @if(count(array_intersect(array_map('strval', $selectedFeeMasters), $this->matchingFeeMasters->pluck('id')->map(fn($id) => (string) $id)->toArray())) === count($this->matchingFeeMasters)) checked @endif
+                                               class="rounded border-input text-primary focus:ring-primary mr-1.5 h-3.5 w-3.5">
+                                        Pilih Semua Tagihan
+                                    </label>
+                                </div>
 
                                 <!-- List of billings with checkboxes -->
                                 <div class="space-y-2 max-h-64 overflow-y-auto border border-border rounded-md p-3 bg-muted/30 mb-4">

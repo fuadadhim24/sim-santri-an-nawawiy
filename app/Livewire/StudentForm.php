@@ -102,6 +102,18 @@ class StudentForm extends Component
         }
     }
 
+    public function toggleSelectAllFees()
+    {
+        $matchingIds = $this->matchingFeeMasters->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        $selectedStr = array_map('strval', $this->selectedFeeMasters);
+
+        if (count(array_intersect($selectedStr, $matchingIds)) === count($matchingIds)) {
+            $this->selectedFeeMasters = [];
+        } else {
+            $this->selectedFeeMasters = $matchingIds;
+        }
+    }
+
     public function updatedAutoGenerateBillings()
     {
         if (!$this->isEdit) {

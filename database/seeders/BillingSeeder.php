@@ -102,6 +102,7 @@ class BillingSeeder extends Seeder
             'discount_applied' => 0,
             'final_amount' => $fmSPP_SMP->amount,
             'status' => 'UNPAID',
+            'due_date' => Carbon::parse('2026-03-10'),
             'created_at' => Carbon::parse('2026-03-01'),
         ]);
 
@@ -164,6 +165,7 @@ class BillingSeeder extends Seeder
                 'discount_applied' => $discountAmount,
                 'final_amount' => $fmSPP_SMA->amount - $discountAmount,
                 'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-02-10'),
                 'created_at' => Carbon::parse('2026-02-01'),
             ]);
 
@@ -191,6 +193,7 @@ class BillingSeeder extends Seeder
                 'discount_applied' => 0,
                 'final_amount' => $fmSPP_PPTQ->amount,
                 'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-01-15'),
                 'created_at' => Carbon::parse('2026-01-05'),
             ]);
         }
@@ -210,6 +213,7 @@ class BillingSeeder extends Seeder
                 'discount_applied' => $yatimDiscount,
                 'final_amount' => $fmSPP_SMP->amount - $yatimDiscount,
                 'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-01-15'),
                 'created_at' => Carbon::parse('2026-01-05'),
             ]);
 
@@ -223,6 +227,7 @@ class BillingSeeder extends Seeder
                     'discount_applied' => $yatimDiscount,
                     'final_amount' => $fmAsrama->amount - $yatimDiscount,
                     'status' => 'UNPAID',
+                    'due_date' => Carbon::parse('2026-01-15'),
                     'created_at' => Carbon::parse('2026-01-05'),
                 ]);
             }
@@ -237,6 +242,7 @@ class BillingSeeder extends Seeder
                     'discount_applied' => 0,
                     'final_amount' => $fmDaftarUlang->amount,
                     'status' => 'UNPAID',
+                    'due_date' => Carbon::parse('2025-12-15'),
                     'created_at' => Carbon::parse('2025-12-01'),
                 ]);
             }
@@ -250,6 +256,7 @@ class BillingSeeder extends Seeder
                 'discount_applied' => $yatimDiscount,
                 'final_amount' => $fmSPP_SMP->amount - $yatimDiscount,
                 'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-02-15'),
                 'created_at' => Carbon::parse('2026-02-01'),
             ]);
 
@@ -305,6 +312,69 @@ class BillingSeeder extends Seeder
                 'paid_at' => Carbon::parse('2025-12-15'),
             ]);
         }
+
+        // ══════════════════════════════════════════════
+        // BILLINGS FOR H. SYARIFUDDIN'S 4 CHILDREN (multi-student testing)
+        // ══════════════════════════════════════════════
+        $s9 = Student::where('full_name', 'Fathir Syarifuddin')->first();
+        $s10 = Student::where('full_name', 'Fania Syarifuddin')->first();
+        $s11 = Student::where('full_name', 'Farhan Syarifuddin')->first();
+        $s12 = Student::where('full_name', 'Farras Syarifuddin')->first();
+
+        if ($s9 && $s10 && $s11 && $s12) {
+            // Fathir (SMP) - SPP Maret (UNPAID Terlambat)
+            Billing::create([
+                'student_id' => $s9->id,
+                'fee_master_id' => $fmSPP_SMP?->id,
+                'title' => 'SPP SMP Maret 2026',
+                'original_amount' => $fmSPP_SMP->amount,
+                'discount_applied' => 0,
+                'final_amount' => $fmSPP_SMP->amount,
+                'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-03-15'),
+                'created_at' => Carbon::parse('2026-03-01'),
+            ]);
+
+            // Fania (SMA) - SPP Maret (UNPAID Terlambat)
+            Billing::create([
+                'student_id' => $s10->id,
+                'fee_master_id' => $fmSPP_SMA?->id,
+                'title' => 'SPP SMA Maret 2026',
+                'original_amount' => $fmSPP_SMA->amount,
+                'discount_applied' => 0,
+                'final_amount' => $fmSPP_SMA->amount,
+                'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-03-15'),
+                'created_at' => Carbon::parse('2026-03-01'),
+            ]);
+
+            // Farhan (PPTQ) - SPP Maret (UNPAID Terlambat)
+            Billing::create([
+                'student_id' => $s11->id,
+                'fee_master_id' => $fmSPP_PPTQ?->id,
+                'title' => 'SPP PPTQ Maret 2026',
+                'original_amount' => $fmSPP_PPTQ->amount,
+                'discount_applied' => 0,
+                'final_amount' => $fmSPP_PPTQ->amount,
+                'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-03-15'),
+                'created_at' => Carbon::parse('2026-03-01'),
+            ]);
+
+            // Farras (SMP Non-Mondok) - SPP Maret (UNPAID Terlambat)
+            Billing::create([
+                'student_id' => $s12->id,
+                'fee_master_id' => $fmSPP_SMP?->id,
+                'title' => 'SPP SMP Maret 2026',
+                'original_amount' => $fmSPP_SMP->amount,
+                'discount_applied' => 0,
+                'final_amount' => $fmSPP_SMP->amount,
+                'status' => 'UNPAID',
+                'due_date' => Carbon::parse('2026-03-15'),
+                'created_at' => Carbon::parse('2026-03-01'),
+            ]);
+        }
+
         }); // end Payment::withoutEvents
         }); // end Billing::withoutEvents
     }

@@ -473,21 +473,19 @@ class ComprehensiveRoleSecurityTest extends TestCase
             ->create([
                 'full_name' => 'Ahmad',
                 'whatsapp' => '081234567890',
-                'phone' => '081234567890',
                 'address' => 'Jl. Test No. 123'
             ]);
 
         Livewire::actingAs($guardian->user)
             ->test('GuardianProfileEdit')
             ->set('whatsapp', '089876543210')
-            ->set('phone', '089876543210')
             ->set('address', 'Jl. Test No. 456')
-            ->call('save');
+            ->call('updateProfile')
+            ->assertHasNoErrors();
 
         $this->assertDatabaseHas('guardians', [
             'id' => $guardian->id,
             'whatsapp' => '089876543210',
-            'phone' => '089876543210',
             'address' => 'Jl. Test No. 456',
         ]);
     }
@@ -506,7 +504,29 @@ class ComprehensiveRoleSecurityTest extends TestCase
         Livewire::actingAs($guardian2->user)
             ->test('GuardianProfileEdit')
             ->set('whatsapp', '081234567890') // guardian1's whatsapp
-            ->call('save')
+            ->call('updateProfile')
             ->assertHasErrors('whatsapp');
+    }
+
+    /** @test */
+    public function guardian_can_update_own_password_in_self_edit()
+    {
+        $user = User::factory()->create([
+            'role' => 'WALI_SANTRI',
+            'password' => \Illuminate\Support\Facades\Hash::make('oldpassword')
+        ]);
+        $guardian = Guardian::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        Livewire::actingAs($user)
+            ->test('GuardianProfileEdit')
+            ->set('current_password', 'oldpassword')
+            ->set('new_password', 'newpassword123')
+            ->set('new_password_confirmation', 'newpassword123')
+            ->call('updatePassword')
+            ->assertHasNoErrors();
+
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('newpassword123', $user->fresh()->password));
     }
 }

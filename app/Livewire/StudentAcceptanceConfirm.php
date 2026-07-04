@@ -80,6 +80,15 @@ class StudentAcceptanceConfirm extends Component
         }
     }
 
+    public function toggleSelectAll()
+    {
+        if (count($this->selectedBillings) === count($this->availableBillings)) {
+            $this->selectedBillings = [];
+        } else {
+            $this->selectedBillings = array_map(fn($b) => $b['id'], $this->availableBillings);
+        }
+    }
+
     public function cancel()
     {
         return redirect()->route('admin.student-acceptance');

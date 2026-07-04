@@ -15,7 +15,7 @@
             <form wire:submit="save" class="space-y-6">
                 <!-- Student Selection with Search Dropdown -->
                 <div class="relative" x-data="{ open: false }" x-on:click.outside="open = false">
-                    <label for="student_search" class="block text-sm font-medium text-foreground">Santri</label>
+                    <label for="student_search" class="block text-sm font-medium text-foreground">Santri <span class="text-red-500">*</span></label>
                     <div class="relative mt-1">
                         <input wire:model.live="student_search" type="text" id="student_search"
                             x-on:focus="open = true"
@@ -66,7 +66,7 @@
 
                 <!-- Fee Master Selection -->
                 <div>
-                    <label for="fee_master_id" class="block text-sm font-medium text-foreground">Jenis Biaya</label>
+                    <label for="fee_master_id" class="block text-sm font-medium text-foreground">Jenis Biaya <span class="text-red-500">*</span></label>
                     <select wire:model.live="fee_master_id" id="fee_master_id"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         <option value="">Pilih Jenis Biaya</option>
@@ -83,7 +83,7 @@
 
                 <!-- Title -->
                 <div>
-                    <label for="title" class="block text-sm font-medium text-foreground">Judul Tagihan</label>
+                    <label for="title" class="block text-sm font-medium text-foreground">Judul Tagihan <span class="text-red-500">*</span></label>
                     <input wire:model="title" type="text" id="title"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm"
                         placeholder="contoh: SPP Januari 2026">
@@ -95,7 +95,7 @@
                 <!-- Amounts -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label for="original_amount" class="block text-sm font-medium text-foreground">Jumlah Asli</label>
+                        <label for="original_amount" class="block text-sm font-medium text-foreground">Jumlah Asli <span class="text-red-500">*</span></label>
                         <input wire:model.live="original_amount" type="number" id="original_amount" step="0"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('original_amount')
@@ -104,7 +104,7 @@
                     </div>
 
                     <div>
-                        <label for="discount_applied" class="block text-sm font-medium text-foreground">Diskon</label>
+                        <label for="discount_applied" class="block text-sm font-medium text-foreground">Diskon <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                         <input wire:model.live="discount_applied" type="number" id="discount_applied" step="0"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('discount_applied')

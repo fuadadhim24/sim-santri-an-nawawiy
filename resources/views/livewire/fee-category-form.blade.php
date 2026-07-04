@@ -8,7 +8,7 @@
             <form wire:submit="save" class="space-y-6">
                 <!-- Name -->
                 <div>
-                    <label for="name" class="block text-sm font-medium text-foreground">Nama Kategori</label>
+                    <label for="name" class="block text-sm font-medium text-foreground">Nama Kategori <span class="text-red-500">*</span></label>
                     <input wire:model="name" type="text" id="name" placeholder="contoh: SPP"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('name')
@@ -18,7 +18,7 @@
 
                 <!-- Code -->
                 <div>
-                    <label for="code" class="block text-sm font-medium text-foreground">Kode Kategori (Slug)</label>
+                    <label for="code" class="block text-sm font-medium text-foreground">Kode Kategori (Slug) <span class="text-red-500">*</span></label>
                     <input wire:model="code" type="text" id="code" placeholder="contoh: SPP_BULANAN"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm uppercase">
                     <p class="mt-1 text-xs text-muted-foreground">Gunakan huruf besar, angka, dan underscore saja.</p>
@@ -29,7 +29,7 @@
 
                 <!-- Activation Mode -->
                 <div>
-                    <label for="activation_mode" class="block text-sm font-medium text-foreground">Mode Aktivasi</label>
+                    <label for="activation_mode" class="block text-sm font-medium text-foreground">Mode Aktivasi <span class="text-red-500">*</span></label>
                     <select wire:model="activation_mode" id="activation_mode"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @foreach($this->activationModeOptions as $value => $label)

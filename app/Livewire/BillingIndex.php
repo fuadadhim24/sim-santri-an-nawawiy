@@ -19,6 +19,7 @@ class BillingIndex extends Component
     public $unitFilter = '';       // Jenjang: 01, 02, 03
     public $classFilter = '';      // Kelas
     public $specialFilter = '';    // Golongan: UMUM, ANAK_GURU, YATIM
+    public $overdueFilter = false; // Filter tagihan terlambat
 
     // Split Billing / Installment Properties
     public $showSplitModal = false;
@@ -51,6 +52,11 @@ class BillingIndex extends Component
     }
 
     public function updatingSpecialFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOverdueFilter()
     {
         $this->resetPage();
     }
@@ -141,7 +147,22 @@ class BillingIndex extends Component
             });
         }
 
+        // Filter tagihan terlambat (UNPAID + due_date sudah lewat)
+        if ($this->overdueFilter) {
+            $query->where('status', 'UNPAID')
+                  ->where(function ($q) {
+                      $q->where('due_date', '<', now()->toDateString())
+                        ->orWhereNull('due_date'); // fallback: anggap terlambat jika tidak ada due_date
+                  });
+        }
+
         $billings = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        // Hitung tagihan terlambat untuk badge
+        $countOverdue = Billing::where('visible_to_wali', true)
+            ->where('status', 'UNPAID')
+            ->where('due_date', '<', now()->toDateString())
+            ->count();
 
         // Summary stats
         $summaryQuery = Billing::where('visible_to_wali', true);
@@ -172,6 +193,7 @@ class BillingIndex extends Component
             'totalPaid' => $totalPaid,
             'countUnpaid' => $countUnpaid,
             'countPaid' => $countPaid,
+            'countOverdue' => $countOverdue,
         ])->layout('layouts.admin');
     }
 

@@ -127,6 +127,20 @@
                         </div>
                     @else
                         <form wire:submit.prevent="confirmAcceptance">
+                            <!-- Select All Checkbox -->
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-border">
+                                <label class="inline-flex items-center text-sm font-semibold text-foreground cursor-pointer select-none">
+                                    <input type="checkbox" 
+                                           wire:click="toggleSelectAll" 
+                                           {{ count($selectedBillings) === count($availableBillings) ? 'checked' : '' }}
+                                           class="rounded border-input text-primary focus:ring-primary mr-2">
+                                    Pilih Semua Tagihan
+                                </label>
+                                <span class="text-xs text-muted-foreground font-medium">
+                                    Terpilih: {{ count($selectedBillings) }} dari {{ count($availableBillings) }}
+                                </span>
+                            </div>
+
                             <div class="space-y-3 mb-6">
                                 @foreach ($availableBillings as $billing)
                                     <label class="flex items-start p-4 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"

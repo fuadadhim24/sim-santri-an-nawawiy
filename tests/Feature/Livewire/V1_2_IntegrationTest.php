@@ -211,4 +211,58 @@ class V1_2_IntegrationTest extends TestCase
         $this->assertFalse($feeMaster->is_active);
         $this->assertTrue($feeMaster->trashed());
     }
+
+    /**
+     * Test Select All button on Student creation form.
+     */
+    public function test_select_all_fees_on_student_form(): void
+    {
+        $admin = User::factory()->create(['role' => 'SUPER_ADMIN']);
+        $this->actingAs($admin);
+
+        $category = FeeCategory::create([
+            'code' => 'SPP',
+            'name' => 'SPP',
+            'activation_mode' => 'multi_active',
+            'is_active' => true,
+        ]);
+
+        $fee1 = FeeMaster::create([
+            'item_name' => 'Fee 1',
+            'amount' => 10000,
+            'fee_category_id' => $category->id,
+            'is_active' => true,
+            'unit_target' => '01',
+            'residence_target' => 'MONDOK',
+        ]);
+
+        $fee2 = FeeMaster::create([
+            'item_name' => 'Fee 2',
+            'amount' => 20000,
+            'fee_category_id' => $category->id,
+            'is_active' => true,
+            'unit_target' => '01',
+            'residence_target' => 'MONDOK',
+        ]);
+
+        $guardian = Guardian::create([
+            'user_id' => User::factory()->create(['role' => 'WALI_SANTRI'])->id,
+            'full_name' => 'Wali Test',
+            'whatsapp' => '628123456789',
+        ]);
+
+        Livewire::test(\App\Livewire\StudentForm::class)
+            ->set('guardian_id', $guardian->id)
+            ->set('full_name', 'Santri Test')
+            ->set('unit_code', '01')
+            ->set('residence_status', 'MONDOK')
+            ->set('selectedFeeMasters', [])
+            // Call toggleSelectAllFees
+            ->call('toggleSelectAllFees')
+            // Expect both fee IDs in selectedFeeMasters
+            ->assertSet('selectedFeeMasters', [(string)$fee1->id, (string)$fee2->id])
+            // Call it again to uncheck all
+            ->call('toggleSelectAllFees')
+            ->assertSet('selectedFeeMasters', []);
+    }
 }

@@ -9,7 +9,7 @@
 
                 <!-- Title -->
                 <div>
-                    <label for="title" class="block text-sm font-medium text-foreground">Judul *</label>
+                    <label for="title" class="block text-sm font-medium text-foreground">Judul <span class="text-red-500">*</span></label>
                     <input wire:model="title" type="text" id="title" placeholder="Contoh: Jadwal Pendaftaran Santri Baru"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('title')
@@ -19,7 +19,7 @@
 
                 <!-- Category -->
                 <div>
-                    <label for="category" class="block text-sm font-medium text-foreground">Kategori *</label>
+                    <label for="category" class="block text-sm font-medium text-foreground">Kategori <span class="text-red-500">*</span></label>
                     <select wire:model.live="category" id="category"
                         class="mt-1 block w-full px-3 py-2 pr-8 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @foreach($this->categoryOptions as $value => $label)
@@ -33,7 +33,7 @@
 
                 <!-- Content -->
                 <div>
-                    <label for="content" class="block text-sm font-medium text-foreground">Isi / Konten *</label>
+                    <label for="content" class="block text-sm font-medium text-foreground">Isi / Konten <span class="text-red-500">*</span></label>
                     <textarea wire:model="content" id="content" rows="8" placeholder="Tulis informasi detail di sini..."
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm"></textarea>
                     <p class="mt-1 text-xs text-muted-foreground">Anda bisa menulis teks panjang, termasuk daftar biaya, persyaratan, dll.</p>
@@ -44,7 +44,7 @@
 
                 <!-- Image Upload -->
                 <div>
-                    <label class="block text-sm font-medium text-foreground">Gambar (opsional)</label>
+                    <label class="block text-sm font-medium text-foreground">Gambar <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                     @if($existingImage)
                         <div class="mt-2 flex items-center space-x-3">
                             <img src="{{ asset('storage/' . $existingImage) }}" alt="Preview" class="h-20 w-auto rounded border border-border">
@@ -61,7 +61,7 @@
 
                 <!-- PDF Upload -->
                 <div>
-                    <label class="block text-sm font-medium text-foreground">Dokumen PDF (opsional)</label>
+                    <label class="block text-sm font-medium text-foreground">Dokumen PDF <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                     @if($existingPdf)
                         <div class="mt-2 flex items-center space-x-3">
                             <span class="inline-flex items-center px-3 py-1.5 rounded bg-red-50 text-red-700 text-sm">

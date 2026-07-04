@@ -15,10 +15,10 @@
             <p class="text-2xl font-bold text-green-600 mt-1">{{ $countPaid }}</p>
             <p class="text-sm text-muted-foreground">Rp {{ number_format($totalPaid, 0, ',', '.') }}</p>
         </div>
-        <div class="bg-card rounded-lg shadow-sm border border-border p-4">
-            <p class="text-xs text-muted-foreground uppercase tracking-wide">Total Tagihan</p>
-            <p class="text-2xl font-bold text-foreground mt-1">{{ $countUnpaid + $countPaid }}</p>
-            <p class="text-sm text-muted-foreground">Rp {{ number_format($totalUnpaid + $totalPaid, 0, ',', '.') }}</p>
+        <div class="bg-card rounded-lg shadow-sm border border-border p-4 {{ $countOverdue > 0 ? 'border-orange-300 bg-orange-50' : '' }}">
+            <p class="text-xs uppercase tracking-wide {{ $countOverdue > 0 ? 'text-orange-600' : 'text-muted-foreground' }}">Terlambat</p>
+            <p class="text-2xl font-bold mt-1 {{ $countOverdue > 0 ? 'text-orange-600' : 'text-foreground' }}">{{ $countOverdue }}</p>
+            <p class="text-sm {{ $countOverdue > 0 ? 'text-orange-500' : 'text-muted-foreground' }}">tagihan belum lunas</p>
         </div>
         <div class="bg-card rounded-lg shadow-sm border border-border p-4">
             <p class="text-xs text-muted-foreground uppercase tracking-wide">Tingkat Lunas</p>
@@ -81,6 +81,25 @@
                     <option value="PAID">Lunas</option>
                     <option value="VOID">Dibatalkan</option>
                 </select>
+
+                <!-- Filter Terlambat -->
+                <button wire:click="$toggle('overdueFilter')"
+                    class="inline-flex items-center py-2 px-3 rounded-md border text-sm font-medium transition-colors
+                        {{ $overdueFilter
+                            ? 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600'
+                            : 'bg-background text-muted-foreground border-input hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300' }}">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Terlambat
+                    @if($countOverdue > 0)
+                        <span class="ml-1.5 px-1.5 py-0.5 text-xs font-bold rounded-full
+                            {{ $overdueFilter ? 'bg-white text-orange-600' : 'bg-orange-500 text-white' }}">
+                            {{ $countOverdue }}
+                        </span>
+                    @endif
+                </button>
 
                 <!-- Search -->
                 <input wire:model.live="search" type="text" placeholder="Cari santri / tagihan..."

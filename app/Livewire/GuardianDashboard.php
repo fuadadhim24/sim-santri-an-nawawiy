@@ -52,12 +52,20 @@ class GuardianDashboard extends Component
         $hasActiveStudents = $guardian->students->where('status', 'diterima')->isNotEmpty();
         $hasPendingStudents = $guardian->students->where('status', 'menunggu')->isNotEmpty();
         $totalUnpaid = 0;
+        $countOverdue = 0;
+        $overdueItems = collect();
 
         if ($hasActiveStudents) {
             foreach ($guardian->students as $student) {
                 foreach ($student->billings as $bill) {
                     if ($bill->status === 'UNPAID') {
                         $totalUnpaid += $bill->final_amount;
+
+                        $dueDate = $bill->due_date ?? $bill->created_at->addDays(14);
+                        if ($dueDate->isPast()) {
+                            $countOverdue++;
+                            $overdueItems->push($bill);
+                        }
                     }
                 }
             }
@@ -103,6 +111,8 @@ class GuardianDashboard extends Component
         return view('livewire.guardian-dashboard', [
             'guardian' => $guardian,
             'totalUnpaid' => $totalUnpaid,
+            'countOverdue' => $countOverdue,
+            'overdueItems' => $overdueItems,
             'hasStudents' => $hasStudents,
             'hasActiveStudents' => $hasActiveStudents,
             'hasPendingStudents' => $hasPendingStudents,

@@ -23,6 +23,7 @@ class FeeMasterSeeder extends Seeder
             'item_name' => 'Biaya Pendaftaran SPMB',
             'amount' => 12000,
             'start_date' => '2025-01-01',
+            'end_date' => '2025-06-30', // Pendaftaran berakhir Juni
             'unit_target' => null,
             'residence_target' => null,
         ]);
@@ -35,6 +36,7 @@ class FeeMasterSeeder extends Seeder
             'item_name' => 'Biaya Daftar Ulang Semester',
             'amount' => 15000,
             'start_date' => '2025-01-01',
+            'end_date' => '2025-12-31', // Daftar ulang berakhir akhir tahun
             'unit_target' => null,
             'residence_target' => null,
         ]);
@@ -48,6 +50,7 @@ class FeeMasterSeeder extends Seeder
             'amount' => 15000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
+            'end_date' => null, // Berulang selamanya
             'unit_target' => '01',
             'residence_target' => null,
         ]);
@@ -58,6 +61,7 @@ class FeeMasterSeeder extends Seeder
             'amount' => 16000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
+            'end_date' => null, // Berulang selamanya
             'unit_target' => '02',
             'residence_target' => null,
         ]);
@@ -68,6 +72,7 @@ class FeeMasterSeeder extends Seeder
             'amount' => 15500,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
+            'end_date' => null, // Berulang selamanya
             'unit_target' => '03',
             'residence_target' => null,
         ]);
@@ -81,6 +86,7 @@ class FeeMasterSeeder extends Seeder
             'amount' => 14000,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
+            'end_date' => null, // Berulang selamanya
             'unit_target' => null,
             'residence_target' => 'MONDOK',
         ]);
@@ -91,6 +97,7 @@ class FeeMasterSeeder extends Seeder
             'amount' => 14500,
             'billing_day' => 10,
             'start_date' => '2025-01-01',
+            'end_date' => null, // Berulang selamanya
             'unit_target' => null,
             'residence_target' => 'MONDOK',
         ]);
@@ -103,6 +110,7 @@ class FeeMasterSeeder extends Seeder
             'item_name' => 'Biaya Semester',
             'amount' => 15000,
             'start_date' => '2025-01-01',
+            'end_date' => '2026-12-31', // Berakhir akhir 2026
             'unit_target' => null,
             'residence_target' => null,
         ]);
@@ -112,6 +120,7 @@ class FeeMasterSeeder extends Seeder
             'item_name' => 'Biaya Akhir Sekolah',
             'amount' => 15000,
             'start_date' => '2025-01-01',
+            'end_date' => '2025-06-15', // Berakhir Juni 2025
             'unit_target' => '02',
             'residence_target' => null,
         ]);

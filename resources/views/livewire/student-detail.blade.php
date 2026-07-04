@@ -294,11 +294,27 @@
                                     {{ $billing->created_at->locale('id')->isoFormat('D MMMM Y') }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if ($billing->status == 'PAID')
+                                    @if ($billing->status === 'PAID')
                                         <a href="{{ route('admin.receipts.show', $billing->id) }}" target="_blank"
-                                            class="text-primary hover:text-primary/80 font-medium">Kwitansi</a>
+                                            class="inline-flex items-center text-xs font-semibold text-primary hover:opacity-85 transition">
+                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            Kwitansi
+                                        </a>
+                                    @elseif ($billing->status === 'UNPAID')
+                                        @php
+                                            $dueDate = $billing->due_date ?? $billing->created_at->addDays(14);
+                                            $isOverdue = $dueDate->isPast();
+                                        @endphp
+                                        <a href="{{ route('duitku.pay', [$billing->id, 'force' => 1]) }}"
+                                            onclick="event.preventDefault(); Swal.fire({title:'Konfirmasi Pembayaran', text:'Apakah Anda yakin ingin membayar {{ $billing->title }} sebesar Rp {{ number_format($billing->final_amount, 0, ',', '.') }}?', icon:'question', showCancelButton:true, confirmButtonText:'Ya, Bayar', cancelButtonText:'Batal', confirmButtonColor:'{{ $isOverdue ? '#c62828' : '#2e7d32' }}'}).then((r)=>{ if(r.isConfirmed) window.location.href=this.href; })"
+                                            style="background-color: {{ $isOverdue ? '#c62828' : '#2e7d32' }}; color: #ffffff;"
+                                            class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-lg transition shadow-sm hover:opacity-90">
+                                            Bayar
+                                        </a>
                                     @else
-                                        <span class="text-gray-400 text-xs">-</span>
+                                        <span class="text-muted-foreground text-xs">—</span>
                                     @endif
                                 </td>
                             </tr>

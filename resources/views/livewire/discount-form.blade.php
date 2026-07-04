@@ -9,7 +9,7 @@
 
                 <!-- Fee Master -->
                 <div>
-                    <label for="fee_master_id" class="block text-sm font-medium text-foreground">Nama Biaya</label>
+                    <label for="fee_master_id" class="block text-sm font-medium text-foreground">Nama Biaya <span class="text-red-500">*</span></label>
                     <select wire:model="fee_master_id" id="fee_master_id"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         <option value="">Pilih Nama Biaya...</option>
@@ -28,7 +28,7 @@
                 <!-- Target Status -->
                 <div>
                     <label for="target_status" class="block text-sm font-medium text-foreground">Status Target
-                        (Penerima)</label>
+                        (Penerima) <span class="text-red-500">*</span></label>
                     <select wire:model="target_status" id="target_status"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         <option value="ANAK_GURU">Anak Guru</option>
@@ -42,7 +42,7 @@
                 <!-- Discount Amount -->
                 <div>
                     <label for="discount_amount" class="block text-sm font-medium text-foreground">Jumlah Diskon
-                        (Rp)</label>
+                        (Rp) <span class="text-red-500">*</span></label>
                     <input wire:model="discount_amount" type="number" id="discount_amount" placeholder="e.g. 50000"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     <p class="mt-1 text-xs text-muted-foreground">Jumlah yang akan dipotong dari biaya asli.</p>

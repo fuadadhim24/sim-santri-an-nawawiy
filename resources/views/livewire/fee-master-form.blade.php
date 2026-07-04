@@ -12,7 +12,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <label for="fee_category_id" class="block text-sm font-medium text-foreground">Kategori
-                                Biaya</label>
+                                Biaya <span class="text-red-500">*</span></label>
                             <a href="{{ route('admin.fee-categories.create') }}"
                                 class="text-xs text-primary hover:underline">+ Kategori Baru</a>
                         </div>
@@ -31,7 +31,7 @@
                     <!-- Item Name -->
                     <div>
                         <label for="item_name" class="block text-sm font-medium text-foreground mb-1">Nama Item
-                            Biaya</label>
+                            Biaya <span class="text-red-500">*</span></label>
                         <input wire:model="item_name" type="text" id="item_name" placeholder="contoh: SPP 2026"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('item_name')
@@ -42,7 +42,7 @@
 
                 <!-- Amount -->
                 <div>
-                    <label for="amount" class="block text-sm font-medium text-foreground mb-1">Jumlah (Rp)</label>
+                    <label for="amount" class="block text-sm font-medium text-foreground mb-1">Jumlah (Rp) <span class="text-red-500">*</span></label>
                     <div class="mt-1 relative rounded-md shadow-sm" x-data="{
                         get displayValue() {
                             let val = $wire.amount;
@@ -65,7 +65,7 @@
                 <!-- Scheduling / Recurrence Rules -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-border">
                     <div>
-                        <label for="recurrence_type" class="block text-sm font-medium text-foreground mb-1">Tipe Siklus Tagihan</label>
+                        <label for="recurrence_type" class="block text-sm font-medium text-foreground mb-1">Tipe Siklus Tagihan <span class="text-red-500">*</span></label>
                         <select wire:model.live="recurrence_type" id="recurrence_type"
                             class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="ONE_TIME">Sekali Bayar (Misal: Uang Pangkal)</option>
@@ -80,7 +80,7 @@
                     </div>
 
                     <div>
-                        <label for="due_days" class="block text-sm font-medium text-foreground mb-1">Jatuh Tempo (Hari)</label>
+                        <label for="due_days" class="block text-sm font-medium text-foreground mb-1">Jatuh Tempo (Hari) <span class="text-red-500">*</span></label>
                         <input wire:model="due_days" type="number" id="due_days" min="0" placeholder="14"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('due_days')
@@ -91,7 +91,7 @@
 
                     @if($recurrence_type !== 'ONE_TIME')
                     <div>
-                        <label for="billing_day" class="block text-sm font-medium text-foreground mb-1">Tanggal Generate</label>
+                        <label for="billing_day" class="block text-sm font-medium text-foreground mb-1">Tanggal Generate <span class="text-red-500">*</span></label>
                         <input wire:model="billing_day" type="number" id="billing_day" min="1" max="31" placeholder="1"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('billing_day')
@@ -105,7 +105,7 @@
                 <!-- Validity Dates -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="start_date" class="block text-sm font-medium text-foreground">Mulai Berlaku</label>
+                        <label for="start_date" class="block text-sm font-medium text-foreground">Mulai Berlaku <span class="text-red-500">*</span></label>
                         <input wire:model="start_date" type="date" id="start_date"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('start_date')
@@ -113,8 +113,7 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="end_date" class="block text-sm font-medium text-foreground">Berakhir Pada
-                            (Opsional)</label>
+                        <label for="end_date" class="block text-sm font-medium text-foreground">Berakhir Pada <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                         <input wire:model="end_date" type="date" id="end_date"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('end_date')
@@ -127,7 +126,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-border">
                     <div>
                         <label for="unit_target" class="block text-sm font-medium text-foreground mb-1">Target
-                            Unit</label>
+                            Unit <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                         <select wire:model="unit_target" id="unit_target"
                             class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Semua Unit</option>
@@ -138,7 +137,7 @@
                     </div>
                     <div>
                         <label for="residence_target" class="block text-sm font-medium text-foreground mb-1">Target
-                            Domisili</label>
+                            Domisili <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                         <select wire:model="residence_target" id="residence_target"
                             class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Semua Status Domisili</option>
@@ -149,7 +148,7 @@
                     </div>
                     <div>
                         <label for="class_level_target_id" class="block text-sm font-medium text-foreground mb-1">Target
-                            Kelas</label>
+                            Kelas <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                         <select wire:model="class_level_target_id" id="class_level_target_id"
                             class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Semua Kelas</option>

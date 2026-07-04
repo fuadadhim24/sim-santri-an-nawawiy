@@ -9,7 +9,7 @@
 
                 <!-- Full Name -->
                 <div>
-                    <label for="full_name" class="block text-sm font-medium text-foreground">Nama Lengkap</label>
+                    <label for="full_name" class="block text-sm font-medium text-foreground">Nama Lengkap <span class="text-red-500">*</span></label>
                     <input wire:model="full_name" type="text" id="full_name"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('full_name')
@@ -19,7 +19,7 @@
 
                 <!-- WhatsApp -->
                 <div>
-                    <label for="whatsapp" class="block text-sm font-medium text-foreground">Nomor WhatsApp</label>
+                    <label for="whatsapp" class="block text-sm font-medium text-foreground">Nomor WhatsApp <span class="text-red-500">*</span></label>
                     <input wire:model="whatsapp" type="text" id="whatsapp"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('whatsapp')
@@ -29,7 +29,7 @@
 
                 <!-- Email -->
                 <div>
-                    <label for="email" class="block text-sm font-medium text-foreground">Alamat Email</label>
+                    <label for="email" class="block text-sm font-medium text-foreground">Alamat Email <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                     <input wire:model="email" type="email" id="email"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('email')
@@ -40,7 +40,11 @@
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-foreground">
-                        Kata Sandi {{ $isEdit ? '(Kosongkan jika tidak ingin mengubah)' : '' }}
+                        @if($isEdit)
+                            Kata Sandi <span class="text-muted-foreground font-normal text-[11px]">(Opsional - Kosongkan jika tidak ingin mengubah)</span>
+                        @else
+                            Kata Sandi <span class="text-red-500">*</span>
+                        @endif
                     </label>
                     <input wire:model="password" type="password" id="password"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">

@@ -277,6 +277,91 @@ class UserSeeder extends Seeder
         ]);
 
         // ──────────────────────────────────────────────
+        // 6. Wali Santri 6 — H. Syarifuddin (4 santri: diterima semua)
+        // ──────────────────────────────────────────────
+        $waliUser6 = User::create([
+            'name' => 'H. Syarifuddin',
+            'whatsapp' => '081122334455',
+            'email' => null,
+            'password' => Hash::make('password'),
+            'role' => 'WALI_SANTRI',
+        ]);
+
+        $guardian6 = Guardian::create([
+            'user_id' => $waliUser6->id,
+            'full_name' => 'H. Syarifuddin',
+            'whatsapp' => '081122334455',
+        ]);
+
+        // Santri 9: SMP
+        Student::create([
+            'guardian_id' => $guardian6->id,
+            'spmb_schedule_id' => $spmbSchedule?->id,
+            'nis' => '2026.01.0009',
+            'registration_number' => '2026.0009',
+            'full_name' => 'Fathir Syarifuddin',
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
+            'special_status' => 'UMUM',
+            'status' => StudentStatus::ACCEPTED->value,
+            'class_level_id' => $level7?->id,
+            'study_group_id' => $rombel7A?->id,
+            'address' => 'Jl. Keadilan No. 40, Kota Depok',
+            'is_active' => true,
+        ]);
+
+        // Santri 10: SMA
+        Student::create([
+            'guardian_id' => $guardian6->id,
+            'spmb_schedule_id' => $spmbSchedule?->id,
+            'nis' => '2026.02.0009',
+            'registration_number' => '2026.0010',
+            'full_name' => 'Fania Syarifuddin',
+            'unit_code' => '02',
+            'residence_status' => 'MONDOK',
+            'special_status' => 'UMUM',
+            'status' => StudentStatus::ACCEPTED->value,
+            'class_level_id' => $level10?->id,
+            'study_group_id' => $rombel10A?->id,
+            'address' => 'Jl. Keadilan No. 40, Kota Depok',
+            'is_active' => true,
+        ]);
+
+        // Santri 11: PPTQ
+        Student::create([
+            'guardian_id' => $guardian6->id,
+            'spmb_schedule_id' => $spmbSchedule?->id,
+            'nis' => '2026.03.0009',
+            'registration_number' => '2026.0011',
+            'full_name' => 'Farhan Syarifuddin',
+            'unit_code' => '03',
+            'residence_status' => 'MONDOK',
+            'special_status' => 'UMUM',
+            'status' => StudentStatus::ACCEPTED->value,
+            'class_level_id' => $levelTahfidz?->id,
+            'study_group_id' => $rombelTahfidzA?->id,
+            'address' => 'Jl. Keadilan No. 40, Kota Depok',
+            'is_active' => true,
+        ]);
+
+        // Santri 12: SMP Non Mondok
+        Student::create([
+            'guardian_id' => $guardian6->id,
+            'spmb_schedule_id' => $spmbSchedule?->id,
+            'nis' => '2026.01.0010',
+            'registration_number' => '2026.0012',
+            'full_name' => 'Farras Syarifuddin',
+            'unit_code' => '01',
+            'residence_status' => 'NON_MONDOK',
+            'special_status' => 'UMUM',
+            'status' => StudentStatus::ACCEPTED->value,
+            'class_level_id' => $level8?->id,
+            'study_group_id' => $rombel8B?->id,
+            'address' => 'Jl. Keadilan No. 40, Kota Depok',
+            'is_active' => true,
+        ]);
+
+        // ──────────────────────────────────────────────
         // 7. Wali Santri Tanpa Santri (Untuk testing/pembersihan)
         // ──────────────────────────────────────────────
         $waliTanpaSantri1 = User::create([

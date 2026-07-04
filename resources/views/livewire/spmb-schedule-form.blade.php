@@ -8,7 +8,7 @@
             <form wire:submit="save" class="space-y-6">
                 <!-- Name -->
                 <div>
-                    <label for="name" class="block text-sm font-medium text-foreground">Nama Jadwal</label>
+                    <label for="name" class="block text-sm font-medium text-foreground">Nama Jadwal <span class="text-red-500">*</span></label>
                     <input wire:model="name" type="text" id="name" placeholder="contoh: SPMB 2026/2027"
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                     @error('name')
@@ -18,7 +18,7 @@
 
                 <!-- Description -->
                 <div>
-                    <label for="description" class="block text-sm font-medium text-foreground">Deskripsi</label>
+                    <label for="description" class="block text-sm font-medium text-foreground">Deskripsi <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
                     <textarea wire:model="description" id="description" rows="3" placeholder="Deskripsi jadwal SPMB..."
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm"></textarea>
                     @error('description')
@@ -29,7 +29,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Registration Start -->
                     <div>
-                        <label for="registration_start" class="block text-sm font-medium text-foreground">Tanggal Mulai Pendaftaran</label>
+                        <label for="registration_start" class="block text-sm font-medium text-foreground">Tanggal Mulai Pendaftaran <span class="text-red-500">*</span></label>
                         <input wire:model.blur="registration_start" type="datetime-local" id="registration_start"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('registration_start')
@@ -39,7 +39,7 @@
 
                     <!-- Registration End -->
                     <div>
-                        <label for="registration_end" class="block text-sm font-medium text-foreground">Tanggal Selesai Pendaftaran</label>
+                        <label for="registration_end" class="block text-sm font-medium text-foreground">Tanggal Selesai Pendaftaran <span class="text-red-500">*</span></label>
                         <input wire:model.blur="registration_end" type="datetime-local" id="registration_end"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('registration_end')
