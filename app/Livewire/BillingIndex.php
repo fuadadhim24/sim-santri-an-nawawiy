@@ -21,14 +21,14 @@ class BillingIndex extends Component
     public $specialFilter = '';    // Golongan: UMUM, ANAK_GURU, YATIM
     public $overdueFilter = false; // Filter tagihan terlambat
 
+    public array $overdueReminderItems = [];
+
     // Split Billing / Installment Properties
     public $showSplitModal = false;
     public $billingToSplit = null;
     public $splitCount = 2;
     public $splitAmounts = [];
     public $splitTitles = [];
-
-
 
     public function updatingSearch()
     {
@@ -79,6 +79,79 @@ class BillingIndex extends Component
             ->toArray();
     }
 
+    private function loadOverdueReminderItems(): void
+    {
+        $query = Billing::with(['student.guardian', 'feeMaster', 'payments'])->where('visible_to_wali', true);
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->whereHas('student', function ($sq) {
+                    $sq->where('full_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('nis', 'like', '%' . $this->search . '%')
+                        ->orWhere('registration_number', 'like', '%' . $this->search . '%');
+                })->orWhere('title', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        if ($this->statusFilter) {
+            $query->where('status', $this->statusFilter);
+        }
+
+        if ($this->unitFilter) {
+            $query->whereHas('student', function ($sq) {
+                $sq->where('unit_code', $this->unitFilter);
+            });
+        }
+
+        if ($this->classFilter) {
+            $query->whereHas('student', function ($sq) {
+                $sq->where('class_name', $this->classFilter);
+            });
+        }
+
+        if ($this->specialFilter) {
+            $query->whereHas('student', function ($sq) {
+                $sq->where('special_status', $this->specialFilter);
+            });
+        }
+
+        $this->overdueReminderItems = [];
+
+        if ($this->overdueFilter) {
+            $query->where('status', 'UNPAID')
+                ->where(function ($q) {
+                    $q->where('due_date', '<', now()->toDateString())
+                        ->orWhereNull('due_date');
+                });
+
+            $this->overdueReminderItems = $query->orderBy('created_at', 'desc')
+                ->get()
+                ->filter(fn ($billing) => $billing->student)
+                ->groupBy(fn ($billing) => $billing->student_id)
+                ->map(function ($items) {
+                    $firstBilling = $items->first();
+                    $student = $firstBilling->student;
+                    $guardian = $student?->guardian;
+
+                    return [
+                        'student_id' => $student?->id,
+                        'student_name' => $student?->full_name ?? 'Santri',
+                        'guardian_name' => $guardian?->full_name ?? 'Wali Santri',
+                        'guardian_phone' => $guardian?->whatsapp ?? '',
+                        'count' => $items->count(),
+                        'billings' => $items->map(function ($billing) {
+                            return [
+                                'title' => $billing->title,
+                                'amount' => (int) $billing->final_amount,
+                            ];
+                        })->values()->all(),
+                    ];
+                })
+                ->values()
+                ->all();
+        }
+    }
+
     public function processCashPayment($billingId)
     {
         if (!Auth::check() || !in_array(Auth::user()->role, ['BENDAHARA', 'SUPER_ADMIN', 'ADMINISTRASI'])) {
@@ -110,7 +183,7 @@ class BillingIndex extends Component
 
     public function render()
     {
-        $query = Billing::with(['student', 'feeMaster', 'payments'])->where('visible_to_wali', true);
+        $query = Billing::with(['student.guardian', 'feeMaster', 'payments'])->where('visible_to_wali', true);
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -158,6 +231,12 @@ class BillingIndex extends Component
 
         $billings = $query->orderBy('created_at', 'desc')->paginate(10);
 
+        if ($this->overdueFilter) {
+            $this->loadOverdueReminderItems();
+        } else {
+            $this->overdueReminderItems = [];
+        }
+
         // Hitung tagihan terlambat untuk badge
         $countOverdue = Billing::where('visible_to_wali', true)
             ->where('status', 'UNPAID')
@@ -194,6 +273,7 @@ class BillingIndex extends Component
             'countUnpaid' => $countUnpaid,
             'countPaid' => $countPaid,
             'countOverdue' => $countOverdue,
+            'overdueReminderItems' => $this->overdueReminderItems,
         ])->layout('layouts.admin');
     }
 

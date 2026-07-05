@@ -2,9 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Enums\StudentStatus;
 use App\Models\Guardian;
+use App\Models\SpmbSchedule;
 use App\Models\Student;
 use App\Models\User;
+use Database\Seeders\RombelSeeder;
+use Database\Seeders\SpmbScheduleSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -132,4 +137,40 @@ class StudentManagementTest extends TestCase
         // Response depends on implementation - should redirect or return success
         $this->assertTrue($response->status() === 302 || $response->status() === 200);
     }
-}
+
+    public function test_admin_reject_student_via_ajax_updates_status_and_returns_json()
+    {
+        $student = Student::factory()->create(['status' => 'REGISTERED']);
+
+        $response = $this->actingAs($this->admin)
+            ->withHeader('Accept', 'application/json')
+            ->post("/admin/students/{$student->id}/reject", [
+                'reason' => 'Dokumen tidak lengkap',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        $student->refresh();
+        $this->assertSame('ditolak', $student->status);
+        $this->assertSame('Dokumen tidak lengkap', $student->rejection_note);
+    }
+    public function test_seeders_create_multiple_active_spmb_schedules_and_pending_students_across_them()
+    {
+        $this->seed(SpmbScheduleSeeder::class);
+        $this->seed(RombelSeeder::class);
+        $this->seed(UserSeeder::class);
+
+        $activeSchedules = SpmbSchedule::where('is_active', true)->get();
+        $this->assertGreaterThanOrEqual(2, $activeSchedules->count());
+
+        $pendingScheduleIds = Student::where('status', StudentStatus::PENDING->value)
+            ->pluck('spmb_schedule_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $this->assertGreaterThanOrEqual(2, $pendingScheduleIds->count());
+    }}

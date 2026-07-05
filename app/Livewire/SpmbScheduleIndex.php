@@ -4,16 +4,19 @@ namespace App\Livewire;
 
 use App\Models\SpmbSchedule;
 use Livewire\Component;
+use Livewire\WithPagination;
 use SweetAlert2\Laravel\Swal;
 
 class SpmbScheduleIndex extends Component
 {
-    public $schedules;
+    use WithPagination;
 
     public function render()
     {
-        $this->schedules = SpmbSchedule::orderBy('registration_start', 'desc')->get();
-        return view('livewire.spmb-schedule-index')->layout('layouts.admin');
+        $schedules = SpmbSchedule::orderBy('registration_start', 'desc')->paginate(10);
+        return view('livewire.spmb-schedule-index', [
+            'schedules' => $schedules
+        ])->layout('layouts.admin');
     }
 
     public function delete($id)

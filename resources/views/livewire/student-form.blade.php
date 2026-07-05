@@ -234,11 +234,11 @@
                     </div>
                 </div>
 
-                @if (!$isEdit && $this->matchingFeeMasters->isNotEmpty())
+                @if (!$isEdit && !empty($availableBillings))
                     <!-- Auto-generate Billings Checkbox -->
-                    <div class="border-t border-border pt-6">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <input type="checkbox" wire:model.live="autoGenerateBillings"
+                    <div class="border-t border-border pt-6 mt-6">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <input type="checkbox" wire:model.live="autoGenerateBillings" id="autoGenerateBillings"
                                 class="h-4 w-4 text-primary focus:ring-primary border-input rounded">
                             <label for="autoGenerateBillings" class="text-sm font-medium text-foreground cursor-pointer">
                                 Generate tagihan otomatis untuk santri baru
@@ -246,57 +246,110 @@
                         </div>
 
                         @if ($autoGenerateBillings)
-                            <!-- Fee Master Selection -->
+                            <!-- Fee Category Selection -->
                             <div>
-                                <h4 class="text-md font-medium text-foreground mb-3">Pilih Tagihan yang Akan Dibuat</h4>
-                                <p class="text-sm text-muted-foreground mb-4">
-                                    Tagihan yang tersedia berdasarkan:
-                                    <span class="font-medium text-foreground">Unit {{ $unit_code == '01' ? 'SMP' : ($unit_code == '02' ? 'SMA' : 'PPTQ') }}</span> •
-                                    <span class="font-medium text-foreground">{{ $residence_status == 'MONDOK' ? 'Mondok' : ($residence_status == 'NON_MONDOK' ? 'Non Mondok' : 'Ngaji Only') }}</span>
-                                </p>
+                                <h4 class="text-md font-medium text-foreground mb-4 flex items-center justify-between">
+                                    Pilih Kategori Tagihan
+                                    <div x-data="{ showInfo: false }" class="relative flex items-center">
+                                        <button type="button" @click="showInfo = !showInfo" @click.outside="showInfo = false" class="p-1.5 text-muted-foreground hover:text-primary hover:bg-secondary rounded-md transition-colors focus:outline-none" title="Informasi Tagihan">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </button>
+                                        <div x-show="showInfo" x-transition style="display: none;" class="absolute right-0 top-full mt-2 px-4 py-3 whitespace-nowrap bg-popover text-popover-foreground text-xs rounded-md shadow-lg border border-border z-50 text-center leading-relaxed font-normal">
+                                            Disesuaikan otomatis dengan<br>Unit & Domisili.
+                                            <div class="absolute -top-1 right-3 w-2 h-2 bg-popover border-t border-l border-border rotate-45"></div>
+                                        </div>
+                                    </div>
+                                </h4>
 
                                 <!-- Select All Checkbox -->
-                                <div class="flex items-center justify-between mb-3">
-                                    <label class="inline-flex items-center text-xs font-semibold text-foreground cursor-pointer select-none">
+                                <div class="flex items-center justify-between mb-4">
+                                    <label class="inline-flex items-center text-xs font-semibold text-foreground cursor-pointer select-none hover:text-primary transition-colors group">
                                         <input type="checkbox" 
                                                wire:click="toggleSelectAllFees" 
-                                               @if(count(array_intersect(array_map('strval', $selectedFeeMasters), $this->matchingFeeMasters->pluck('id')->map(fn($id) => (string) $id)->toArray())) === count($this->matchingFeeMasters)) checked @endif
-                                               class="rounded border-input text-primary focus:ring-primary mr-1.5 h-3.5 w-3.5">
-                                        Pilih Semua Tagihan
+                                               {{ count($selectedBillings) === count($availableBillings) && count($availableBillings) > 0 ? 'checked' : '' }}
+                                               class="rounded border-input text-primary focus:ring-primary mr-2 transition-all group-hover:border-primary">
+                                        Semua Kategori
                                     </label>
+                                    <span class="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-bold">
+                                        {{ count($selectedBillings) }}/{{ count($availableBillings) }}
+                                    </span>
                                 </div>
 
-                                <!-- List of billings with checkboxes -->
-                                <div class="space-y-2 max-h-64 overflow-y-auto border border-border rounded-md p-3 bg-muted/30 mb-4">
-                                    @foreach ($this->matchingFeeMasters as $fee)
-                                        <label class="flex items-start space-x-3 p-2 hover:bg-muted rounded cursor-pointer">
-                                            <input type="checkbox" wire:model.live="selectedFeeMasters" value="{{ $fee->id }}"
-                                                class="mt-1 h-4 w-4 text-primary focus:ring-primary border-input rounded">
-                                            <div class="flex-1">
-                                                <span class="text-sm font-medium text-foreground">{{ $fee->item_name }}</span>
-                                                <span class="text-xs text-muted-foreground block">
-                                                    {{ $fee->category->name ?? 'Tanpa Kategori' }} • Rp {{ number_format($fee->amount, 0, ',', '.') }}
-                                                </span>
-                                                <span class="text-xs text-muted-foreground block">
-                                                    @if ($fee->start_date)
-                                                        Mulai: {{ $fee->start_date->format('d M Y') }}
-                                                    @endif
-                                                    @if ($fee->end_date)
-                                                        {{ $fee->start_date ? ' • ' : '' }}Berakhir: {{ $fee->end_date->format('d M Y') }}
-                                                    @endif
-                                                </span>
+                                <div class="space-y-3 overflow-y-auto pr-2 border border-border rounded-lg p-2 bg-background shadow-inner" style="max-height: 300px;">
+                                    @foreach ($availableBillings as $billing)
+                                        <div x-data="{ expanded: false }" class="border border-border rounded-lg hover:border-primary transition-all overflow-hidden"
+                                             :class="{ 'ring-1 ring-primary border-primary shadow-sm': $wire.selectedBillings.includes({{ $billing['id'] }}) }">
+                                            
+                                            <!-- Accordion Header -->
+                                            <div class="flex items-start p-3 bg-background transition-colors">
+                                                <div class="pt-0.5">
+                                                    <input type="checkbox"
+                                                           wire:model.live="selectedBillings"
+                                                           value="{{ $billing['id'] }}"
+                                                           class="rounded border-input text-primary focus:ring-primary transition-all cursor-pointer">
+                                                </div>
+                                                <div class="ml-3 flex-1 cursor-pointer select-none" @click="expanded = !expanded">
+                                                    <div class="flex justify-between items-start">
+                                                        <div>
+                                                            <div class="font-semibold text-sm text-foreground leading-tight">{{ $billing['name'] }}</div>
+                                                        </div>
+                                                        <button type="button" class="text-muted-foreground p-1 hover:bg-muted rounded-md transition-colors" :class="{ 'rotate-180': expanded }">
+                                                            <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div class="text-xs font-medium text-foreground mt-1 font-mono">
+                                                        Total: Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </label>
+
+                                            <!-- Preview Dropdown List -->
+                                            <div class="bg-muted p-3 border-t border-border" x-show="expanded" x-transition style="display: none;">
+                                                <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Rincian Komponen:</p>
+                                                <ul class="space-y-2">
+                                                    @foreach ($billing['fees'] as $fee)
+                                                        <li class="flex justify-between text-xs py-1.5">
+                                                            <div class="flex items-start space-x-2">
+                                                                <div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
+                                                                <div class="flex flex-col">
+                                                                    <span class="text-foreground font-medium">{{ $fee['item_name'] }}</span>
+                                                                    <div class="flex flex-row flex-wrap items-center gap-1.5 mt-1">
+                                                                        @if ($fee['unit'])
+                                                                            <span class="inline-flex px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-medium border border-blue-200" style="font-size: 8px; line-height: 1.2;">
+                                                                                UNIT: {{ $fee['unit'] == '01' ? 'SMP' : ($fee['unit'] == '02' ? 'SMA' : ($fee['unit'] == '03' ? 'PPTQ' : $fee['unit'])) }}
+                                                                            </span>
+                                                                        @else
+                                                                            <span class="inline-flex px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium border border-border" style="font-size: 8px; line-height: 1.2;">
+                                                                                UNIT: SEMUA
+                                                                            </span>
+                                                                        @endif
+                                                                        
+                                                                        @if ($fee['domicile'])
+                                                                            <span class="inline-flex px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium border border-purple-200" style="font-size: 8px; line-height: 1.2;">
+                                                                                DOM: {{ $fee['domicile'] }}
+                                                                            </span>
+                                                                        @else
+                                                                            <span class="inline-flex px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium border border-border" style="font-size: 8px; line-height: 1.2;">
+                                                                                DOM: SEMUA
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span class="font-mono text-muted-foreground mt-0.5">Rp {{ number_format($fee['amount'], 0, ',', '.') }}</span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </div>
                                     @endforeach
                                 </div>
-                                <p class="text-xs text-muted-foreground mb-4">
-                                    Total {{ count($selectedFeeMasters) }} tagihan dipilih dari {{ count($this->matchingFeeMasters) }} yang tersedia.
-                                </p>
 
-                                @if (count($selectedFeeMasters) > 0)
+                                @if (count($selectedBillings) > 0)
                                     <!-- Summary table of selected billings -->
-                                    <div>
-                                        <h5 class="text-sm font-medium text-foreground mb-2">Ringkasan Tagihan yang Akan Dibuat:</h5>
+                                    <div class="mt-6 pt-4 border-t border-border">
+                                        <h5 class="text-sm font-medium text-foreground mb-3">Ringkasan Rincian Tagihan yang Akan Dibuat:</h5>
                                         <div class="overflow-x-auto border border-border rounded-md">
                                             <table class="min-w-full divide-y divide-border">
                                                 <thead class="bg-muted">
@@ -305,39 +358,29 @@
                                                             Nama Tagihan
                                                         </th>
                                                         <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                                            Kategori
+                                                            Kategori Paket
                                                         </th>
                                                         <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                                            Jumlah
-                                                        </th>
-                                                        <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                                            Mulai Berlaku
-                                                        </th>
-                                                        <th class="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                                            Berakhir Pada
+                                                            Nominal
                                                         </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="bg-background divide-y divide-border">
-                                                    @foreach ($this->matchingFeeMasters as $fee)
-                                                        @if (in_array((string) $fee->id, $selectedFeeMasters))
-                                                            <tr class="hover:bg-muted/50">
-                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-foreground">
-                                                                    {{ $fee->item_name }}
-                                                                </td>
-                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-muted-foreground">
-                                                                    {{ $fee->category->name ?? 'Tanpa Kategori' }}
-                                                                </td>
-                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-foreground font-medium">
-                                                                    Rp {{ number_format($fee->amount, 0, ',', '.') }}
-                                                                </td>
-                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-muted-foreground">
-                                                                    {{ $fee->start_date ? $fee->start_date->format('d M Y') : '-' }}
-                                                                </td>
-                                                                <td class="px-4 py-2 whitespace-nowrap text-sm text-muted-foreground">
-                                                                    {{ $fee->end_date ? $fee->end_date->format('d M Y') : '-' }}
-                                                                </td>
-                                                            </tr>
+                                                    @foreach ($availableBillings as $billing)
+                                                        @if (in_array($billing['id'], $selectedBillings))
+                                                            @foreach ($billing['fees'] as $fee)
+                                                                <tr class="hover:bg-muted/50">
+                                                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-foreground font-medium">
+                                                                        {{ $fee['item_name'] }}
+                                                                    </td>
+                                                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-muted-foreground">
+                                                                        {{ $billing['name'] }}
+                                                                    </td>
+                                                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-foreground font-mono">
+                                                                        Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
                                                         @endif
                                                     @endforeach
                                                 </tbody>

@@ -74,7 +74,7 @@ class StudentAcceptanceConfirm extends Component
             ->get()
             ->map(function ($category) {
                 return [
-                    'id' => $category->id,
+                    'id' => (string) $category->id,
                     'name' => $category->name,
                     'description' => $category->description,
                     'unit' => $category->unit_target,
@@ -85,6 +85,8 @@ class StudentAcceptanceConfirm extends Component
                             'amount' => $fee->amount,
                             'recurrence_type' => $fee->recurrence_type,
                             'due_days' => $fee->due_days,
+                            'unit' => $fee->unit_target,
+                            'domicile' => $fee->residence_target,
                         ];
                     })->toArray(),
                     'total_amount' => $category->fees->sum('amount')
@@ -153,10 +155,10 @@ class StudentAcceptanceConfirm extends Component
         return redirect()->route('admin.student-acceptance');
     }
 
-    public function rejectAcceptance()
+    public function rejectAcceptance(string $reason = '')
     {
         try {
-            $this->student->markAsRejected();
+            $this->student->markAsRejected($reason ?: null);
             session()->flash('success', 'Pendaftaran santri telah ditolak.');
             return redirect()->route('admin.student-acceptance');
         } catch (\Exception $e) {

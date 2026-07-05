@@ -375,11 +375,12 @@ class Student extends Model
         ]);
     }
 
-    public function markAsRejected(): void
+    public function markAsRejected(?string $reason = null): void
     {
         $this->update([
-            'status' => StudentStatus::REJECTED->value,
-            'is_active' => false,
+            'status'         => StudentStatus::REJECTED->value,
+            'is_active'      => false,
+            'rejection_note' => $reason,
         ]);
     }
 

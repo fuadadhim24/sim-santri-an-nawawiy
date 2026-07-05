@@ -12,6 +12,8 @@ class StudentAcceptance extends Component
 {
     use WithPagination;
 
+    protected $listeners = ['refreshStudentAcceptance' => '$refresh'];
+
     public $search = '';
 
     public function render()

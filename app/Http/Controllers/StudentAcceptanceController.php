@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class StudentAcceptanceController extends Controller
 {
@@ -31,13 +32,36 @@ class StudentAcceptanceController extends Controller
         try {
             $student->update([
                 'is_active' => false,
-                'status' => \App\Enums\StudentStatus::REJECTED->value,
                 'rejection_note' => $request->input('reason'),
             ]);
+            $student->markAsRejected();
+
+            $expandedIds = $request->session()->get('expanded_schedule_ids', []);
+            $expandedIds = array_filter(array_unique(array_merge($expandedIds, [$student->spmb_schedule_id])));
+            $request->session()->put('expanded_schedule_ids', $expandedIds);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Santri ' . $student->full_name . ' berhasil ditolak.',
+                ]);
+            }
 
             return redirect()->route('admin.student-acceptance')
                 ->with('success', 'Santri ' . $student->full_name . ' berhasil ditolak.');
         } catch (\Exception $e) {
+            Log::error('Failed to reject student', [
+                'student_id' => $studentId,
+                'error' => $e->getMessage(),
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menolak santri: ' . $e->getMessage(),
+                ], 500);
+            }
+
             return redirect()->route('admin.student-acceptance')
                 ->with('error', 'Gagal menolak santri: ' . $e->getMessage());
         }

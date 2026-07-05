@@ -41,7 +41,9 @@ class UserSeeder extends Seeder
             'role' => 'BENDAHARA',
         ]);
 
-        $spmbSchedule = SpmbSchedule::where('is_active', true)->first();
+        $activeSchedules = SpmbSchedule::where('is_active', true)->orderBy('id')->get();
+        $spmbSchedule = $activeSchedules->first();
+        $secondActiveSchedule = $activeSchedules->get(1) ?? $spmbSchedule;
 
         $level7 = \App\Models\ClassLevel::where('name', 'Kelas 7 SMP')->first();
         $rombel7A = \App\Models\StudyGroup::where('name', 'Kelas 7 SMP - A')->first();
@@ -132,6 +134,23 @@ class UserSeeder extends Seeder
             'full_name' => 'Fatima Binti Usman',
             'unit_code' => '01',
             'residence_status' => 'NON_MONDOK',
+            'special_status' => 'UMUM',
+            'status' => StudentStatus::PENDING->value,
+            'class_level_id' => null,
+            'study_group_id' => null,
+            'address' => 'Jl. Pesantren No. 5, Kab. Bogor',
+            'is_active' => false,
+        ]);
+
+        // Santri tambahan: menunggu di jadwal kedua untuk simulasi multi jadwal SPMB
+        Student::create([
+            'guardian_id' => $guardian2->id,
+            'spmb_schedule_id' => $secondActiveSchedule?->id,
+            'nis' => '2026.01.0004',
+            'registration_number' => '2026.0008',
+            'full_name' => 'Hana Binti Usman',
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
             'special_status' => 'UMUM',
             'status' => StudentStatus::PENDING->value,
             'class_level_id' => null,

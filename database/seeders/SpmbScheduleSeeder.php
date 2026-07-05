@@ -13,25 +13,38 @@ class SpmbScheduleSeeder extends Seeder
     public function run(): void
     {
         $currentYear = now()->year;
-
-        // Create active SPMB schedule for current year
         $nextYear = $currentYear + 1;
-        SpmbSchedule::create([
-            'name' => "Pendaftaran Santri Baru Tahun Ajaran {$currentYear}/{$nextYear}",
-            'description' => 'Pendaftaran santri baru untuk tahun ajaran ' . $currentYear . '/' . $nextYear,
-            'registration_start' => now()->subDays(5),
-            'registration_end' => now()->addDays(30),
-            'is_active' => true,
-        ]);
-
-        // Create another schedule for next year (not active yet)
         $yearAfterNext = $currentYear + 2;
-        SpmbSchedule::create([
-            'name' => "Pendaftaran Santri Baru Tahun Ajaran {$nextYear}/{$yearAfterNext}",
-            'description' => 'Pendaftaran santri baru untuk tahun ajaran ' . $nextYear . '/' . $yearAfterNext,
-            'registration_start' => now()->addMonths(6),
-            'registration_end' => now()->addMonths(9),
-            'is_active' => false,
-        ]);
+
+        $schedules = [
+            [
+                'name' => "Gelombang 1 - Pendaftaran Santri Baru {$currentYear}/{$nextYear}",
+                'description' => 'Gelombang pertama pendaftaran santri baru untuk tahun ajaran ' . $currentYear . '/' . $nextYear,
+                'registration_start' => now()->subDays(5),
+                'registration_end' => now()->addDays(15),
+                'is_active' => true,
+            ],
+            [
+                'name' => "Gelombang 2 - Pendaftaran Santri Baru {$currentYear}/{$nextYear}",
+                'description' => 'Gelombang kedua pendaftaran santri baru untuk tahun ajaran ' . $currentYear . '/' . $nextYear,
+                'registration_start' => now()->addDays(16),
+                'registration_end' => now()->addDays(30),
+                'is_active' => true,
+            ],
+            [
+                'name' => "Pendaftaran Santri Baru Tahun Ajaran {$nextYear}/{$yearAfterNext}",
+                'description' => 'Pendaftaran santri baru untuk tahun ajaran ' . $nextYear . '/' . $yearAfterNext,
+                'registration_start' => now()->addMonths(6),
+                'registration_end' => now()->addMonths(9),
+                'is_active' => false,
+            ],
+        ];
+
+        foreach ($schedules as $schedule) {
+            SpmbSchedule::firstOrCreate(
+                ['name' => $schedule['name']],
+                $schedule
+            );
+        }
     }
 }

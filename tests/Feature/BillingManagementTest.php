@@ -214,6 +214,37 @@ class BillingManagementTest extends TestCase
     }
 
     /**
+     * Test overdue reminder list is available when overdue filter is enabled
+     */
+    public function test_overdue_reminder_items_are_available_when_filter_is_enabled()
+    {
+        $guardian = \App\Models\Guardian::factory()->create([
+            'full_name' => 'Bapak Ahmad',
+            'whatsapp' => '081234567890',
+        ]);
+
+        $student = Student::factory()->create([
+            'full_name' => 'Alya Nur',
+            'guardian_id' => $guardian->id,
+        ]);
+
+        Billing::factory()->create([
+            'student_id' => $student->id,
+            'status' => 'UNPAID',
+            'due_date' => now()->subDay(),
+            'visible_to_wali' => true,
+            'final_amount' => 150000,
+            'title' => 'SPP Bulan Juni',
+        ]);
+
+        $component = \Livewire\Livewire::test(\App\Livewire\BillingIndex::class)
+            ->set('overdueFilter', true);
+
+        $component->assertSet('overdueFilter', true);
+        $component->assertSee('Kirim Pengingat WA');
+    }
+
+    /**
      * Test student search autocomplete in billing form
      */
     public function test_student_search_autocomplete_in_billing_form()

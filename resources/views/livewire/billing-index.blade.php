@@ -83,23 +83,26 @@
                 </select>
 
                 <!-- Filter Terlambat -->
-                <button wire:click="$toggle('overdueFilter')"
-                    class="inline-flex items-center py-2 px-3 rounded-md border text-sm font-medium transition-colors
-                        {{ $overdueFilter
-                            ? 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600'
-                            : 'bg-background text-muted-foreground border-input hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300' }}">
-                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Terlambat
-                    @if($countOverdue > 0)
-                        <span class="ml-1.5 px-1.5 py-0.5 text-xs font-bold rounded-full
-                            {{ $overdueFilter ? 'bg-white text-orange-600' : 'bg-orange-500 text-white' }}">
-                            {{ $countOverdue }}
-                        </span>
+                <div class="flex flex-col">
+                    <label class="inline-flex items-center text-sm font-medium cursor-pointer bg-muted/50 px-3 py-2 rounded-md border border-border transition-colors select-none
+                        {{ $overdueFilter ? 'bg-primary/10 text-primary border-primary/20' : 'text-muted-foreground hover:text-foreground' }}">
+                        <input type="checkbox" wire:model.live="overdueFilter" class="rounded border-input text-primary focus:ring-primary mr-2">
+                        Terlambat
+                        @if($countOverdue > 0)
+                            <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full
+                                {{ $overdueFilter ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground' }}">
+                                {{ $countOverdue }}
+                            </span>
+                        @endif
+                    </label>
+
+                    @if($overdueFilter && !empty($overdueReminderItems))
+                        <button type="button" onclick="window.openOverdueReminderModal()"
+                            class="mt-2 inline-flex items-center rounded-md border border-green-200 bg-green-50 px-3 py-1.5 text-[11px] font-semibold text-green-700 hover:bg-green-100">
+                            Kirim Pengingat WA
+                        </button>
                     @endif
-                </button>
+                </div>
 
                 <!-- Search -->
                 <input wire:model.live="search" type="text" placeholder="Cari santri / tagihan..."
@@ -362,4 +365,165 @@
         </div>
     </div>
     @endif
+
+    @script
+    <script>
+        // Data diambil langsung dari Livewire via $wire saat tombol diklik
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function normalizeWaNumber(phone) {
+            const digits = String(phone || '').replace(/\D/g, '');
+            if (!digits) return '';
+            if (digits.startsWith('0')) return `62${digits.slice(1)}`;
+            if (digits.startsWith('62')) return digits;
+            return `62${digits}`;
+        }
+
+        function buildOverdueReminderMessage(item) {
+            const billList = (item.billings || []).map((bill) => `- ${bill.title} (Rp ${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(bill.amount || 0)})`).join('\n');
+
+            return `*Pemberitahuan Tagihan Terlambat*\n*An-Nawawiy*\n\nAssalamu'alaikum Warahmatullahi Wabarakatuh,\n\nYth. Bapak/Ibu *${item.guardian_name || 'Wali Santri'}*\n\nKami mengingatkan bahwa santri atas nama *${item.student_name || 'Santri'}* memiliki *${item.count || 0}* tagihan belum dibayar yang sudah melewati batas waktu pembayaran.\n\nRincian tagihan:\n${billList}\n\nMohon segera melakukan pembayaran agar administrasi tetap terjaga.\n\nTerima kasih atas perhatian dan kerja samanya.\n\n---\n_Pesan otomatis dari Sistem Informasi Santri An-Nawawiy_`;
+        }
+
+        function showOverdueReminderPreview(item, message) {
+            window.Swal.fire({
+                title: 'Preview Pesan WhatsApp',
+                html: `
+                    <div class="text-left">
+                        <p class="text-sm text-gray-600 mb-3">Pesan akan dikirim ke ${escapeHtml(item.guardian_name || 'Wali Santri')} untuk santri <strong>${escapeHtml(item.student_name || 'Santri')}</strong>.</p>
+                        <div class="p-3 bg-gray-50 border border-gray-200 rounded text-sm font-mono whitespace-pre-wrap max-h-[50vh] overflow-y-auto mb-4" id="wa-preview">${escapeHtml(message)}</div>
+                        <div class="flex flex-col gap-2">
+                            <button type="button" id="copy-btn" class="w-full py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 font-medium">Copy Pesan</button>
+                            <button type="button" id="edit-btn" class="w-full py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 font-medium">Edit Pesan</button>
+                            <button type="button" id="send-btn" class="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 font-medium">Kirim ke WhatsApp</button>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                allowOutsideClick: true,
+                customClass: {
+                    popup: 'rounded-2xl'
+                },
+                width: '650px',
+                didOpen: () => {
+                    const copyBtn = window.Swal.getHtmlContainer().querySelector('#copy-btn');
+                    const editBtn = window.Swal.getHtmlContainer().querySelector('#edit-btn');
+                    const sendBtn = window.Swal.getHtmlContainer().querySelector('#send-btn');
+
+                    copyBtn.addEventListener('click', async () => {
+                        await navigator.clipboard.writeText(message);
+                        copyBtn.innerText = 'Tersalin!';
+                        setTimeout(() => copyBtn.innerText = 'Copy Pesan', 2000);
+                    });
+
+                    editBtn.addEventListener('click', () => {
+                        window.Swal.fire({
+                            title: 'Edit Pesan WhatsApp',
+                            input: 'textarea',
+                            inputValue: message,
+                            allowOutsideClick: false,
+                            inputAttributes: {
+                                'rows': '12',
+                                'style': 'height: 300px; font-family: monospace; font-size: 14px;'
+                            },
+                            showCancelButton: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                            preConfirm: (val) => {
+                                if (!val) return window.Swal.showValidationMessage('Pesan tidak boleh kosong!');
+                                return val;
+                            }
+                        }).then((editResult) => {
+                            if (editResult.isConfirmed) {
+                                showOverdueReminderPreview(item, editResult.value);
+                            } else {
+                                showOverdueReminderPreview(item, message);
+                            }
+                        });
+                    });
+
+                    sendBtn.addEventListener('click', () => {
+                        const phone = normalizeWaNumber(item.guardian_phone);
+                        if (!phone) {
+                            window.Swal.fire({ icon: 'warning', title: 'Nomor WhatsApp Tidak Tersedia', text: 'Nomor WA wali santri belum tersedia.', confirmButtonText: 'Tutup' });
+                            return;
+                        }
+
+                        const encodedMsg = encodeURIComponent(message);
+                        window.open(`https://wa.me/${phone}?text=${encodedMsg}`, '_blank');
+                        window.Swal.close();
+                    });
+                }
+            });
+        }
+
+        window.openOverdueReminderModal = function() {
+            // Ambil data terkini dari Livewire component
+            window.overdueReminderItems = $wire.overdueReminderItems || [];
+
+            if (!window.overdueReminderItems || window.overdueReminderItems.length === 0) {
+                window.Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Ada Tagihan Terlambat',
+                    text: 'Tidak ada data tagihan terlambat untuk dikirimkan.',
+                    confirmButtonText: 'Tutup',
+                    showCloseButton: true
+                });
+                return;
+            }
+
+            const html = `
+                <div class="text-left">
+                    <p class="text-sm text-gray-600 mb-3">Pilih santri yang ingin diingatkan melalui WhatsApp.</p>
+                    <div class="space-y-2 pr-1" style="max-height: 55vh; overflow-y: auto; scrollbar-width: thin;">
+                        ${window.overdueReminderItems.map((item, index) => `
+                            <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-800">${escapeHtml(item.student_name || 'Santri')}</p>
+                                        <p class="text-xs text-gray-600">Wali: ${escapeHtml(item.guardian_name || 'Wali Santri')}</p>
+                                        <p class="text-xs text-gray-600">Tagihan terlambat: <strong>${item.count || 0}</strong></p>
+                                    </div>
+                                    <button type="button" data-index="${index}" class="send-overdue-wa-btn px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-semibold whitespace-nowrap">
+                                        Preview
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            window.Swal.fire({
+                title: 'Kirim Pengingat WhatsApp',
+                html,
+                showConfirmButton: false,
+                showCloseButton: true,
+                allowOutsideClick: true,
+                customClass: {
+                    popup: 'rounded-2xl'
+                },
+                width: '650px',
+                didOpen: () => {
+                    document.querySelectorAll('.send-overdue-wa-btn').forEach((button) => {
+                        button.addEventListener('click', () => {
+                            const item = window.overdueReminderItems[Number(button.getAttribute('data-index'))];
+                            const message = buildOverdueReminderMessage(item);
+                            showOverdueReminderPreview(item, message);
+                        });
+                    });
+                }
+            });
+        };
+    </script>
+    @endscript
 </div>

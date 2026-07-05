@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             FeeMasterSeeder::class,
             DiscountSeeder::class,
             BillingSeeder::class,
+            OverdueTestSeeder::class,
             FaqSeeder::class,
         ]);
     }

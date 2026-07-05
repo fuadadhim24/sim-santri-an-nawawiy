@@ -92,6 +92,11 @@
                 </tbody>
             </table>
         </div>
+        @if ($schedules->hasPages())
+            <div class="px-6 py-4 border-t border-border bg-muted/20">
+                {{ $schedules->links() }}
+            </div>
+        @endif
     </div>
 
     <x-modal name="delete-confirm-modal" :show="false">

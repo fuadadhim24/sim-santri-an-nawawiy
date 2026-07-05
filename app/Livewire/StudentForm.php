@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\FeeCategory;
 use App\Models\FeeMaster;
 use App\Models\Guardian;
 use App\Models\Student;
@@ -48,7 +49,8 @@ class StudentForm extends Component
     public $ijazah_file;
     public $nisn_document_file;
 
-    public $selectedFeeMasters = [];
+    public $availableBillings = [];
+    public $selectedBillings = [];
     public $generatedNis = null;
     public $isEdit = false;
     public $is_active = true;
@@ -59,25 +61,64 @@ class StudentForm extends Component
         return Guardian::orderBy('full_name')->get();
     }
 
-    public function getFeeMastersProperty()
-    {
-        return FeeMaster::with('category')
-            ->where('is_active', true)
-            ->orderBy('item_name')
-            ->get();
-    }
-
-    public function getMatchingFeeMastersProperty()
+    public function loadAvailableBillings()
     {
         if ($this->isEdit) {
-            return collect();
+            $this->availableBillings = [];
+            return;
         }
 
-        return $this->feeMasters->filter(function ($fee) {
-            $unitMatch = empty($fee->unit_target) || str_contains($fee->unit_target, $this->unit_code);
-            $residenceMatch = empty($fee->residence_target) || str_contains($fee->residence_target, $this->residence_status);
-            return $unitMatch && $residenceMatch;
+        $query = FeeCategory::where('is_active', true);
+
+        // Filter by domicile status
+        $query->where(function ($q) {
+            $q->where('domicile_target', $this->residence_status)
+              ->orWhereNull('domicile_target');
         });
+
+        // Filter by unit code
+        $query->where(function ($q) {
+            $q->where('unit_target', $this->unit_code)
+              ->orWhereNull('unit_target');
+        });
+
+        $this->availableBillings = $query->where('is_locked', false)
+            ->with(['fees' => function ($q) {
+                $q->where('is_active', true)
+                  ->where(function ($sq) {
+                      $sq->whereNull('unit_target')
+                         ->orWhere('unit_target', $this->unit_code);
+                  })
+                  ->where(function ($sq) {
+                      $sq->whereNull('residence_target')
+                         ->orWhere('residence_target', $this->residence_status);
+                  });
+            }])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => (string) $category->id,
+                    'name' => $category->name,
+                    'description' => $category->description,
+                    'unit' => $category->unit_target,
+                    'domicile' => $category->domicile_target,
+                    'fees' => $category->fees->map(function ($fee) {
+                        return [
+                            'item_name' => $fee->item_name,
+                            'amount' => $fee->amount,
+                            'recurrence_type' => $fee->recurrence_type,
+                            'due_days' => $fee->due_days,
+                            'unit' => $fee->unit_target,
+                            'domicile' => $fee->residence_target,
+                        ];
+                    })->toArray(),
+                    'total_amount' => $category->fees->sum('amount')
+                ];
+            })
+            ->toArray();
+
+        $this->selectedBillings = array_map(fn($b) => $b['id'], $this->availableBillings);
     }
 
     public function mount(Student $student = null)
@@ -95,33 +136,30 @@ class StudentForm extends Component
             $this->generatedNis = $student->nis;
             $this->isEdit = true;
         } else {
-            $this->selectedFeeMasters = [];
+            $this->loadAvailableBillings();
         }
     }
 
     public function updatedUnitCode()
     {
         if (!$this->isEdit) {
-            $this->selectedFeeMasters = [];
+            $this->loadAvailableBillings();
         }
     }
 
     public function updatedResidenceStatus()
     {
         if (!$this->isEdit) {
-            $this->selectedFeeMasters = [];
+            $this->loadAvailableBillings();
         }
     }
 
     public function toggleSelectAllFees()
     {
-        $matchingIds = $this->matchingFeeMasters->pluck('id')->map(fn($id) => (string) $id)->toArray();
-        $selectedStr = array_map('strval', $this->selectedFeeMasters);
-
-        if (count(array_intersect($selectedStr, $matchingIds)) === count($matchingIds)) {
-            $this->selectedFeeMasters = [];
+        if (count($this->selectedBillings) === count($this->availableBillings)) {
+            $this->selectedBillings = [];
         } else {
-            $this->selectedFeeMasters = $matchingIds;
+            $this->selectedBillings = array_map(fn($b) => $b['id'], $this->availableBillings);
         }
     }
 
@@ -129,7 +167,9 @@ class StudentForm extends Component
     {
         if (!$this->isEdit) {
             if (!$this->autoGenerateBillings) {
-                $this->selectedFeeMasters = [];
+                $this->selectedBillings = [];
+            } else {
+                $this->selectedBillings = array_map(fn($b) => $b['id'], $this->availableBillings);
             }
         }
     }
@@ -210,9 +250,8 @@ class StudentForm extends Component
 
             $newStudent = Student::create($data);
 
-            $selectedFeeMasterIds = array_map('intval', $this->selectedFeeMasters);
-            if (!empty($selectedFeeMasterIds)) {
-                $billingService->generateOnceBillsForSelectedFees($newStudent, $selectedFeeMasterIds);
+            if ($this->autoGenerateBillings && !empty($this->selectedBillings)) {
+                $billingService->generateBillingsForStudentWithCategories($newStudent, $this->selectedBillings);
             }
 
             session()->flash('message', 'Student created successfully with NIS: ' . $nis);

@@ -54,7 +54,7 @@
                                     class="text-primary hover:text-primary/80 font-medium mr-3">Ubah</a>
                                 <button
                                     wire:click="delete({{ $discount->id }})"
-                                    wire:confirm="Hapus diskon ini secara permanen?"
+                                    wire:swal="Hapus diskon ini secara permanen? Tindakan ini tidak dapat dibatalkan."
                                     wire:loading.attr="disabled"
                                     wire:target="delete({{ $discount->id }})"
                                     class="text-destructive hover:text-destructive/80 font-medium">
