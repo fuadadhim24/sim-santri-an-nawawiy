@@ -91,6 +91,7 @@ class GuardianDashboard extends Component
         $activeSpmbSchedules = SpmbSchedule::where('is_active', true)
             ->orderBy('registration_start', 'desc')
             ->get()
+            ->filter(fn($s) => $s->isOpen())
             ->unique('name');
 
         $schedulesWithStudents = [];

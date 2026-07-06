@@ -10,32 +10,6 @@ use Livewire\Component;
 
 class SpmbScheduleSelection extends Component
 {
-    public $schedules;
-    public $selectedSchedule;
-
-    public function mount()
-    {
-        $this->loadActiveSchedules();
-    }
-
-    public function loadActiveSchedules()
-    {
-        $guardian = Guardian::where('user_id', Auth::id())->first();
-
-        $this->schedules = SpmbSchedule::where('is_active', true)
-            ->get()
-            ->filter(function ($schedule) {
-                return $schedule->isOpen();
-            })
-            ->map(function ($schedule) use ($guardian) {
-                $schedule->registered_students = Student::where('guardian_id', $guardian->id ?? 0)
-                    ->where('spmb_schedule_id', $schedule->id)
-                    ->get();
-
-                return $schedule;
-            });
-    }
-
     public function selectSchedule($id)
     {
         $schedule = SpmbSchedule::find($id);
@@ -58,8 +32,22 @@ class SpmbScheduleSelection extends Component
 
     public function render()
     {
-        $this->loadActiveSchedules();
+        $guardian = Guardian::where('user_id', Auth::id())->first();
+        $guardianId = $guardian?->id ?? 0;
 
-        return view('livewire.spmb-schedule-selection')->layout('layouts.guardian');
+        $schedules = SpmbSchedule::where('is_active', true)
+            ->get()
+            ->filter(fn($s) => $s->isOpen())
+            ->values() // reindex agar tidak ada gap
+            ->map(function ($schedule) use ($guardianId) {
+                $schedule->registered_students = Student::where('guardian_id', $guardianId)
+                    ->where('spmb_schedule_id', $schedule->id)
+                    ->get();
+                return $schedule;
+            });
+
+        return view('livewire.spmb-schedule-selection', [
+            'schedules' => $schedules,
+        ])->layout('layouts.guardian');
     }
 }

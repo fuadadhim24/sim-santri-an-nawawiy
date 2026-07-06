@@ -21,6 +21,9 @@ class SpmbStudentRegistration extends Component
     #[Rule('required|min:3')]
     public $full_name = '';
 
+    #[Rule('nullable|numeric|digits:10')]
+    public $nisn = '';
+
     #[Rule('required|in:01,02,03')]
     public $unit_code = '01';
 
@@ -115,7 +118,8 @@ class SpmbStudentRegistration extends Component
             'residence_status' => $this->residence_status,
             'special_status' => $this->special_status,
             'class_level_id' => $this->class_level_id,
-            'address' => $this->address,
+            'address'           => $this->address,
+            'nisn'              => $this->nisn ?: null,
             'nis' => null,
             'registration_number' => $regNumber,
             'is_active' => false,

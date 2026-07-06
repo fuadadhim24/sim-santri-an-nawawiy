@@ -64,6 +64,21 @@
                     @enderror
                 </div>
 
+                <!-- NISN (Opsional) -->
+                <div>
+                    <label for="nisn" class="block text-sm font-semibold text-foreground mb-1.5">
+                        NISN <span class="text-muted-foreground font-normal text-xs">(opsional)</span>
+                    </label>
+                    <input wire:model="nisn" type="text" inputmode="numeric" pattern="\d{10}" id="nisn"
+                        placeholder="Contoh: 1234567890"
+                        maxlength="10"
+                        class="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors @error('nisn') border-destructive @enderror">
+                    <p class="text-xs text-muted-foreground mt-1">Harus tepat 10 digit angka. Kosongkan jika belum memiliki NISN.</p>
+                    @error('nisn')
+                        <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Unit -->
                     <div>

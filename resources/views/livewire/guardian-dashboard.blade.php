@@ -56,30 +56,11 @@
         {{-- ── Banner Terlambat ── --}}
         @if ($countOverdue > 0)
             <div class="border rounded-xl p-4" style="background-color: #fcfaf7; border-color: #e6dfd5; color: #3e2723;">
-                <div class="flex items-start space-x-3">
-                    <svg class="w-5 h-5 text-red-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-red-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-bold text-red-800">{{ $countOverdue }} tagihan melewati batas waktu bayar</p>
-                        <p class="text-sm text-muted-foreground mt-0.5">Harap segera dilunasi agar tidak menumpuk.</p>
-                        <button @click="open = !open"
-                            class="mt-1.5 text-xs font-semibold text-primary underline hover:opacity-85 transition">
-                            <span x-text="open ? 'Sembunyikan detail' : 'Lihat detail'"></span>
-                        </button>
-                        <ul x-show="open" x-transition class="mt-2 space-y-1">
-                            @foreach ($overdueItems as $oi)
-                                @php $od = $oi->due_date ?? $oi->created_at->addDays(14); @endphp
-                                <li class="text-xs text-muted-foreground flex items-start space-x-1.5">
-                                    <span class="mt-0.5 text-red-600 font-bold">•</span>
-                                    <span>
-                                        <strong class="text-foreground">{{ $oi->title }}</strong>
-                                        <span class="text-red-700 font-medium ml-1">(tenggat {{ $od->locale('id')->isoFormat('D MMM Y') }})</span>
-                                    </span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    <p class="font-bold text-red-800">{{ $countOverdue }} tagihan melewati batas waktu bayar — harap segera dilunasi.</p>
                 </div>
             </div>
         @endif
