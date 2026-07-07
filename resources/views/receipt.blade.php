@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -67,7 +67,7 @@
 </head>
 
 <body class="p-4 md:p-10">
-    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden print-border">
+    <div id="receipt-card" class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden print-border">
         <!-- Header -->
         <div class="bg-primary p-8 text-white flex justify-between items-center">
             <div>
@@ -91,6 +91,7 @@
                     <p class="text-muted-foreground">Unit:
                         {{ $billing->student->unit_code == '01' ? 'SMP' : ($billing->student->unit_code == '02' ? 'SMA' : 'PPTQ') }}
                     </p>
+                    <p class="text-muted-foreground">Kelas: {{ $billing->student->class_name ?? '-' }}</p>
                 </div>
                 <div class="md:text-right">
                     <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Rincian Pembayaran
@@ -178,6 +179,13 @@
             </svg>
             Kembali ke Dasbor
         </a>
+        <button onclick="downloadReceiptAsImage()"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Unduh Gambar
+        </button>
         <button onclick="window.print()"
             class="px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition shadow-sm flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -188,6 +196,42 @@
             Cetak Struk Bukti
         </button>
     </div>
+
+    <script>
+        function downloadReceiptAsImage() {
+            const button = event.currentTarget;
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Memproses...
+            `;
+
+            const element = document.getElementById('receipt-card');
+            html2canvas(element, {
+                scale: 3, // Ultra HD Quality
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Kwitansi_Pembayaran_{{ str_pad($billing->id, 6, "0", STR_PAD_LEFT) }}_{{ Str::slug($billing->student->full_name) }}.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                button.disabled = false;
+                button.innerHTML = originalContent;
+            }).catch(err => {
+                console.error('Failed to generate image:', err);
+                alert('Gagal mengunduh gambar kwitansi.');
+                button.disabled = false;
+                button.innerHTML = originalContent;
+            });
+        }
+    </script>
 </body>
 
 </html>
