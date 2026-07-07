@@ -31,7 +31,7 @@ class StudentForm extends Component
     #[Rule('required|in:MONDOK,NON_MONDOK,NGAJI_ONLY')]
     public $residence_status = 'MONDOK';
 
-    #[Rule('required|in:UMUM,ANAK_GURU,YATIM')]
+    #[Rule('required|in:UMUM,ANAK_GURU,YATIM,PRESTASI')]
     public $special_status = 'UMUM';
 
     #[Rule('required|exists:class_levels,id')]

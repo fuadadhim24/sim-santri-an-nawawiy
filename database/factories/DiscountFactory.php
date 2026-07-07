@@ -14,7 +14,7 @@ class DiscountFactory extends Factory
     {
         return [
             'fee_master_id' => FeeMaster::factory(),
-            'target_status' => $this->faker->randomElement(['ANAK_GURU', 'YATIM']),
+            'target_status' => $this->faker->randomElement(['ANAK_GURU', 'YATIM', 'PRESTASI']),
             'discount_amount' => $this->faker->numberBetween(5000, 50000),
         ];
     }

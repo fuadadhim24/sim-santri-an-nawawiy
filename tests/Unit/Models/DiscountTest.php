@@ -50,7 +50,7 @@ class DiscountTest extends TestCase
     {
         $feeMaster = FeeMaster::factory()->create();
 
-        $statuses = ['ANAK_GURU', 'YATIM'];
+        $statuses = ['ANAK_GURU', 'YATIM', 'PRESTASI'];
 
         foreach ($statuses as $status) {
             $discount = Discount::create([

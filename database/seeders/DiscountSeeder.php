@@ -50,5 +50,19 @@ class DiscountSeeder extends Seeder
                 ]);
             }
         }
+
+        // ──────────────────────────────────────────────
+        // Diskon PRESTASI — potongan Rp 4.000 per fee
+        // ──────────────────────────────────────────────
+        $prestasiFees = [$fmSPP_SMP, $fmSPP_SMA, $fmSPP_PPTQ, $fmAsrama, $fmPocket];
+        foreach ($prestasiFees as $fm) {
+            if ($fm) {
+                Discount::create([
+                    'fee_master_id' => $fm->id,
+                    'target_status' => 'PRESTASI',
+                    'discount_amount' => 4000,
+                ]);
+            }
+        }
     }
 }

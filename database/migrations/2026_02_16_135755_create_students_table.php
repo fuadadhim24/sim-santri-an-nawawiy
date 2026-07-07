@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('full_name');
             $table->enum('unit_code', ['01', '02', '03']); // 01=SMP, 02=SMA, 03=PPTQ
             $table->enum('residence_status', ['MONDOK', 'NON_MONDOK', 'NGAJI_ONLY']);
-            $table->enum('special_status', ['UMUM', 'ANAK_GURU', 'YATIM'])->default('UMUM');
+            $table->enum('special_status', ['UMUM', 'ANAK_GURU', 'YATIM', 'PRESTASI'])->default('UMUM');
             $table->string('class_name')->nullable();
             $table->text('address')->nullable();
             $table->boolean('is_active')->default(false);

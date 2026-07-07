@@ -207,7 +207,15 @@
                         </span>
                         @if ($student->special_status !== 'UMUM')
                             <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">
-                                {{ $student->special_status === 'ANAK_GURU' ? 'Anak Guru' : 'Yatim' }}
+                                @if ($student->special_status === 'ANAK_GURU')
+                                    Anak Guru
+                                @elseif ($student->special_status === 'YATIM')
+                                    Yatim
+                                @elseif ($student->special_status === 'PRESTASI')
+                                    Siswa Berprestasi
+                                @else
+                                    {{ str_replace('_', ' ', $student->special_status) }}
+                                @endif
                             </span>
                         @endif
                     </div>

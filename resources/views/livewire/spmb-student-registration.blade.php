@@ -133,6 +133,7 @@
                             <option value="UMUM">Umum</option>
                             <option value="ANAK_GURU">Anak Guru</option>
                             <option value="YATIM">Yatim</option>
+                            <option value="PRESTASI">Siswa Berprestasi</option>
                         </select>
                         @error('special_status')
                             <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>

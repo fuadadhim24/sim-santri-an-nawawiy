@@ -35,6 +35,7 @@
                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm {{ $isEdit ? 'bg-muted/40 cursor-not-allowed opacity-80' : '' }}">
                         <option value="ANAK_GURU">Anak Guru</option>
                         <option value="YATIM">Yatim</option>
+                        <option value="PRESTASI">Siswa Berprestasi</option>
                     </select>
                     @error('target_status')
                         <span class="text-destructive text-sm">{{ $message }}</span>

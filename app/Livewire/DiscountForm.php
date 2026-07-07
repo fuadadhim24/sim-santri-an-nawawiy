@@ -14,7 +14,7 @@ class DiscountForm extends Component
     #[Rule('required|exists:fee_masters,id')]
     public $fee_master_id = '';
 
-    #[Rule('required|in:ANAK_GURU,YATIM')]
+    #[Rule('required|in:ANAK_GURU,YATIM,PRESTASI')]
     public $target_status = 'ANAK_GURU';
 
     #[Rule('required|numeric|min:0')]

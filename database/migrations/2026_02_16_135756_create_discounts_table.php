@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('fee_master_id')->constrained('fee_masters')->onDelete('cascade');
-            $table->enum('target_status', ['ANAK_GURU', 'YATIM']);
+            $table->enum('target_status', ['ANAK_GURU', 'YATIM', 'PRESTASI']);
             $table->decimal('discount_amount', 12, 2);
             $table->timestamps();
         });
