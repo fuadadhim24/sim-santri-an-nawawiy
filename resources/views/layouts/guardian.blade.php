@@ -208,7 +208,7 @@
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">4. Unduh Kwitansi</span>
                                 <p class="text-[11px] text-muted-foreground">
-                                    Unduh kwitansi pembayaran resmi langsung dari tabel riwayat transaksi di dashboard.
+                                    Unduh kwitansi pembayaran resmi langsung dari tabel riwayat transaksi di dashboard. Anda dapat mencetaknya langsung atau menyimpannya dalam format gambar PNG berkualitas tinggi.
                                 </p>
                             </div>
                         </div>

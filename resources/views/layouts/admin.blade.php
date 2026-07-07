@@ -474,11 +474,20 @@
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Cara Kerja Diskon</span>
-                                <p class="text-xs text-muted-foreground">Diskon ditautkan ke Master Biaya tertentu dan berlaku otomatis untuk santri yang memiliki status khusus (Yatim, Piatu, Yatim Piatu, Dhuafa). Santri berstatus "UMUM" tidak mendapatkan diskon.</p>
+                                <p class="text-xs text-muted-foreground">Diskon ditautkan ke Master Biaya tertentu dan berlaku otomatis untuk santri yang memiliki status khusus (Yatim, Anak Guru, Siswa Berprestasi). Santri berstatus "UMUM" tidak mendapatkan diskon.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Efek pada Tagihan</span>
-                                <p class="text-xs text-muted-foreground">Ketika diskon ditambahkan atau diubah, seluruh tagihan <strong>belum lunas</strong> dari Master Biaya terkait akan otomatis dihitung ulang nominalnya.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Proteksi & Edit Diskon</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Saat mengedit diskon, pilihan <strong>Nama Biaya</strong> dan <strong>Status Target</strong> akan otomatis dikunci (disabled) untuk menjaga konsistensi relasi data. Jika ingin mengubahnya, buatlah aturan diskon baru.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Kebijakan Rekalkulasi</span>
+                                <div class="text-xs text-muted-foreground space-y-1.5 mt-1 leading-relaxed">
+                                    <p>Anda dapat memilih jangkauan tagihan unpaid terdampak saat mengubah nominal diskon:</p>
+                                    <li><strong>Ubah Semua:</strong> Menyesuaikan seluruh tagihan belum lunas dari masa lalu hingga masa depan.</li>
+                                    <li><strong>Hanya Masa Depan:</strong> Menyesuaikan tagihan belum lunas yang jatuh temponya mulai hari ini.</li>
+                                    <li><strong>Mulai Bulan Depan:</strong> Mengecualikan bulan berjalan saat ini dan hanya mengubah tagihan mulai tanggal 1 bulan depan.</li>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -511,12 +520,12 @@
                                 <p class="text-xs text-muted-foreground">Santri baru masuk dengan status <strong>pending</strong>. Setelah diverifikasi, admin mengubah status menjadi <strong>diterima</strong>. Saat diterima, tagihan-tagihan wajib akan otomatis digenerate sesuai konfigurasi kategori biaya.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Detail Santri</span>
-                                <p class="text-xs text-muted-foreground">Klik nama santri untuk melihat detail profil, riwayat tagihan, dan status pembayaran santri secara lengkap.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Detail Santri & Berkas Fisik</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Klik nama santri untuk melihat profil lengkap. Pada form edit, berkas fisik yang sudah diunggah sebelumnya akan ditandai dengan badge hijau <strong>✓ Sudah Ada</strong> beserta tombol preview berikon mata untuk memudahkan pengecekan berkas lama.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Status Khusus</span>
-                                <p class="text-xs text-muted-foreground">Santri dengan status khusus (Yatim, Piatu, Dhuafa) akan otomatis mendapat potongan tagihan jika sudah diatur di menu Diskon.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Status Khusus & Diskon</span>
+                                <p class="text-xs text-muted-foreground">Santri dengan status khusus (Yatim, Anak Guru, Siswa Berprestasi) akan otomatis mendapat potongan tagihan jika sudah diatur di menu Diskon.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Santri Pindahan (Masuk Pertengahan)</span>
