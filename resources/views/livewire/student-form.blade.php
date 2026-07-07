@@ -68,50 +68,102 @@
                     <h4 class="text-sm font-semibold text-foreground mb-4">Unggah Berkas Fisik Dokumen</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- KK File -->
-                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40">
-                            <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Kartu Keluarga (PDF/Gambar - Max 2MB)</label>
-                            <input type="file" wire:model="kk_file" class="mt-2 text-xs">
-                            @error('kk_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40 flex flex-col justify-between min-h-[120px]">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Kartu Keluarga (PDF/Gambar - Max 2MB)</label>
+                                    @if ($isEdit && $student->kk)
+                                        <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            ✓ Sudah Ada
+                                        </span>
+                                    @endif
+                                </div>
+                                <input type="file" wire:model="kk_file" class="mt-2 text-xs w-full">
+                                @error('kk_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                            </div>
                             @if ($isEdit && $student->kk)
-                                <a href="{{ Storage::url($student->kk) }}" target="_blank" class="mt-2 inline-flex items-center text-xs text-primary font-semibold hover:underline">
-                                    Lihat KK Saat Ini
-                                </a>
+                                <div class="mt-3 flex items-center justify-between text-xs border-t border-border/60 pt-2">
+                                    <span class="text-[10px] text-muted-foreground italic">Kosongkan jika tak ingin diubah</span>
+                                    <a href="{{ Storage::url($student->kk) }}" target="_blank" class="inline-flex items-center gap-1 font-bold text-primary hover:underline">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        Lihat KK saat ini
+                                    </a>
+                                </div>
                             @endif
                         </div>
 
                         <!-- Foto File -->
-                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40">
-                            <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Foto Santri (Gambar - Max 2MB)</label>
-                            <input type="file" wire:model="foto_file" class="mt-2 text-xs">
-                            @error('foto_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40 flex flex-col justify-between min-h-[120px]">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Foto Santri (Gambar - Max 2MB)</label>
+                                    @if ($isEdit && $student->foto)
+                                        <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            ✓ Sudah Ada
+                                        </span>
+                                    @endif
+                                </div>
+                                <input type="file" wire:model="foto_file" class="mt-2 text-xs w-full">
+                                @error('foto_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                            </div>
                             @if ($isEdit && $student->foto)
-                                <a href="{{ Storage::url($student->foto) }}" target="_blank" class="mt-2 inline-flex items-center text-xs text-primary font-semibold hover:underline">
-                                    Lihat Foto Saat Ini
-                                </a>
+                                <div class="mt-3 flex items-center justify-between text-xs border-t border-border/60 pt-2">
+                                    <span class="text-[10px] text-muted-foreground italic">Kosongkan jika tak ingin diubah</span>
+                                    <a href="{{ Storage::url($student->foto) }}" target="_blank" class="inline-flex items-center gap-1 font-bold text-primary hover:underline">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        Lihat Foto saat ini
+                                    </a>
+                                </div>
                             @endif
                         </div>
 
                         <!-- Akta Lahir -->
-                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40">
-                            <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Akta Kelahiran (PDF/Gambar - Max 2MB)</label>
-                            <input type="file" wire:model="akta_file" class="mt-2 text-xs">
-                            @error('akta_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40 flex flex-col justify-between min-h-[120px]">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Akta Kelahiran (PDF/Gambar - Max 2MB)</label>
+                                    @if ($isEdit && $student->akta)
+                                        <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            ✓ Sudah Ada
+                                        </span>
+                                    @endif
+                                </div>
+                                <input type="file" wire:model="akta_file" class="mt-2 text-xs w-full">
+                                @error('akta_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                            </div>
                             @if ($isEdit && $student->akta)
-                                <a href="{{ Storage::url($student->akta) }}" target="_blank" class="mt-2 inline-flex items-center text-xs text-primary font-semibold hover:underline">
-                                    Lihat Akta Saat Ini
-                                </a>
+                                <div class="mt-3 flex items-center justify-between text-xs border-t border-border/60 pt-2">
+                                    <span class="text-[10px] text-muted-foreground italic">Kosongkan jika tak ingin diubah</span>
+                                    <a href="{{ Storage::url($student->akta) }}" target="_blank" class="inline-flex items-center gap-1 font-bold text-primary hover:underline">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        Lihat Akta saat ini
+                                    </a>
+                                </div>
                             @endif
                         </div>
 
                         <!-- Ijazah -->
-                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40">
-                            <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Ijazah Terakhir (PDF/Gambar - Max 2MB - Opsional)</label>
-                            <input type="file" wire:model="ijazah_file" class="mt-2 text-xs">
-                            @error('ijazah_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40 flex flex-col justify-between min-h-[120px]">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider">Ijazah Terakhir (PDF/Gambar - Max 2MB - Opsional)</label>
+                                    @if ($isEdit && $student->ijazah)
+                                        <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            ✓ Sudah Ada
+                                        </span>
+                                    @endif
+                                </div>
+                                <input type="file" wire:model="ijazah_file" class="mt-2 text-xs w-full">
+                                @error('ijazah_file') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                            </div>
                             @if ($isEdit && $student->ijazah)
-                                <a href="{{ Storage::url($student->ijazah) }}" target="_blank" class="mt-2 inline-flex items-center text-xs text-primary font-semibold hover:underline">
-                                    Lihat Ijazah Saat Ini
-                                </a>
+                                <div class="mt-3 flex items-center justify-between text-xs border-t border-border/60 pt-2">
+                                    <span class="text-[10px] text-muted-foreground italic">Kosongkan jika tak ingin diubah</span>
+                                    <a href="{{ Storage::url($student->ijazah) }}" target="_blank" class="inline-flex items-center gap-1 font-bold text-primary hover:underline">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        Lihat Ijazah saat ini
+                                    </a>
+                                </div>
                             @endif
                         </div>
                     </div>
