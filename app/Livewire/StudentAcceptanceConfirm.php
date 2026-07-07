@@ -19,6 +19,7 @@ class StudentAcceptanceConfirm extends Component
     public $unit_code;
     public $residence_status;
     public $spmb_schedule_id;
+    public $class_level_id;
 
     public function mount(Student $student)
     {
@@ -30,13 +31,14 @@ class StudentAcceptanceConfirm extends Component
         $this->unit_code = $student->unit_code;
         $this->residence_status = $student->residence_status;
         $this->spmb_schedule_id = $student->spmb_schedule_id;
+        $this->class_level_id = $student->class_level_id;
 
         $this->loadAvailableBillings();
     }
 
     public function updated($propertyName)
     {
-        if (in_array($propertyName, ['unit_code', 'residence_status'])) {
+        if (in_array($propertyName, ['unit_code', 'residence_status', 'class_level_id'])) {
             $this->loadAvailableBillings();
         }
     }
@@ -60,7 +62,8 @@ class StudentAcceptanceConfirm extends Component
 
         $this->availableBillings = $query->where('is_locked', false)
             ->with(['fees' => function ($q) {
-                $q->where('is_active', true)
+                $q->with('classLevelTarget')
+                  ->where('is_active', true)
                   ->where(function ($sq) {
                       $sq->whereNull('unit_target')
                          ->orWhere('unit_target', $this->unit_code);
@@ -68,6 +71,10 @@ class StudentAcceptanceConfirm extends Component
                   ->where(function ($sq) {
                       $sq->whereNull('residence_target')
                          ->orWhere('residence_target', $this->residence_status);
+                  })
+                  ->where(function ($sq) {
+                      $sq->whereNull('class_level_target_id')
+                         ->orWhere('class_level_target_id', $this->class_level_id ?: null);
                   });
             }])
             ->orderBy('name')
@@ -87,6 +94,8 @@ class StudentAcceptanceConfirm extends Component
                             'due_days' => $fee->due_days,
                             'unit' => $fee->unit_target,
                             'domicile' => $fee->residence_target,
+                            'class_level_target_id' => $fee->class_level_target_id,
+                            'class_level_target_name' => $fee->classLevelTarget?->name ?? 'SEMUA',
                         ];
                     })->toArray(),
                     'total_amount' => $category->fees->sum('amount')
@@ -106,6 +115,7 @@ class StudentAcceptanceConfirm extends Component
             'unit_code' => 'required|in:01,02,03',
             'residence_status' => 'required|in:MONDOK,NON_MONDOK,NGAJI_ONLY',
             'spmb_schedule_id' => 'nullable|exists:spmb_schedules,id',
+            'class_level_id' => 'required|exists:class_levels,id',
         ]);
 
         try {
@@ -116,6 +126,7 @@ class StudentAcceptanceConfirm extends Component
                 'unit_code' => $this->unit_code,
                 'residence_status' => $this->residence_status,
                 'spmb_schedule_id' => $this->spmb_schedule_id ?: null,
+                'class_level_id' => $this->class_level_id,
             ]);
 
             $this->student->update(['is_active' => true]);
@@ -169,9 +180,12 @@ class StudentAcceptanceConfirm extends Component
     public function render()
     {
         $schedules = \App\Models\SpmbSchedule::where('is_active', true)->get();
+        
+        $classLevels = \App\Models\ClassLevel::orderBy('level_order')->get();
 
         return view('livewire.student-acceptance-confirm', [
-            'schedules' => $schedules
+            'schedules' => $schedules,
+            'classLevels' => $classLevels,
         ])->layout('layouts.admin');
     }
 }

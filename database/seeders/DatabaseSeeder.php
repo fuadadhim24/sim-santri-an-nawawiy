@@ -21,6 +21,47 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Copy seeder files to storage
+        try {
+            $storage = \Illuminate\Support\Facades\Storage::disk('public');
+            
+            $filesToCopy = [
+                'kk' => ['source' => 'pondok.png', 'target' => 'students/kk/seeder_kk.png'],
+                'foto' => ['source' => 'user.png', 'target' => 'students/foto/seeder_foto.png'],
+                'akta' => ['source' => 'smpq.png', 'target' => 'students/akta/seeder_akta.png'],
+                'nisn' => ['source' => 'pondok.png', 'target' => 'students/nisn/seeder_nisn.png'],
+                'ijazah' => ['source' => 'smpq.png', 'target' => 'students/ijazah/seeder_ijazah.png'],
+            ];
+
+            foreach ($filesToCopy as $key => $info) {
+                $sourcePath = public_path('image/' . $info['source']);
+                if (file_exists($sourcePath) && !$storage->exists($info['target'])) {
+                    $storage->put($info['target'], file_get_contents($sourcePath));
+                }
+            }
+        } catch (\Exception $e) {
+            // Safe fallback
+        }
+
+        // Register global listener to auto-populate files for all students created during seeding
+        \App\Models\Student::creating(function (\App\Models\Student $student) {
+            if (empty($student->kk)) {
+                $student->kk = 'students/kk/seeder_kk.png';
+            }
+            if (empty($student->foto)) {
+                $student->foto = 'students/foto/seeder_foto.png';
+            }
+            if (empty($student->akta)) {
+                $student->akta = 'students/akta/seeder_akta.png';
+            }
+            if (empty($student->nisn_document) && rand(1, 100) <= 70) {
+                $student->nisn_document = 'students/nisn/seeder_nisn.png';
+            }
+            if (empty($student->ijazah) && rand(1, 100) <= 50) {
+                $student->ijazah = 'students/ijazah/seeder_ijazah.png';
+            }
+        });
+
         $this->call([
             SpmbScheduleSeeder::class,
             RombelSeeder::class,

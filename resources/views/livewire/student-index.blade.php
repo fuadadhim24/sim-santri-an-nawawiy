@@ -14,6 +14,16 @@
                     Tambah Santri</a>
             </div>
         </div>
+        @if (session()->has('message'))
+            <div class="p-4 mx-6 mt-4 bg-green-50 border border-green-200 text-green-800 rounded-md text-sm font-semibold">
+                {{ session('message') }}
+            </div>
+        @endif
+        @if (session()->has('error'))
+            <div class="p-4 mx-6 mt-4 bg-red-50 border border-red-200 text-red-800 rounded-md text-sm font-semibold">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-muted-foreground uppercase bg-muted">
@@ -72,3 +82,20 @@
         </div>
     </div>
 </div>
+
+@if (session()->has('message'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('message') }}",
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+        });
+    </script>
+@endif

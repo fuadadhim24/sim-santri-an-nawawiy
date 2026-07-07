@@ -166,7 +166,27 @@ class BillingForm extends Component
 
     public function getFeeMastersProperty()
     {
-        return FeeMaster::with('category')->orderBy('item_name')->get();
+        $query = FeeMaster::with('category')->where('is_active', true);
+        
+        if ($this->student_id) {
+            $student = Student::find($this->student_id);
+            if ($student) {
+                $query->where(function ($q) use ($student) {
+                    $q->whereNull('unit_target')
+                      ->orWhere('unit_target', $student->unit_code);
+                })
+                ->where(function ($q) use ($student) {
+                    $q->whereNull('residence_target')
+                      ->orWhere('residence_target', $student->residence_status);
+                })
+                ->where(function ($q) use ($student) {
+                    $q->whereNull('class_level_target_id')
+                      ->orWhere('class_level_target_id', $student->class_level_id);
+                });
+            }
+        }
+        
+        return $query->orderBy('item_name')->get();
     }
 
     public function render()

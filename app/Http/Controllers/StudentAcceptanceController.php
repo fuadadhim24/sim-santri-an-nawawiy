@@ -30,11 +30,7 @@ class StudentAcceptanceController extends Controller
         $student = Student::findOrFail($studentId);
 
         try {
-            $student->update([
-                'is_active' => false,
-                'rejection_note' => $request->input('reason'),
-            ]);
-            $student->markAsRejected();
+            $student->markAsRejected($request->input('reason'));
 
             $expandedIds = $request->session()->get('expanded_schedule_ids', []);
             $expandedIds = array_filter(array_unique(array_merge($expandedIds, [$student->spmb_schedule_id])));

@@ -15,6 +15,14 @@ class FeeMasterSeeder extends Seeder
         $catReReg = FeeCategory::where('code', 'RE_REG')->first();
         $catOther = FeeCategory::where('code', 'OTHER')->first();
 
+        // Get class levels to target specific fees
+        $level7 = \App\Models\ClassLevel::where('name', 'Kelas 7 SMP')->first();
+        $level8 = \App\Models\ClassLevel::where('name', 'Kelas 8 SMP')->first();
+        $level9 = \App\Models\ClassLevel::where('name', 'Kelas 9 SMP')->first();
+        $level10 = \App\Models\ClassLevel::where('name', 'Kelas 10 SMA')->first();
+        $level11 = \App\Models\ClassLevel::where('name', 'Kelas 11 SMA')->first();
+        $level12 = \App\Models\ClassLevel::where('name', 'Kelas 12 SMA')->first();
+
         // ──────────────────────────────────────────────
         // Biaya Pendaftaran (Registrasi)
         // ──────────────────────────────────────────────
@@ -53,6 +61,7 @@ class FeeMasterSeeder extends Seeder
             'end_date' => null, // Berulang selamanya
             'unit_target' => '01',
             'residence_target' => null,
+            'class_level_target_id' => $level7?->id,
         ]);
 
         FeeMaster::create([
@@ -64,6 +73,7 @@ class FeeMasterSeeder extends Seeder
             'end_date' => null, // Berulang selamanya
             'unit_target' => '02',
             'residence_target' => null,
+            'class_level_target_id' => $level10?->id,
         ]);
 
         FeeMaster::create([
@@ -113,6 +123,7 @@ class FeeMasterSeeder extends Seeder
             'end_date' => '2026-12-31', // Berakhir akhir 2026
             'unit_target' => null,
             'residence_target' => null,
+            'class_level_target_id' => $level7?->id,
         ]);
 
         FeeMaster::create([

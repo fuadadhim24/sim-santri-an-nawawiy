@@ -21,7 +21,16 @@ class StudentFactory extends Factory
             'unit_code' => $this->faker->randomElement(['01', '02', '03']),
             'residence_status' => $this->faker->randomElement(['MONDOK', 'NON_MONDOK', 'NGAJI_ONLY']),
             'special_status' => $this->faker->randomElement(['UMUM', 'ANAK_GURU', 'YATIM']),
-            'class_name' => 'Kelas ' . $this->faker->randomElement(['X', 'XI', 'XII']),
+            'class_level_id' => function () {
+                return \App\Models\ClassLevel::inRandomOrder()->first()?->id;
+            },
+            'study_group_id' => function (array $attributes) {
+                if ($attributes['class_level_id']) {
+                    return \App\Models\StudyGroup::where('class_level_id', $attributes['class_level_id'])->inRandomOrder()->first()?->id;
+                }
+                return null;
+            },
+            'class_name' => null,
             'address' => $this->faker->address(),
             'is_active' => $this->faker->boolean(),
             'status' => 'ACTIVE',

@@ -68,7 +68,10 @@ class RoleBasedAccessTest extends TestCase
 
         $this->actingAs($superAdmin);
 
+        $level = \App\Models\ClassLevel::first();
+
         Livewire::test(\App\Livewire\StudentAcceptanceConfirm::class, ['student' => $student])
+            ->set('class_level_id', $level ? $level->id : null)
             ->call('confirmAcceptance');
 
         $student->refresh();
@@ -116,13 +119,15 @@ class RoleBasedAccessTest extends TestCase
         $foto = \Illuminate\Http\UploadedFile::fake()->image('foto.jpg');
         $akta = \Illuminate\Http\UploadedFile::fake()->image('akta.jpg');
 
+        $level = \App\Models\ClassLevel::first();
+
         Livewire::test(\App\Livewire\StudentForm::class)
             ->set('guardian_id', $guardian->id)
             ->set('full_name', 'Test Student')
             ->set('unit_code', '02')
             ->set('residence_status', 'NON_MONDOK')
             ->set('special_status', 'UMUM')
-            ->set('class_name', '8A')
+            ->set('class_level_id', $level ? $level->id : null)
             ->set('address', 'Jl. Test')
             ->set('kk_file', $kk)
             ->set('foto_file', $foto)

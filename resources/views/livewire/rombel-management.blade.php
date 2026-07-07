@@ -24,25 +24,7 @@
         <div class="p-6 bg-background rounded-b-lg">
             <div class="flex overflow-x-auto space-x-4 pb-4 min-h-[70vh]">
                 
-                <!-- Column: Belum Penempatan -->
-                <div class="flex-shrink-0 w-80 bg-secondary/30 rounded-lg shadow-sm border border-border flex flex-col">
-                    <div class="p-4 border-b border-border bg-secondary/50 rounded-t-lg">
-                        <h3 class="font-bold text-foreground">Santri Baru / Belum Penempatan</h3>
-                        <p class="text-xs text-muted-foreground mt-1">{{ $unassignedStudents->count() }} Santri</p>
-                    </div>
-                    <div class="p-3 flex-1 overflow-y-auto">
-                        <!-- Placeholder Card -->
-                        <div wire:click="openManageStudentsModal('unassigned_global', null, 'Santri Baru / Belum Penempatan')" class="bg-card p-3 rounded shadow-sm border border-border cursor-pointer hover:border-primary transition">
-                            <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-semibold text-sm text-card-foreground">Daftar Santri</h4>
-                            </div>
-                            <div class="text-2xl font-bold text-primary">
-                                {{ $unassignedStudents->count() }}
-                            </div>
-                            <p class="text-xs text-muted-foreground mt-1">Klik untuk menempatkan</p>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Columns: Class Levels -->
                 @foreach($classLevels as $level)
@@ -217,13 +199,16 @@
                     </div>
 
                     <!-- Modal Body -->
-                    <div class="px-6 py-4 flex-1 overflow-y-auto bg-white">
+                    <div x-data="{ selectedIds: @entangle('selectedStudentIds') }" class="px-6 py-4 flex-1 overflow-y-auto bg-white">
                         <div class="flex justify-between items-center mb-4">
-                            <button type="button" wire:click="selectAllStudents" class="text-sm font-semibold text-primary hover:text-primary/80">
-                                {{ count($selectedStudentIds) === count($modalStudents) && count($modalStudents) > 0 ? 'Deselect All' : 'Select All' }} ({{ count($modalStudents) }} Santri)
+                            <button type="button" 
+                                    @click="selectedIds.length === {{ count($modalStudents) }} && {{ count($modalStudents) }} > 0 ? selectedIds = [] : selectedIds = [{{ implode(',', $modalStudents->pluck('id')->toArray()) }}].map(String)" 
+                                    class="text-sm font-semibold text-primary hover:text-primary/80">
+                                <span x-text="selectedIds.length === {{ count($modalStudents) }} && {{ count($modalStudents) }} > 0 ? 'Deselect All' : 'Select All'">Select All</span>
+                                ({{ count($modalStudents) }} Santri)
                             </button>
                             <div class="text-sm text-gray-500">
-                                Terpilih: <span class="font-bold text-primary">{{ count($selectedStudentIds) }}</span>
+                                Terpilih: <span class="font-bold text-primary" x-text="selectedIds.length">0</span>
                             </div>
                         </div>
 
@@ -244,9 +229,9 @@
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @forelse($modalStudents as $student)
-                                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="document.getElementById('checkbox-{{ $student->id }}').click()">
+                                    <tr class="hover:bg-gray-50 cursor-pointer" @click="document.getElementById('checkbox-{{ $student->id }}').click()">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <input id="checkbox-{{ $student->id }}" wire:model.live="selectedStudentIds" value="{{ $student->id }}" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" onclick="event.stopPropagation()">
+                                            <input id="checkbox-{{ $student->id }}" x-model="selectedIds" value="{{ $student->id }}" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" @click.stop>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $student->full_name }}</div>
@@ -265,13 +250,87 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- BILLING TRANSITION SECTION FOR MOVE -->
+                        @if($targetMoveId && !$this->isSameClassLevel())
+                            <div class="mt-6 border-t pt-4 space-y-4">
+                                <h4 class="text-sm font-semibold text-gray-900">Penyesuaian Tagihan Kelas Baru</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="block text-xs font-semibold text-gray-700 uppercase">Kebijakan Tagihan Lama (Unpaid):</label>
+                                        <div class="space-y-2 mt-1.5">
+                                            <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none">
+                                                <input type="radio" wire:model.live="moveBillingPolicy" value="none" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                <div>
+                                                    <span class="font-semibold">Jangan Ubah Tagihan Lama</span>
+                                                    <p class="text-[10px] text-gray-500 mt-0.5">Semua tagihan lama tetap dibiarkan aktif.</p>
+                                                </div>
+                                            </label>
+
+                                            <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none mt-2">
+                                                <input type="radio" wire:model.live="moveBillingPolicy" value="delete_all_and_new" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                <div>
+                                                    <span class="font-semibold text-destructive">Hapus Semua Tagihan Lama</span>
+                                                    <p class="text-[10px] text-gray-500 mt-0.5">Semua tagihan kelas lama yang belum dibayar akan dihapus.</p>
+                                                </div>
+                                            </label>
+
+                                            <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none mt-2">
+                                                <input type="radio" wire:model.live="moveBillingPolicy" value="delete_except_month_and_new" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                <div>
+                                                    <span class="font-semibold text-primary">Hapus Kecuali Bulan Ini</span>
+                                                    <p class="text-[10px] text-gray-500 mt-0.5">Hapus tagihan lama kecuali tagihan yang dibuat/jatuh tempo bulan ini.</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-2 relative">
+                                        <label class="block text-xs font-semibold text-gray-700 uppercase">Buat Tagihan Kelas Baru (Jika ada):</label>
+                                        
+                                        <!-- Loading state -->
+                                        <div wire:loading wire:target="targetMoveId" class="w-full mt-1.5 animate-pulse">
+                                            <div class="flex items-center gap-3 p-3 bg-blue-50/50 border border-blue-200 rounded-lg text-xs text-blue-800">
+                                                <svg class="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <span class="font-bold block">Menganalisis Tagihan Kelas...</span>
+                                                    <span class="text-[10px] text-blue-600 block mt-0.5">Memeriksa struktur biaya dan kebijakan transisi tingkat kelas tujuan...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Content state -->
+                                        <div wire:loading.remove wire:target="targetMoveId">
+                                            @if(empty($availableMoveBillings))
+                                                <p class="text-xs text-gray-500 bg-gray-50 p-2.5 rounded border border-dashed mt-1.5">Tidak ada tagihan khusus untuk tingkat kelas tujuan.</p>
+                                            @else
+                                                <div class="space-y-2 mt-1.5 max-h-[120px] overflow-y-auto p-1.5 border rounded">
+                                                    @foreach($availableMoveBillings as $billing)
+                                                        <label class="flex items-center text-xs text-gray-700 cursor-pointer select-none">
+                                                            <input type="checkbox" wire:model.live="moveBillingCategories" value="{{ $billing['id'] }}" class="rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                            <div class="flex-1 flex justify-between pr-2">
+                                                                <span>{{ $billing['name'] }}</span>
+                                                                <span class="font-mono text-gray-500">Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}</span>
+                                                            </div>
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Modal Footer & Action -->
                     <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="w-full sm:w-1/2 flex items-center gap-2">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Pindahkan ke:</label>
-                            <select wire:model="targetMoveId" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md shadow-sm">
+                            <select wire:model.live="targetMoveId" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md shadow-sm">
                                 <option value="">-- Pilih Tujuan --</option>
                                 @foreach($classLevels as $level)
                                     <optgroup label="{{ $level->name }}">
@@ -284,7 +343,12 @@
                             </select>
                         </div>
                         
-                        <button wire:click="moveSelectedStudents" wire:loading.attr="disabled" type="button" class="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:text-sm {{ count($selectedStudentIds) === 0 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ count($selectedStudentIds) === 0 ? 'disabled' : '' }}>
+                        <button wire:click="moveSelectedStudents" 
+                                wire:loading.attr="disabled" 
+                                type="button" 
+                                class="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:text-sm"
+                                :class="selectedIds.length === 0 ? 'opacity-50 cursor-not-allowed' : ''"
+                                :disabled="selectedIds.length === 0">
                             <svg wire:loading wire:target="moveSelectedStudents" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -490,6 +554,85 @@
                                             @endforelse
                                         </tbody>
                                     </table>
+                                </div>
+
+                                <!-- BILLING TRANSITION SECTION FOR WIZARD -->
+                                <div class="mt-6 border-t pt-4 space-y-4">
+                                    <h4 class="text-sm font-semibold text-gray-900">
+                                        {{ $destinationLevelId === 'lulus' ? 'Kelola Sisa Tagihan Kelulusan' : 'Penyesuaian Tagihan Kelas Baru Massal' }}
+                                    </h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="space-y-2">
+                                            <label class="block text-xs font-semibold text-gray-700 uppercase">Kebijakan Tagihan Lama (Unpaid):</label>
+                                            @if($destinationLevelId === 'lulus')
+                                                <div class="space-y-2 mt-1.5">
+                                                    <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none">
+                                                        <input type="radio" wire:model.live="wizardBillingPolicy" value="graduation_keep_unpaid" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                        <div>
+                                                            <span class="font-semibold">Pertahankan Sisa Tagihan Lulusan</span>
+                                                            <p class="text-[10px] text-gray-500 mt-0.5">Sisa tagihan belum dibayar tetap ditagihkan (wajib dilunasi sebelum keluar).</p>
+                                                        </div>
+                                                    </label>
+
+                                                    <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none mt-2">
+                                                        <input type="radio" wire:model.live="wizardBillingPolicy" value="graduation_delete_unpaid" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                        <div>
+                                                            <span class="font-semibold text-destructive">Hapus Sisa Tagihan (Pemutihan Utang)</span>
+                                                            <p class="text-[10px] text-gray-500 mt-0.5">Semua sisa tagihan santri yang lulus akan dihapus/diarsipkan.</p>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            @else
+                                                <div class="space-y-2 mt-1.5">
+                                                    <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none">
+                                                        <input type="radio" wire:model.live="wizardBillingPolicy" value="none" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                        <div>
+                                                            <span class="font-semibold">Jangan Ubah Tagihan Lama & Jangan Buat Baru</span>
+                                                            <p class="text-[10px] text-gray-500 mt-0.5">Semua tagihan lama tetap aktif tanpa ada pembuatan tagihan otomatis baru.</p>
+                                                        </div>
+                                                    </label>
+
+                                                    <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none mt-2">
+                                                        <input type="radio" wire:model.live="wizardBillingPolicy" value="delete_all" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                        <div>
+                                                            <span class="font-semibold text-destructive">Hapus Semua Tagihan Lama & Buat Baru</span>
+                                                            <p class="text-[10px] text-gray-500 mt-0.5">Hapus semua tagihan kelas lama (unpaid) dan buat tagihan untuk kelas baru.</p>
+                                                        </div>
+                                                    </label>
+
+                                                    <label class="flex items-start text-xs text-gray-700 cursor-pointer select-none mt-2">
+                                                        <input type="radio" wire:model.live="wizardBillingPolicy" value="delete_except_current_month" class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                        <div>
+                                                            <span class="font-semibold text-primary">Hapus Kecuali Bulan Ini & Buat Baru</span>
+                                                            <p class="text-[10px] text-gray-500 mt-0.5">Hapus tagihan kelas lama (unpaid) kecuali bulan ini, dan buat tagihan kelas baru.</p>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            @if($destinationLevelId !== 'lulus')
+                                                <label class="block text-xs font-semibold text-gray-700 uppercase">Buat Tagihan Kelas Baru (Massal):</label>
+                                                @if(empty($availableWizardBillings))
+                                                    <p class="text-xs text-gray-500 bg-gray-50 p-2.5 rounded border border-dashed mt-1.5">Tidak ada tagihan khusus untuk kelas tujuan.</p>
+                                                @else
+                                                    <div class="space-y-2 mt-1.5 max-h-[120px] overflow-y-auto p-1.5 border rounded">
+                                                        @foreach($availableWizardBillings as $billing)
+                                                            <label class="flex items-center text-xs text-gray-700 cursor-pointer select-none">
+                                                                <input type="checkbox" wire:model.live="wizardBillingCategories" value="{{ $billing['id'] }}" class="rounded border-gray-300 text-primary focus:ring-primary mr-2">
+                                                                <div class="flex-1 flex justify-between pr-2">
+                                                                    <span>{{ $billing['name'] }}</span>
+                                                                    <span class="font-mono text-gray-500">Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}</span>
+                                                                </div>
+                                                            </label>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endif

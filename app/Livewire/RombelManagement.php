@@ -6,6 +6,9 @@ use Livewire\Component;
 use App\Models\ClassLevel;
 use App\Models\StudyGroup;
 use App\Models\Student;
+use App\Models\FeeCategory;
+use App\Models\FeeMaster;
+use Illuminate\Support\Facades\DB;
 
 class RombelManagement extends Component
 {
@@ -21,6 +24,11 @@ class RombelManagement extends Component
     public $targetClassLevelId;
     public $studyGroupName;
     public $studyGroupCapacity = 40;
+
+    // Move students billing properties
+    public $moveBillingPolicy = 'none'; // 'none', 'delete_all_and_new', 'delete_except_month_and_new'
+    public $moveBillingCategories = [];
+    public $availableMoveBillings = [];
 
     protected $rules = [
         'classLevelName' => 'required|string|max:255',
@@ -118,6 +126,9 @@ class RombelManagement extends Component
         $this->manageSourceName = $name;
         $this->selectedStudentIds = [];
         $this->targetMoveId = '';
+        $this->moveBillingPolicy = 'none';
+        $this->moveBillingCategories = [];
+        $this->availableMoveBillings = [];
 
         if ($type === 'unassigned_global') {
             $this->modalStudents = Student::where('is_active', true)
@@ -138,6 +149,76 @@ class RombelManagement extends Component
         }
 
         $this->showManageStudentsModal = true;
+    }
+
+    public function isSameClassLevel()
+    {
+        if (empty($this->targetMoveId)) {
+            return true;
+        }
+
+        $sourceClassLevelId = null;
+        if ($this->manageSourceType === 'unassigned_level') {
+            $sourceClassLevelId = $this->manageSourceId;
+        } elseif ($this->manageSourceType === 'rombel') {
+            $rombel = StudyGroup::find($this->manageSourceId);
+            $sourceClassLevelId = $rombel?->class_level_id;
+        }
+
+        $targetClassLevelId = null;
+        if (str_starts_with($this->targetMoveId, 'unassigned_level_')) {
+            $targetClassLevelId = str_replace('unassigned_level_', '', $this->targetMoveId);
+        } elseif (str_starts_with($this->targetMoveId, 'rombel_')) {
+            $rombelId = str_replace('rombel_', '', $this->targetMoveId);
+            $rombel = StudyGroup::find($rombelId);
+            $targetClassLevelId = $rombel?->class_level_id;
+        }
+
+        return $sourceClassLevelId == $targetClassLevelId;
+    }
+
+    public function updatedTargetMoveId($value)
+    {
+        $this->availableMoveBillings = [];
+        $this->moveBillingCategories = [];
+        
+        $classLevelId = null;
+        if (str_starts_with($value, 'unassigned_level_')) {
+            $classLevelId = str_replace('unassigned_level_', '', $value);
+        } elseif (str_starts_with($value, 'rombel_')) {
+            $rombelId = str_replace('rombel_', '', $value);
+            $rombel = StudyGroup::find($rombelId);
+            $classLevelId = $rombel?->class_level_id;
+        }
+
+        $sourceClassLevelId = null;
+        if ($this->manageSourceType === 'unassigned_level') {
+            $sourceClassLevelId = $this->manageSourceId;
+        } elseif ($this->manageSourceType === 'rombel') {
+            $rombel = StudyGroup::find($this->manageSourceId);
+            $sourceClassLevelId = $rombel?->class_level_id;
+        }
+
+        if ($classLevelId && $sourceClassLevelId != $classLevelId) {
+            $this->availableMoveBillings = FeeCategory::where('is_active', true)
+                ->where('is_locked', false)
+                ->with(['fees' => function ($q) use ($classLevelId) {
+                    $q->where('is_active', true)
+                      ->where('class_level_target_id', $classLevelId);
+                }])
+                ->get()
+                ->filter(fn($cat) => $cat->fees->count() > 0)
+                ->map(function ($category) {
+                    return [
+                        'id' => (string) $category->id,
+                        'name' => $category->name,
+                        'total_amount' => $category->fees->sum('amount')
+                    ];
+                })
+                ->toArray();
+            
+            $this->moveBillingCategories = array_map(fn($b) => $b['id'], $this->availableMoveBillings);
+        }
     }
 
     public function selectAllStudents()
@@ -162,6 +243,7 @@ class RombelManagement extends Component
         }
 
         $updates = [];
+        $classLevelId = null;
         
         if (str_starts_with($this->targetMoveId, 'unassigned_level_')) {
             $levelId = str_replace('unassigned_level_', '', $this->targetMoveId);
@@ -169,6 +251,7 @@ class RombelManagement extends Component
                 'class_level_id' => $levelId,
                 'study_group_id' => null,
             ];
+            $classLevelId = $levelId;
         } elseif (str_starts_with($this->targetMoveId, 'rombel_')) {
             $rombelId = str_replace('rombel_', '', $this->targetMoveId);
             $rombel = StudyGroup::find($rombelId);
@@ -177,13 +260,41 @@ class RombelManagement extends Component
                     'class_level_id' => $rombel->class_level_id,
                     'study_group_id' => $rombel->id,
                 ];
+                $classLevelId = $rombel->class_level_id;
             }
         }
 
+        $sourceClassLevelId = null;
+        if ($this->manageSourceType === 'unassigned_level') {
+            $sourceClassLevelId = $this->manageSourceId;
+        } elseif ($this->manageSourceType === 'rombel') {
+            $rombel = StudyGroup::find($this->manageSourceId);
+            $sourceClassLevelId = $rombel?->class_level_id;
+        }
+
         if (!empty($updates)) {
-            Student::whereIn('id', $this->selectedStudentIds)->update($updates);
+            $students = Student::whereIn('id', $this->selectedStudentIds)->get();
+            $billingService = app(\App\Services\BillingService::class);
+
+            DB::transaction(function () use ($students, $updates, $billingService, $sourceClassLevelId, $classLevelId) {
+                foreach ($students as $student) {
+                    $student->update($updates);
+
+                    // Only run transition if target class level is different from source class level
+                    if ($sourceClassLevelId != $classLevelId && $this->moveBillingPolicy !== 'none') {
+                        $policy = $this->moveBillingPolicy === 'delete_all_and_new' ? 'delete_all' : ($this->moveBillingPolicy === 'delete_except_month_and_new' ? 'delete_except_current_month' : 'keep_all');
+                        
+                        $billingService->transitionStudentBillings(
+                            $student,
+                            $policy,
+                            [],
+                            $this->moveBillingCategories
+                        );
+                    }
+                }
+            });
+
             $count = count($this->selectedStudentIds);
-            
             $this->showManageStudentsModal = false;
             $this->dispatch('swal:success', [
                 'title' => 'Berhasil!', 
@@ -205,6 +316,11 @@ class RombelManagement extends Component
     public $promotionDraft = []; 
     public $destinationStudyGroups = []; 
 
+    // Wizard billing transition properties
+    public $wizardBillingCategories = [];
+    public $availableWizardBillings = [];
+    public $wizardBillingPolicy = 'none'; // 'none', 'delete_all', 'delete_except_current_month', 'graduation_keep_unpaid', 'graduation_delete_unpaid'
+
     public function openPromotionWizard()
     {
         $this->resetValidation();
@@ -215,6 +331,9 @@ class RombelManagement extends Component
         $this->promotionMethod = 'kosong';
         $this->promotionDraft = [];
         $this->paralelMapping = [];
+        $this->wizardBillingCategories = [];
+        $this->availableWizardBillings = [];
+        $this->wizardBillingPolicy = 'none';
     }
 
     public function wizardNextStep()
@@ -255,13 +374,47 @@ class RombelManagement extends Component
             
             if ($this->destinationLevelId === 'lulus') {
                 $this->generatePromotionDraft();
+                $this->loadWizardBillings();
                 $this->wizardStep = 3;
             } else {
                 $this->wizardStep = 2;
             }
         } elseif ($this->wizardStep === 2) {
             $this->generatePromotionDraft();
+            $this->loadWizardBillings();
             $this->wizardStep = 3;
+        }
+    }
+
+    public function loadWizardBillings()
+    {
+        $this->availableWizardBillings = [];
+        $this->wizardBillingCategories = [];
+
+        if ($this->destinationLevelId === 'lulus') {
+            $this->wizardBillingPolicy = 'graduation_keep_unpaid';
+        } else {
+            $this->wizardBillingPolicy = 'none';
+            $classLevelId = $this->destinationLevelId;
+
+            $this->availableWizardBillings = FeeCategory::where('is_active', true)
+                ->where('is_locked', false)
+                ->with(['fees' => function ($q) use ($classLevelId) {
+                    $q->where('is_active', true)
+                      ->where('class_level_target_id', $classLevelId);
+                }])
+                ->get()
+                ->filter(fn($cat) => $cat->fees->count() > 0)
+                ->map(function ($category) {
+                    return [
+                        'id' => (string) $category->id,
+                        'name' => $category->name,
+                        'total_amount' => $category->fees->sum('amount')
+                    ];
+                })
+                ->toArray();
+            
+            $this->wizardBillingCategories = array_map(fn($b) => $b['id'], $this->availableWizardBillings);
         }
     }
 
@@ -350,27 +503,51 @@ class RombelManagement extends Component
     {
         $count = 0;
         $isLulus = ($this->destinationLevelId === 'lulus');
+        $billingService = app(\App\Services\BillingService::class);
 
-        foreach ($this->promotionDraft as $studentId => $data) {
-            if ($data['skip']) {
-                continue;
-            }
+        DB::transaction(function () use ($isLulus, $billingService, &$count) {
+            foreach ($this->promotionDraft as $studentId => $data) {
+                if ($data['skip']) {
+                    continue;
+                }
 
-            if ($isLulus) {
-                Student::where('id', $studentId)->update([
-                    'status' => 'lulus',
-                    'is_active' => false,
-                    'class_level_id' => null,
-                    'study_group_id' => null,
-                ]);
-            } else {
-                Student::where('id', $studentId)->update([
-                    'class_level_id' => $data['new_level_id'],
-                    'study_group_id' => $data['new_rombel_id'],
-                ]);
+                $student = Student::find($studentId);
+                if (!$student) continue;
+
+                if ($isLulus) {
+                    $student->update([
+                        'status' => 'lulus',
+                        'is_active' => false,
+                        'class_level_id' => null,
+                        'study_group_id' => null,
+                    ]);
+
+                    // If graduation policy is delete all unpaid
+                    if ($this->wizardBillingPolicy === 'graduation_delete_unpaid') {
+                        $unpaid = $billingService->getUnpaidBillings($student);
+                        foreach ($unpaid as $bill) {
+                            $bill->delete();
+                        }
+                    }
+                } else {
+                    $student->update([
+                        'class_level_id' => $data['new_level_id'],
+                        'study_group_id' => $data['new_rombel_id'],
+                    ]);
+
+                    // Execute billing transitions for promoted student
+                    if ($this->wizardBillingPolicy !== 'none') {
+                        $billingService->transitionStudentBillings(
+                            $student,
+                            $this->wizardBillingPolicy,
+                            [],
+                            $this->wizardBillingCategories
+                        );
+                    }
+                }
+                $count++;
             }
-            $count++;
-        }
+        });
 
         $this->showPromotionWizard = false;
         $this->dispatch('swal:success', [
@@ -387,11 +564,6 @@ class RombelManagement extends Component
             }]);
         }])->orderBy('level_order')->get();
 
-        $unassignedStudents = Student::where('is_active', true)
-            ->where('status', 'diterima')
-            ->whereNull('class_level_id')
-            ->get();
-
         $unassignedToRombel = [];
         foreach ($classLevels as $level) {
             $unassignedToRombel[$level->id] = Student::where('is_active', true)
@@ -403,7 +575,6 @@ class RombelManagement extends Component
 
         return view('livewire.rombel-management', [
             'classLevels' => $classLevels,
-            'unassignedStudents' => $unassignedStudents,
             'unassignedToRombel' => $unassignedToRombel,
         ])->layout('layouts.admin');
     }

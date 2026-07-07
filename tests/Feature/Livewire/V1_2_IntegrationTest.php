@@ -256,13 +256,13 @@ class V1_2_IntegrationTest extends TestCase
             ->set('full_name', 'Santri Test')
             ->set('unit_code', '01')
             ->set('residence_status', 'MONDOK')
-            ->set('selectedFeeMasters', [])
+            ->set('selectedBillings', [])
             // Call toggleSelectAllFees
             ->call('toggleSelectAllFees')
-            // Expect both fee IDs in selectedFeeMasters
-            ->assertSet('selectedFeeMasters', [(string)$fee1->id, (string)$fee2->id])
+            // Expect category ID in selectedBillings
+            ->assertSet('selectedBillings', [(string)$category->id])
             // Call it again to uncheck all
             ->call('toggleSelectAllFees')
-            ->assertSet('selectedFeeMasters', []);
+            ->assertSet('selectedBillings', []);
     }
 }

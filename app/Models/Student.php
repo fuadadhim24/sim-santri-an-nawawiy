@@ -199,6 +199,14 @@ class Student extends Model
     }
 
     /**
+     * Accessor to get class name, falling back to classLevel relationship name if column is null
+     */
+    public function getClassNameAttribute($value)
+    {
+        return $this->classLevel?->name ?? $value;
+    }
+
+    /**
      * Accessor to get full URL for KK
      */
     public function getKkUrlAttribute()

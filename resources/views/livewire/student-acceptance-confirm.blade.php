@@ -78,7 +78,8 @@
                             nisn: @entangle('nisn'),
                             unit_code: @entangle('unit_code'),
                             residence_status: @entangle('residence_status'),
-                            spmb_schedule_id: @entangle('spmb_schedule_id')
+                            spmb_schedule_id: @entangle('spmb_schedule_id'),
+                            class_level_id: @entangle('class_level_id')
                         }">
                         
                         @if (session()->has('success_field'))
@@ -112,11 +113,19 @@
                                     </p>
                                 </div>
                             </div>
-                            <div>
-                                <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Jadwal SPMB</label>
-                                <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
-                                    {{ $student->spmbSchedule ? $student->spmbSchedule->name : '-' }}
-                                </p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Tingkat Kelas</label>
+                                    <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
+                                        {{ $classLevels->firstWhere('id', $class_level_id)?->name ?? ($student->classLevel?->name ?? '-') }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Jadwal SPMB</label>
+                                    <p class="font-medium text-foreground text-sm border-b border-dashed border-border pb-1">
+                                        {{ $student->spmbSchedule ? $student->spmbSchedule->name : '-' }}
+                                    </p>
+                                </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -174,6 +183,17 @@
                                     </select>
                                     @error('residence_status') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
                                 </div>
+                            </div>
+                            
+                            <div>
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Tingkat Kelas</label>
+                                <select wire:model.live="class_level_id" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                                    <option value="">-- Pilih Tingkat Kelas --</option>
+                                    @foreach($classLevels as $level)
+                                        <option value="{{ $level->id }}">{{ $level->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('class_level_id') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
@@ -451,6 +471,12 @@
                                                                         @else
                                                                             <span class="inline-flex px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium border border-border" style="font-size: 8px; line-height: 1.2;">
                                                                                 DOM: SEMUA
+                                                                            </span>
+                                                                        @endif
+
+                                                                        @if (isset($fee['class_level_target_name']))
+                                                                            <span class="inline-flex px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-medium border border-amber-200" style="font-size: 8px; line-height: 1.2;">
+                                                                                KELAS: {{ $fee['class_level_target_name'] }}
                                                                             </span>
                                                                         @endif
                                                                     </div>

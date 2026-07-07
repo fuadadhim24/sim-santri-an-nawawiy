@@ -34,6 +34,10 @@ class BillingService
             ->where(function ($q) use ($student) {
                 $q->where('residence_target', $student->residence_status)
                   ->orWhereNull('residence_target');
+            })
+            ->where(function ($q) use ($student) {
+                $q->where('class_level_target_id', $student->class_level_id)
+                  ->orWhereNull('class_level_target_id');
             });
 
         if ($feeItemName) {
@@ -346,6 +350,9 @@ class BillingService
             ->where(function ($q) use ($student) {
                 $q->where('residence_target', $student->residence_status)->orWhereNull('residence_target');
             })
+            ->where(function ($q) use ($student) {
+                $q->where('class_level_target_id', $student->class_level_id)->orWhereNull('class_level_target_id');
+            })
             ->first();
     }
 
@@ -454,6 +461,10 @@ class BillingService
                         $q->where('residence_target', $student->residence_status)
                           ->orWhereNull('residence_target');
                     })
+                    ->where(function ($q) use ($student) {
+                        $q->where('class_level_target_id', $student->class_level_id)
+                          ->orWhereNull('class_level_target_id');
+                    })
                     ->get();
 
                 foreach ($feeMasters as $feeMaster) {
@@ -514,6 +525,10 @@ class BillingService
                         $q->where('residence_target', $student->residence_status)
                           ->orWhereNull('residence_target');
                     })
+                    ->where(function ($q) use ($student) {
+                        $q->where('class_level_target_id', $student->class_level_id)
+                          ->orWhereNull('class_level_target_id');
+                    })
                     ->get();
 
                 foreach ($feeMasters as $feeMaster) {
@@ -540,5 +555,99 @@ class BillingService
         ]);
 
         return $count;
+    }
+
+    /**
+     * Get unpaid billings for a student.
+     */
+    public function getUnpaidBillings(Student $student)
+    {
+        return Billing::where('student_id', $student->id)
+            ->where('status', 'UNPAID')
+            ->where('visible_to_wali', true)
+            ->with('feeMaster.category')
+            ->get();
+    }
+
+    /**
+     * Handle transition of billings when a student's profile changes (unit, residence, class level).
+     */
+    public function transitionStudentBillings(
+        Student $student,
+        string $oldUnpaidPolicy,
+        array $oldBillingsToDelete,
+        array $newCategoryIdsToGenerate
+    ): array {
+        $deletedCount = 0;
+        $generatedCount = 0;
+
+        DB::transaction(function () use (
+            $student,
+            $oldUnpaidPolicy,
+            $oldBillingsToDelete,
+            $newCategoryIdsToGenerate,
+            &$deletedCount,
+            &$generatedCount
+        ) {
+            // 1. Process old unpaid billings based on the policy
+            if ($oldUnpaidPolicy === 'delete_all') {
+                $unpaidBillings = Billing::where('student_id', $student->id)
+                    ->where('status', 'UNPAID')
+                    ->get();
+
+                foreach ($unpaidBillings as $billing) {
+                    $billing->delete(); // Soft delete
+                    $deletedCount++;
+                }
+            } elseif ($oldUnpaidPolicy === 'delete_except_current_month') {
+                $unpaidBillings = Billing::where('student_id', $student->id)
+                    ->where('status', 'UNPAID')
+                    ->get();
+
+                $currentMonth = now()->format('Y-m');
+
+                foreach ($unpaidBillings as $billing) {
+                    $createdAtMonth = $billing->created_at ? $billing->created_at->format('Y-m') : '';
+                    $dueDateMonth = $billing->due_date ? $billing->due_date->format('Y-m') : '';
+
+                    if ($createdAtMonth !== $currentMonth && $dueDateMonth !== $currentMonth) {
+                        $billing->delete();
+                        $deletedCount++;
+                    }
+                }
+            } elseif ($oldUnpaidPolicy === 'delete_selected') {
+                if (!empty($oldBillingsToDelete)) {
+                    $billings = Billing::where('student_id', $student->id)
+                        ->where('status', 'UNPAID')
+                        ->whereIn('id', $oldBillingsToDelete)
+                        ->get();
+
+                    foreach ($billings as $billing) {
+                        $billing->delete();
+                        $deletedCount++;
+                    }
+                }
+            }
+            // If policy is 'keep_all', we do nothing
+
+            // 2. Generate new billings matching the new profile
+            if (!empty($newCategoryIdsToGenerate)) {
+                $generatedCount = $this->generateBillingsForStudentWithCategories($student, $newCategoryIdsToGenerate);
+            }
+
+            Log::info('Student billing transition completed', [
+                'student_id' => $student->id,
+                'student_name' => $student->full_name,
+                'policy' => $oldUnpaidPolicy,
+                'deleted_count' => $deletedCount,
+                'generated_count' => $generatedCount,
+                'operator_id' => auth()->id() ?? 1,
+            ]);
+        });
+
+        return [
+            'deleted' => $deletedCount,
+            'generated' => $generatedCount
+        ];
     }
 }

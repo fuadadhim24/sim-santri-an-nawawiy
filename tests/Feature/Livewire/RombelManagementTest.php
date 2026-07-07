@@ -193,4 +193,32 @@ class RombelManagementTest extends TestCase
         $this->assertEquals(1, Student::where('study_group_id', $destGroup1->id)->count());
         $this->assertEquals(2, Student::where('study_group_id', $destGroup2->id)->count());
     }
+
+    public function test_move_students_same_class_level_does_not_trigger_billing_transition()
+    {
+        $level = ClassLevel::create(['name' => 'Kelas 1', 'order' => 1]);
+        $rombelA = StudyGroup::create(['name' => '1-A', 'max_capacity' => 30, 'class_level_id' => $level->id]);
+        $rombelB = StudyGroup::create(['name' => '1-B', 'max_capacity' => 30, 'class_level_id' => $level->id]);
+        
+        $student = Student::factory()->create([
+            'is_active' => true,
+            'status' => 'diterima',
+            'class_level_id' => $level->id,
+            'study_group_id' => $rombelA->id
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(RombelManagement::class)
+            ->call('openManageStudentsModal', 'rombel', $rombelA->id, '1-A')
+            ->set('selectedStudentIds', [$student->id])
+            ->set('targetMoveId', 'rombel_' . $rombelB->id)
+            ->assertSet('availableMoveBillings', [])
+            ->call('moveSelectedStudents');
+
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'class_level_id' => $level->id,
+            'study_group_id' => $rombelB->id
+        ]);
+    }
 }

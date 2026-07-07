@@ -571,12 +571,15 @@ class ComprehensiveRoleSecurityTest extends TestCase
             'is_active' => false,
         ]);
 
+        $level = \App\Models\ClassLevel::create(['name' => 'Kelas 7 SMP', 'level_order' => 1]);
+
         Livewire::actingAs($admin)
             ->test('StudentAcceptanceConfirm', ['student' => $student])
             ->set('full_name', 'Updated Name')
             ->set('nisn', '0987654321')
             ->set('unit_code', '02')
             ->set('residence_status', 'NON_MONDOK')
+            ->set('class_level_id', $level->id)
             ->call('confirmAcceptance')
             ->assertHasNoErrors();
 

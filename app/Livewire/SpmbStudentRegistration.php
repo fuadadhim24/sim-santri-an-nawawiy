@@ -90,6 +90,7 @@ class SpmbStudentRegistration extends Component
         return \App\Models\ClassLevel::orderBy('level_order')->get();
     }
 
+
     public function save(NisGeneratorService $nisService)
     {
         $this->validate();
