@@ -35,15 +35,6 @@ class FeeCategoryIndex extends Component
             return;
         }
 
-        // Check active unpaid billings using categories
-        $hasActiveBillings = \App\Models\Billing::whereIn('fee_master_id', function ($query) use ($category) {
-            $query->select('id')
-                ->from('fee_masters')
-                ->where('fee_category_id', $category->id);
-        })
-            ->where('status', 'UNPAID')
-            ->exists();
-
         // Fetch master biaya names for detail list
         $feeNames = $category->fees()->pluck('item_name')->toArray();
 
@@ -52,7 +43,6 @@ class FeeCategoryIndex extends Component
             'name' => $category->name,
             'feeCount' => $feeCount,
             'feeNames' => $feeNames,
-            'hasActiveBillings' => $hasActiveBillings,
         ]);
     }
 
@@ -77,29 +67,6 @@ class FeeCategoryIndex extends Component
             session()->flash('message', "Kategori '{$category->name}' dan seluruh master biaya terkait berhasil dinonaktifkan.");
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menonaktifkan kategori: ' . $e->getMessage());
-        }
-    }
-
-    #[\Livewire\Attributes\On('forceDeleteCategory')]
-    public function forceDeleteCategory($id = null)
-    {
-        if (is_array($id)) {
-            $id = $id['id'] ?? null;
-        }
-        if (!$id) return;
-
-        $category = FeeCategory::findOrFail($id);
-        if ($category->is_locked) return;
-
-        try {
-            $fees = $category->fees()->get();
-            foreach ($fees as $fee) {
-                $fee->archive();
-            }
-            $category->delete();
-            session()->flash('message', "Kategori '{$category->name}' dan master biaya terkait berhasil dihapus.");
-        } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus kategori: ' . $e->getMessage());
         }
     }
 

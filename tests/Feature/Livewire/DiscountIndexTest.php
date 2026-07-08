@@ -91,7 +91,7 @@ class DiscountIndexTest extends TestCase
             ->assertDispatched('show-delete-discount-confirmation');
     }
 
-    public function test_execute_delete_with_recalculate()
+    public function test_execute_delete_does_not_recalculate_billings()
     {
         $category = FeeCategory::create(['name' => 'SPP', 'code' => 'SPP']);
         $feeMaster = FeeMaster::create([
@@ -124,51 +124,7 @@ class DiscountIndexTest extends TestCase
 
         Livewire::actingAs($this->admin)
             ->test(DiscountIndex::class)
-            ->dispatch('execute-delete-discount', id: $discount->id, recalculateBillings: true);
-
-        // Discount is deleted
-        $this->assertDatabaseMissing('discounts', ['id' => $discount->id]);
-
-        // Billings are recalculated (discount reset to 0, final amount = 150000)
-        $billing->refresh();
-        $this->assertEquals(0, $billing->discount_applied);
-        $this->assertEquals(150000, $billing->final_amount);
-    }
-
-    public function test_execute_delete_without_recalculate()
-    {
-        $category = FeeCategory::create(['name' => 'SPP', 'code' => 'SPP']);
-        $feeMaster = FeeMaster::create([
-            'fee_category_id' => $category->id,
-            'item_name' => 'SPP SMP',
-            'amount' => 150000,
-            'start_date' => '2026-01-01',
-            'is_active' => true
-        ]);
-        $discount = Discount::create([
-            'fee_master_id' => $feeMaster->id,
-            'target_status' => 'YATIM',
-            'discount_amount' => 50000
-        ]);
-
-        $student = Student::factory()->create([
-            'special_status' => 'YATIM',
-            'status' => 'ACTIVE'
-        ]);
-
-        $billing = Billing::create([
-            'student_id' => $student->id,
-            'fee_master_id' => $feeMaster->id,
-            'title' => 'SPP SMP',
-            'original_amount' => 150000,
-            'discount_applied' => 50000,
-            'final_amount' => 100000,
-            'status' => 'UNPAID'
-        ]);
-
-        Livewire::actingAs($this->admin)
-            ->test(DiscountIndex::class)
-            ->dispatch('execute-delete-discount', id: $discount->id, recalculateBillings: false);
+            ->dispatch('execute-delete-discount', id: $discount->id);
 
         // Discount is deleted
         $this->assertDatabaseMissing('discounts', ['id' => $discount->id]);

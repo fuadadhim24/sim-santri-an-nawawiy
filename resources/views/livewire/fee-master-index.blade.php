@@ -177,21 +177,16 @@
             const data = event[0] || event;
             window.Swal.fire({
                 title: 'Arsipkan Master Biaya?',
-                html: `Terdapat <strong>${data.unpaidCount}</strong> tagihan belum lunas yang terkait dengan Master Biaya <strong>"${data.itemName}"</strong>.<br><br>Pilih tindakan pengarsipan:`,
+                html: `Apakah Anda yakin ingin mengarsipkan Master Biaya "${data.itemName}"?<br><br><span class="text-xs text-amber-700 bg-amber-50 border border-amber-200 p-2.5 rounded-md block text-left">⚠️ Terdapat <strong>${data.unpaidCount}</strong> tagihan belum lunas yang terkait. Pengarsipan master biaya tidak berlaku surut dan tidak akan membatalkan atau mengubah tagihan tersebut.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                denyButtonColor: '#ff9800',
-                showDenyButton: true,
-                confirmButtonText: 'Arsipkan & Batalkan (Void) Tagihan',
-                denyButtonText: 'Arsipkan Saja (Simpan Tagihan)',
+                confirmButtonText: 'Ya, Arsipkan!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $wire.dispatch('executeDelete', { id: data.id, voidBillings: true });
-                } else if (result.isDenied) {
-                    $wire.dispatch('executeDelete', { id: data.id, voidBillings: false });
+                    $wire.dispatch('executeDelete', { id: data.id });
                 }
             });
         });
@@ -209,7 +204,7 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $wire.dispatch('executeDelete', { id: data.id, voidBillings: false });
+                    $wire.dispatch('executeDelete', { id: data.id });
                 }
             });
         });

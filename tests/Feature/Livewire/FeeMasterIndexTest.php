@@ -115,7 +115,7 @@ class FeeMasterIndexTest extends TestCase
         $this->assertNull($billing->archived_at);
     }
 
-    public function test_execute_delete_with_voiding_billings_archives_unpaid_billings()
+    public function test_execute_delete_always_preserves_unpaid_billings()
     {
         $category = FeeCategory::create(['name' => 'Bulanan', 'code' => 'SPP']);
         $student = Student::factory()->create();
@@ -141,13 +141,14 @@ class FeeMasterIndexTest extends TestCase
 
         Livewire::actingAs($this->admin)
             ->test(FeeMasterIndex::class)
-            ->call('executeDelete', $feeMaster->id, true);
+            ->call('executeDelete', $feeMaster->id);
 
         $feeMaster->refresh();
         $this->assertTrue($feeMaster->trashed());
 
-        // Billing should be archived
+        // Billing should still be active and NOT archived
         $billing->refresh();
-        $this->assertNotNull($billing->archived_at);
+        $this->assertEquals('UNPAID', $billing->status);
+        $this->assertNull($billing->archived_at);
     }
 }

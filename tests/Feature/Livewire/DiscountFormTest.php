@@ -92,22 +92,10 @@ class DiscountFormTest extends TestCase
             ->set('fee_master_id', $feeMaster->id)
             ->set('target_status', 'YATIM')
             ->set('discount_amount', 40000)
-            ->assertSet('affectedBillings', collect([
-                [
-                    'student_name' => $student->full_name,
-                    'student_nis' => $student->nis,
-                    'billing_title' => 'SPP Januari 2026',
-                    'original_amount' => 150000.0,
-                    'current_discount' => 0.0,
-                    'current_final' => 150000.0,
-                    'new_discount' => 40000.0,
-                    'new_final' => 110000.0,
-                    'diff' => -40000.0,
-                ]
-            ]));
+            ->assertSet('affectedBillings', collect());
     }
 
-    public function test_can_edit_discount_and_recalculate_based_on_policy()
+    public function test_can_edit_discount_does_not_recalculate_billings()
     {
         $category = FeeCategory::create(['name' => 'SPP', 'code' => 'SPP']);
         $feeMaster = FeeMaster::create([
@@ -178,52 +166,23 @@ class DiscountFormTest extends TestCase
             'due_date' => now()->addMonth()->startOfMonth()->format('Y-m-d') // Next Month
         ]);
 
-        // Scenario 1: Only recalculate future billings (including this month)
         Livewire::actingAs($this->admin)
             ->test(DiscountForm::class, ['discount' => $discount])
             ->set('discount_amount', 50000)
-            ->set('recalculate_policy', 'future')
             ->call('save')
             ->assertRedirect(route('admin.discounts'));
 
-        // Future billing should be updated to 50000 discount
-        $this->assertEquals(50000, $futureBilling->fresh()->discount_applied);
-        $this->assertEquals(100000, $futureBilling->fresh()->final_amount);
+        // All billings should remain at 30000 discount (no retroactive changes)
+        $this->assertEquals(30000, $futureBilling->fresh()->discount_applied);
+        $this->assertEquals(120000, $futureBilling->fresh()->final_amount);
 
-        // Current month billing should be updated to 50000 discount (since it is today/future)
-        $this->assertEquals(50000, $currentMonthBilling->fresh()->discount_applied);
-        $this->assertEquals(100000, $currentMonthBilling->fresh()->final_amount);
-
-        // Overdue billing should remain at 30000 discount
-        $this->assertEquals(30000, $overdueBilling->fresh()->discount_applied);
-        $this->assertEquals(120000, $overdueBilling->fresh()->final_amount);
-
-        // Reset discounts for next scenario
-        $futureBilling->refresh()->update(['discount_applied' => 30000, 'final_amount' => 120000]);
-        $currentMonthBilling->refresh()->update(['discount_applied' => 30000, 'final_amount' => 120000]);
-
-        // Scenario 2: Only recalculate starting next month (excluding this month)
-        Livewire::actingAs($this->admin)
-            ->test(DiscountForm::class, ['discount' => $discount])
-            ->set('discount_amount', 60000)
-            ->set('recalculate_policy', 'next_month')
-            ->call('save')
-            ->assertRedirect(route('admin.discounts'));
-
-        // Next month billing should be updated to 60000 discount
-        $this->assertEquals(60000, $nextMonthBilling->fresh()->discount_applied);
-        $this->assertEquals(90000, $nextMonthBilling->fresh()->final_amount);
-
-        // Future billing (which is Dec 2026) should be updated to 60000 discount
-        $this->assertEquals(60000, $futureBilling->fresh()->discount_applied);
-        $this->assertEquals(90000, $futureBilling->fresh()->final_amount);
-
-        // Current month billing should remain at 30000 discount (excluded!)
         $this->assertEquals(30000, $currentMonthBilling->fresh()->discount_applied);
         $this->assertEquals(120000, $currentMonthBilling->fresh()->final_amount);
 
-        // Overdue billing should remain at 30000 discount
         $this->assertEquals(30000, $overdueBilling->fresh()->discount_applied);
         $this->assertEquals(120000, $overdueBilling->fresh()->final_amount);
+
+        $this->assertEquals(30000, $nextMonthBilling->fresh()->discount_applied);
+        $this->assertEquals(120000, $nextMonthBilling->fresh()->final_amount);
     }
 }

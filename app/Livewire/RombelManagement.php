@@ -274,23 +274,10 @@ class RombelManagement extends Component
 
         if (!empty($updates)) {
             $students = Student::whereIn('id', $this->selectedStudentIds)->get();
-            $billingService = app(\App\Services\BillingService::class);
 
-            DB::transaction(function () use ($students, $updates, $billingService, $sourceClassLevelId, $classLevelId) {
+            DB::transaction(function () use ($students, $updates) {
                 foreach ($students as $student) {
                     $student->update($updates);
-
-                    // Only run transition if target class level is different from source class level
-                    if ($sourceClassLevelId != $classLevelId && $this->moveBillingPolicy !== 'none') {
-                        $policy = $this->moveBillingPolicy === 'delete_all_and_new' ? 'delete_all' : ($this->moveBillingPolicy === 'delete_except_month_and_new' ? 'delete_except_current_month' : 'keep_all');
-                        
-                        $billingService->transitionStudentBillings(
-                            $student,
-                            $policy,
-                            [],
-                            $this->moveBillingCategories
-                        );
-                    }
                 }
             });
 
@@ -505,7 +492,7 @@ class RombelManagement extends Component
         $isLulus = ($this->destinationLevelId === 'lulus');
         $billingService = app(\App\Services\BillingService::class);
 
-        DB::transaction(function () use ($isLulus, $billingService, &$count) {
+        DB::transaction(function () use ($isLulus, &$count) {
             foreach ($this->promotionDraft as $studentId => $data) {
                 if ($data['skip']) {
                     continue;
@@ -521,29 +508,11 @@ class RombelManagement extends Component
                         'class_level_id' => null,
                         'study_group_id' => null,
                     ]);
-
-                    // If graduation policy is delete all unpaid
-                    if ($this->wizardBillingPolicy === 'graduation_delete_unpaid') {
-                        $unpaid = $billingService->getUnpaidBillings($student);
-                        foreach ($unpaid as $bill) {
-                            $bill->delete();
-                        }
-                    }
                 } else {
                     $student->update([
                         'class_level_id' => $data['new_level_id'],
                         'study_group_id' => $data['new_rombel_id'],
                     ]);
-
-                    // Execute billing transitions for promoted student
-                    if ($this->wizardBillingPolicy !== 'none') {
-                        $billingService->transitionStudentBillings(
-                            $student,
-                            $this->wizardBillingPolicy,
-                            [],
-                            $this->wizardBillingCategories
-                        );
-                    }
                 }
                 $count++;
             }

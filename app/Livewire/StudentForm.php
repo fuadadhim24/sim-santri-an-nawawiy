@@ -58,9 +58,9 @@ class StudentForm extends Component
     public $autoGenerateBillings = true;
 
     // Academic lock and transition properties
-    public $isAcademicLocked = true;
+    public $isAcademicLocked = false;
     public $showUnlockModal = false;
-    public $academicChangesConfirmed = false;
+    public $academicChangesConfirmed = true;
 
     // Billing transition properties
     public $showTransitionModal = false; // Controls display of Before-After Preview card
@@ -301,8 +301,8 @@ class StudentForm extends Component
             $this->nisn = $student->nisn;
             $this->generatedNis = $student->nis;
             $this->isEdit = true;
-            $this->isAcademicLocked = true;
-            $this->academicChangesConfirmed = false;
+            $this->isAcademicLocked = false;
+            $this->academicChangesConfirmed = true;
         } else {
             $this->isAcademicLocked = false;
             $this->academicChangesConfirmed = true;
@@ -435,25 +435,7 @@ class StudentForm extends Component
         }
 
         if ($this->isEdit) {
-            DB::transaction(function () use ($data, $billingService) {
-                $this->student->update($data);
-
-                $isProfileChanged = (
-                    $this->student->unit_code !== $this->unit_code ||
-                    $this->student->residence_status !== $this->residence_status ||
-                    $this->student->class_level_id !== ($this->class_level_id ? (int)$this->class_level_id : null) ||
-                    $this->student->special_status !== $this->special_status
-                );
-
-                if ($isProfileChanged && $this->academicChangesConfirmed) {
-                    $billingService->transitionStudentBillings(
-                        $this->student,
-                        $this->oldUnpaidPolicy,
-                        $this->oldBillingsToDelete,
-                        $this->newCategoriesToGenerate
-                    );
-                }
-            });
+            $this->student->update($data);
             session()->flash('message', 'Student updated successfully.');
         } else {
             $year = date('Y');

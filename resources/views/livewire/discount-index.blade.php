@@ -93,26 +93,21 @@
                     html: `
                         <div class="text-sm text-left space-y-2 text-foreground">
                             <p>Aturan diskon untuk biaya <strong>${data.feeMasterName}</strong> (Target: <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-semibold">${data.targetStatus}</span>) akan dihapus.</p>
-                            <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 font-semibold flex items-center gap-2 mt-2">
-                                <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                <span>Terdeteksi ${data.affectedCount} tagihan belum lunas yang sedang menggunakan diskon ini!</span>
+                            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 font-semibold flex items-center gap-2 mt-2">
+                                <svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <span>Terdeteksi ${data.affectedCount} tagihan belum lunas yang terkait. Penghapusan tidak berlaku surut dan tidak akan mengubah potongan pada tagihan tersebut.</span>
                             </div>
-                            <p class="text-xs text-muted-foreground mt-3">Silakan pilih bagaimana sistem memperlakukan tagihan belum lunas tersebut:</p>
                         </div>
                     `,
                     icon: 'warning',
                     showCancelButton: true,
-                    showDenyButton: true,
                     confirmButtonColor: '#d33',
-                    denyButtonColor: '#4b5563',
-                    confirmButtonText: 'Hapus & Batalkan Diskon Tagihan',
-                    denyButtonText: 'Hapus Aturan Saja (Biarkan Tagihan Terdiskon)',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus',
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $wire.dispatch('execute-delete-discount', { id: data.id, recalculateBillings: true });
-                    } else if (result.isDenied) {
-                        $wire.dispatch('execute-delete-discount', { id: data.id, recalculateBillings: false });
+                        $wire.dispatch('execute-delete-discount', { id: data.id });
                     }
                 });
             });
@@ -130,7 +125,7 @@
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $wire.dispatch('execute-delete-discount', { id: data.id, recalculateBillings: false });
+                        $wire.dispatch('execute-delete-discount', { id: data.id });
                     }
                 });
             });

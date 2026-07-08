@@ -17,36 +17,16 @@ class DiscountObserver
 
     public function created(Discount $discount): void
     {
-        $this->recalculateBillings($discount, 'created');
+        // Not retroactive
     }
 
     public function updated(Discount $discount): void
     {
-        if ($discount->wasChanged(['discount_amount', 'target_status'])) {
-            $this->recalculateBillings($discount, 'updated');
-        }
+        // Not retroactive
     }
 
     public function deleted(Discount $discount): void
     {
-        $this->recalculateBillings($discount, 'deleted');
-    }
-
-    protected function recalculateBillings(Discount $discount, string $action): void
-    {
-        $feeMaster = $discount->feeMaster;
-
-        if (!$feeMaster) {
-            return;
-        }
-
-        $count = $this->billingService->recalculateBillingsForFeeMaster($feeMaster);
-
-        Log::info("Discount {$action}: recalculated billings", [
-            'discount_id' => $discount->id,
-            'fee_master_id' => $feeMaster->id,
-            'target_status' => $discount->target_status,
-            'billings_updated' => $count,
-        ]);
+        // Not retroactive
     }
 }

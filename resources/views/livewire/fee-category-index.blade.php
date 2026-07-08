@@ -167,57 +167,28 @@
                     </details>`
                 : '';
             
-            if (data.hasActiveBillings) {
-                window.Swal.fire({
-                    title: 'Tidak Bisa Dihapus',
-                    html: `
-                        <div class="text-left space-y-3">
-                            <p>Kategori <b>${data.name}</b> memiliki <b>${data.feeCount} Master Biaya</b> dan masih ada <b>Tagihan Aktif (Belum Lunas)</b> pada santri.</p>
-                            ${feeListHtml}
-                            <div class="bg-red-50 p-3 rounded text-red-800 text-xs">
-                                ⚠️ Sesuai integritas data keuangan, kategori ini tidak boleh dihapus agar histori pembayaran santri tidak rusak.
-                            </div>
-                            <p class="text-sm">Solusi aman: Silakan <b>Nonaktifkan Kategori</b> ini untuk menghentikan tagihan baru.</p>
+            window.Swal.fire({
+                title: 'Tidak Bisa Dihapus',
+                html: `
+                    <div class="text-left space-y-3">
+                        <p>Kategori <b>${data.name}</b> memiliki <b>${data.feeCount} Master Biaya</b> terkait.</p>
+                        ${feeListHtml}
+                        <div class="bg-amber-50 border border-amber-200 p-3 rounded text-amber-800 text-xs mt-2">
+                            ⚠️ Kategori yang memiliki data master biaya terkait tidak dapat dihapus. Silakan nonaktifkan kategori ini jika tidak ingin digunakan lagi.
                         </div>
-                    `,
-                    icon: 'error',
-                    showCancelButton: true,
-                    confirmButtonColor: '#eab308',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Nonaktifkan Kategori',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $wire.deactivateCategory(data.id);
-                    }
-                });
-            } else {
-                window.Swal.fire({
-                    title: 'Pilih Tindakan Pengamanan',
-                    html: `
-                        <div class="text-left space-y-3">
-                            <p>Kategori <b>${data.name}</b> digunakan oleh <b>${data.feeCount} Master Biaya</b>.</p>
-                            ${feeListHtml}
-                            <p class="text-sm">Pilih salah satu tindakan di bawah ini:</p>
-                        </div>
-                    `,
-                    icon: 'warning',
-                    showDenyButton: true,
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    denyButtonColor: '#eab308',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Hapus Kategori & Biayanya',
-                    denyButtonText: 'Nonaktifkan Saja',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $wire.forceDeleteCategory(data.id);
-                    } else if (result.isDenied) {
-                        $wire.deactivateCategory(data.id);
-                    }
-                });
-            }
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#eab308',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Nonaktifkan Kategori',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $wire.deactivateCategory(data.id);
+                }
+            });
         });
     </script>
     @endscript

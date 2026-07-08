@@ -49,19 +49,14 @@ class DiscountIndex extends Component
     }
 
     #[\Livewire\Attributes\On('execute-delete-discount')]
-    public function executeDelete($id, $recalculateBillings)
+    public function executeDelete($id)
     {
         $discount = Discount::findOrFail($id);
 
-        if ($recalculateBillings) {
-            // Recalculate billings (trigger normal delete with events)
+        // Delete silently without recalculating (keep current discounts on existing billings)
+        Discount::withoutEvents(function () use ($discount) {
             $discount->delete();
-        } else {
-            // Delete silently without recalculating (keep current discounts on existing billings)
-            Discount::withoutEvents(function () use ($discount) {
-                $discount->delete();
-            });
-        }
+        });
 
         session()->flash('message', 'Diskon berhasil dihapus.');
     }

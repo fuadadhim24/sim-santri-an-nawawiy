@@ -139,11 +139,11 @@ class V1_2_IntegrationTest extends TestCase
         // Verify discount is deleted
         $this->assertDatabaseMissing('discounts', ['id' => $discount->id]);
 
-        // Verify UNPAID billing is recalculated (discount removed)
+        // Verify UNPAID billing is NOT recalculated (discount remains)
         $unpaidBilling->refresh();
         $this->assertEquals(500000, $unpaidBilling->original_amount);
-        $this->assertEquals(0, $unpaidBilling->discount_applied);
-        $this->assertEquals(500000, $unpaidBilling->final_amount);
+        $this->assertEquals(200000, $unpaidBilling->discount_applied);
+        $this->assertEquals(300000, $unpaidBilling->final_amount);
 
         // Verify PAID billing is NOT touched
         $paidBilling->refresh();

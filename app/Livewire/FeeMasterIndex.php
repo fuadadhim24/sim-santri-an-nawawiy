@@ -67,17 +67,10 @@ class FeeMasterIndex extends Component
     }
 
     #[\Livewire\Attributes\On('executeDelete')]
-    public function executeDelete($id, $voidBillings = false)
+    public function executeDelete($id)
     {
         $feeMaster = FeeMaster::find($id);
         if (!$feeMaster) return;
-
-        if ($voidBillings) {
-            $unpaidBillings = $feeMaster->billings()->where('status', 'UNPAID')->get();
-            foreach ($unpaidBillings as $billing) {
-                $billing->archive(auth()->id() ?? 1, 'Master Biaya diarsipkan');
-            }
-        }
 
         $feeMaster->delete();
         session()->flash('message', 'Master biaya berhasil diarsipkan secara sementara (soft delete).');
