@@ -17,6 +17,55 @@ class DiscountIndex extends Component
         $this->resetPage();
     }
 
+    public function confirmDelete($id)
+    {
+        $discount = Discount::findOrFail($id);
+        
+        // Count unpaid billings of that fee master that match the target status
+        $feeMaster = $discount->feeMaster;
+        $affectedCount = 0;
+        if ($feeMaster) {
+            $affectedCount = \App\Models\Billing::where('fee_master_id', $feeMaster->id)
+                ->where('status', 'UNPAID')
+                ->whereHas('student', function ($q) use ($discount) {
+                    $q->where('special_status', $discount->target_status);
+                })
+                ->count();
+        }
+
+        if ($affectedCount > 0) {
+            $this->dispatch('show-delete-discount-confirmation', [
+                'id' => $id,
+                'affectedCount' => $affectedCount,
+                'feeMasterName' => $feeMaster ? $feeMaster->item_name : '',
+                'targetStatus' => $discount->target_status,
+            ]);
+        } else {
+            // Simple delete if no billings affected
+            $this->dispatch('show-simple-delete-discount-confirmation', [
+                'id' => $id,
+            ]);
+        }
+    }
+
+    #[\Livewire\Attributes\On('execute-delete-discount')]
+    public function executeDelete($id, $recalculateBillings)
+    {
+        $discount = Discount::findOrFail($id);
+
+        if ($recalculateBillings) {
+            // Recalculate billings (trigger normal delete with events)
+            $discount->delete();
+        } else {
+            // Delete silently without recalculating (keep current discounts on existing billings)
+            Discount::withoutEvents(function () use ($discount) {
+                $discount->delete();
+            });
+        }
+
+        session()->flash('message', 'Diskon berhasil dihapus.');
+    }
+
     public function delete($id)
     {
         $discount = Discount::findOrFail($id);

@@ -31,6 +31,7 @@ class FeeMasterForm extends Component
     public $due_days = 14;
     public $billing_day = 1;
     public $class_level_target_id = '';
+    public $update_policy = 'all';
 
     protected function rules(): array
     {
@@ -46,6 +47,7 @@ class FeeMasterForm extends Component
             'billing_day' => 'nullable|integer|min:1|max:31',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'update_policy' => 'nullable|in:all,except_current,none',
         ];
     }
 
@@ -179,32 +181,57 @@ class FeeMasterForm extends Component
 
             if ($oldAmount != $this->amount || $oldItemName != $this->item_name) {
                 DB::transaction(function () use ($data) {
-                    $unpaidBillings = \App\Models\Billing::where('fee_master_id', $this->feeMaster->id)
-                        ->where('status', 'UNPAID')
-                        ->get();
+                    // 1. Create the new active fee master first
+                    $newFeeMaster = FeeMaster::create($data);
 
-                    foreach ($unpaidBillings as $billing) {
-                        $billing->archive(auth()->id() ?? 1, 'Perubahan Master Biaya');
+                    // 2. Archive the old fee master, pointing its replaced_by to the new active one
+                    $this->feeMaster->archive($newFeeMaster->id);
 
-                        \App\Models\Billing::create([
-                            'student_id' => $billing->student_id,
-                            'fee_master_id' => $this->feeMaster->id,
-                            'title' => $this->item_name,
-                            'original_amount' => $this->amount,
-                            'discount_applied' => $billing->discount_applied,
-                            'final_amount' => max(0, $this->amount - $billing->discount_applied),
-                            'status' => 'UNPAID',
-                            'version_of' => $billing->version_of ?? $billing->id,
-                            'version' => $billing->version + 1,
-                            'visible_to_wali' => true,
+                    // 3. Copy discounts from the old fee master to the new fee master
+                    $oldDiscounts = \App\Models\Discount::where('fee_master_id', $this->feeMaster->id)->get();
+                    foreach ($oldDiscounts as $discount) {
+                        \App\Models\Discount::create([
+                            'fee_master_id' => $newFeeMaster->id,
+                            'target_status' => $discount->target_status,
+                            'discount_amount' => $discount->discount_amount,
                         ]);
                     }
 
-                    $this->feeMaster->archive($this->feeMaster->id);
+                    // 4. Process unpaid billings according to selected update policy
+                    if ($this->update_policy !== 'none') {
+                        $query = \App\Models\Billing::where('fee_master_id', $this->feeMaster->id)
+                            ->where('status', 'UNPAID');
 
-                    FeeMaster::create(array_merge($data, [
-                        'replaced_by' => $this->feeMaster->id,
-                    ]));
+                        if ($this->update_policy === 'except_current') {
+                            $currentMonth = now()->month;
+                            $currentYear = now()->year;
+                            $query->where(function ($q) use ($currentMonth, $currentYear) {
+                                $q->whereNull('due_date')
+                                  ->orWhereMonth('due_date', '!=', $currentMonth)
+                                  ->orWhereYear('due_date', '!=', $currentYear);
+                            });
+                        }
+
+                        $unpaidBillings = $query->get();
+
+                        foreach ($unpaidBillings as $billing) {
+                            $billing->archive(auth()->id() ?? 1, 'Perubahan Master Biaya');
+
+                            \App\Models\Billing::create([
+                                'student_id' => $billing->student_id,
+                                'fee_master_id' => $newFeeMaster->id, // Link to the new active fee master
+                                'title' => $this->item_name,
+                                'original_amount' => $this->amount,
+                                'discount_applied' => $billing->discount_applied,
+                                'final_amount' => max(0, $this->amount - $billing->discount_applied),
+                                'status' => 'UNPAID',
+                                'version_of' => $billing->version_of ?? $billing->id,
+                                'version' => $billing->version + 1,
+                                'visible_to_wali' => true,
+                                'due_date' => $billing->due_date,
+                            ]);
+                        }
+                    }
 
                     Swal::success([
                         'title' => 'Fee Master updated successfully.',
@@ -236,6 +263,52 @@ class FeeMasterForm extends Component
     public function getClassLevelsProperty()
     {
         return \App\Models\ClassLevel::orderBy('level_order')->get();
+    }
+
+    public function getAffectedBillingsProperty()
+    {
+        if (!$this->isEdit || !$this->feeMaster) {
+            return collect();
+        }
+
+        // Only calculate preview if amount or name changed
+        if ($this->feeMaster->amount == $this->amount && $this->feeMaster->item_name == $this->item_name) {
+            return collect();
+        }
+
+        $query = \App\Models\Billing::where('fee_master_id', $this->feeMaster->id)
+            ->where('status', 'UNPAID')
+            ->with('student');
+
+        if ($this->update_policy === 'except_current') {
+            $currentMonth = now()->month;
+            $currentYear = now()->year;
+            $query->where(function ($q) use ($currentMonth, $currentYear) {
+                $q->whereNull('due_date')
+                  ->orWhereMonth('due_date', '!=', $currentMonth)
+                  ->orWhereYear('due_date', '!=', $currentYear);
+            });
+        } elseif ($this->update_policy === 'none') {
+            return collect();
+        }
+
+        $newAmount = (float)($this->amount ?: 0);
+
+        return $query->get()->map(function ($billing) use ($newAmount) {
+            $newFinalAmount = max(0, $newAmount - $billing->discount_applied);
+            return [
+                'id' => $billing->id,
+                'student_name' => $billing->student->full_name,
+                'student_nis' => $billing->student->nis,
+                'billing_title' => $billing->title,
+                'due_date' => $billing->due_date ? $billing->due_date->format('d-m-Y') : '-',
+                'current_original' => $billing->original_amount,
+                'current_final' => $billing->final_amount,
+                'new_original' => $newAmount,
+                'new_final' => $newFinalAmount,
+                'difference' => $newFinalAmount - $billing->final_amount,
+            ];
+        });
     }
 
     public function render()

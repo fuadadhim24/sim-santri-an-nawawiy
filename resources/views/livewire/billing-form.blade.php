@@ -93,31 +93,53 @@
                 </div>
 
                 <!-- Amounts -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" x-data="{
+                    formatIDR(val) {
+                        if (!val) return '';
+                        return val.toString().replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    }
+                }">
                     <div>
-                        <label for="original_amount" class="block text-sm font-medium text-foreground">Jumlah Asli <span class="text-red-500">*</span></label>
-                        <input wire:model.live="original_amount" type="number" id="original_amount" step="0"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                        <label for="original_amount" class="block text-sm font-medium text-foreground mb-1">Jumlah Asli <span class="text-red-500">*</span></label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-muted-foreground sm:text-sm font-medium">Rp</span>
+                            </div>
+                            <input type="text" x-bind:value="formatIDR($wire.original_amount)"
+                                x-on:input.debounce.500ms="$wire.original_amount = $event.target.value.replace(/\D/g, ''); $wire.$refresh();" placeholder="500.000"
+                                class="block w-full pl-10 pr-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-ring focus:border-ring sm:text-sm font-mono">
+                        </div>
                         @error('original_amount')
-                            <span class="text-destructive text-sm">{{ $message }}</span>
+                            <span class="text-destructive text-sm block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="discount_applied" class="block text-sm font-medium text-foreground">Diskon <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
-                        <input wire:model.live="discount_applied" type="number" id="discount_applied" step="0"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                        <label for="discount_applied" class="block text-sm font-medium text-foreground mb-1">Diskon <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-muted-foreground sm:text-sm font-medium">Rp</span>
+                            </div>
+                            <input type="text" x-bind:value="formatIDR($wire.discount_applied)"
+                                x-on:input.debounce.500ms="$wire.discount_applied = $event.target.value.replace(/\D/g, ''); $wire.$refresh();" placeholder="50.000"
+                                class="block w-full pl-10 pr-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-ring focus:border-ring sm:text-sm font-mono">
+                        </div>
                         @error('discount_applied')
-                            <span class="text-destructive text-sm">{{ $message }}</span>
+                            <span class="text-destructive text-sm block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="final_amount" class="block text-sm font-medium text-foreground">Jumlah Akhir</label>
-                        <input wire:model="final_amount" type="number" id="final_amount" step="0" readonly
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-muted rounded-md shadow-sm sm:text-sm text-muted-foreground">
+                        <label for="final_amount" class="block text-sm font-medium text-foreground mb-1">Jumlah Akhir</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-muted-foreground sm:text-sm font-medium">Rp</span>
+                            </div>
+                            <input type="text" x-bind:value="formatIDR($wire.final_amount)" readonly
+                                class="block w-full pl-10 pr-4 py-2 border border-input bg-muted rounded-md shadow-sm sm:text-sm text-muted-foreground font-mono">
+                        </div>
                         @error('final_amount')
-                            <span class="text-destructive text-sm">{{ $message }}</span>
+                            <span class="text-destructive text-sm block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>

@@ -45,6 +45,44 @@ class FeeMasterIndex extends Component
         }
     }
 
+    public function confirmDelete($id)
+    {
+        $feeMaster = FeeMaster::find($id);
+        if (!$feeMaster) return;
+
+        $unpaidCount = $feeMaster->billings()->where('status', 'UNPAID')->count();
+
+        if ($unpaidCount > 0) {
+            $this->dispatch('show-delete-confirm-modal',
+                id: $feeMaster->id,
+                itemName: $feeMaster->item_name,
+                unpaidCount: $unpaidCount
+            );
+        } else {
+            $this->dispatch('show-simple-delete-confirm-modal',
+                id: $feeMaster->id,
+                itemName: $feeMaster->item_name
+            );
+        }
+    }
+
+    #[\Livewire\Attributes\On('executeDelete')]
+    public function executeDelete($id, $voidBillings = false)
+    {
+        $feeMaster = FeeMaster::find($id);
+        if (!$feeMaster) return;
+
+        if ($voidBillings) {
+            $unpaidBillings = $feeMaster->billings()->where('status', 'UNPAID')->get();
+            foreach ($unpaidBillings as $billing) {
+                $billing->archive(auth()->id() ?? 1, 'Master Biaya diarsipkan');
+            }
+        }
+
+        $feeMaster->delete();
+        session()->flash('message', 'Master biaya berhasil diarsipkan secara sementara (soft delete).');
+    }
+
     public function confirmSync($feeMasterId)
     {
         $this->syncFeeMasterId = $feeMasterId;

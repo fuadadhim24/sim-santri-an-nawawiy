@@ -147,4 +147,187 @@ class FeeMasterFormTest extends TestCase
                     && !$categories->contains('id', $inactiveCategory->id);
             });
     }
+
+    public function test_edit_fee_master_with_all_policy_updates_all_billings()
+    {
+        $category = FeeCategory::create(['name' => 'Bulanan', 'type' => 'bulanan', 'code' => 'SPP']);
+        $student = Student::factory()->create(['is_active' => true, 'status' => 'diterima']);
+
+        $feeMaster = FeeMaster::create([
+            'item_name' => 'SPP Awal',
+            'amount' => 100000,
+            'fee_category_id' => $category->id,
+            'recurrence_type' => 'MONTHLY',
+            'is_active' => true,
+        ]);
+
+        $billing = \App\Models\Billing::create([
+            'student_id' => $student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Awal',
+            'original_amount' => 100000,
+            'discount_applied' => 0,
+            'final_amount' => 100000,
+            'status' => 'UNPAID',
+            'due_date' => now()->format('Y-m-d'),
+            'version' => 1,
+            'visible_to_wali' => true,
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(FeeMasterForm::class, ['feeMaster' => $feeMaster])
+            ->set('amount', 150000)
+            ->set('update_policy', 'all')
+            ->call('processSave')
+            ->assertHasNoErrors();
+
+        $newFeeMaster = FeeMaster::where('amount', 150000)->first();
+        $this->assertNotNull($newFeeMaster);
+
+        $newBilling = \App\Models\Billing::where('fee_master_id', $newFeeMaster->id)->first();
+        $this->assertNotNull($newBilling);
+        $this->assertEquals(150000, $newBilling->original_amount);
+    }
+
+    public function test_edit_fee_master_with_except_current_policy_does_not_update_current_month_billings()
+    {
+        $category = FeeCategory::create(['name' => 'Bulanan', 'type' => 'bulanan', 'code' => 'SPP']);
+        $student = Student::factory()->create(['is_active' => true, 'status' => 'diterima']);
+
+        $feeMaster = FeeMaster::create([
+            'item_name' => 'SPP Awal',
+            'amount' => 100000,
+            'fee_category_id' => $category->id,
+            'recurrence_type' => 'MONTHLY',
+            'is_active' => true,
+        ]);
+
+        // Current month billing (should NOT be updated)
+        $currentBilling = \App\Models\Billing::create([
+            'student_id' => $student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Awal',
+            'original_amount' => 100000,
+            'discount_applied' => 0,
+            'final_amount' => 100000,
+            'status' => 'UNPAID',
+            'due_date' => now()->format('Y-m-d'),
+            'version' => 1,
+            'visible_to_wali' => true,
+        ]);
+
+        // Future billing (should be updated)
+        $futureBilling = \App\Models\Billing::create([
+            'student_id' => $student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Awal',
+            'original_amount' => 100000,
+            'discount_applied' => 0,
+            'final_amount' => 100000,
+            'status' => 'UNPAID',
+            'due_date' => now()->addMonths(2)->format('Y-m-d'),
+            'version' => 1,
+            'visible_to_wali' => true,
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(FeeMasterForm::class, ['feeMaster' => $feeMaster])
+            ->set('amount', 150000)
+            ->set('update_policy', 'except_current')
+            ->call('processSave')
+            ->assertHasNoErrors();
+
+        $newFeeMaster = FeeMaster::where('amount', 150000)->first();
+        $this->assertNotNull($newFeeMaster);
+
+        // Current billing remains unchanged under old fee master ID
+        $currentBilling->refresh();
+        $this->assertEquals(100000, $currentBilling->original_amount);
+        $this->assertEquals($feeMaster->id, $currentBilling->fee_master_id);
+
+        // Future billing recreated under new fee master ID
+        $newFutureBilling = \App\Models\Billing::where('fee_master_id', $newFeeMaster->id)->first();
+        $this->assertNotNull($newFutureBilling);
+        $this->assertEquals(150000, $newFutureBilling->original_amount);
+    }
+
+    public function test_edit_fee_master_with_none_policy_does_not_update_any_billings()
+    {
+        $category = FeeCategory::create(['name' => 'Bulanan', 'type' => 'bulanan', 'code' => 'SPP']);
+        $student = Student::factory()->create(['is_active' => true, 'status' => 'diterima']);
+
+        $feeMaster = FeeMaster::create([
+            'item_name' => 'SPP Awal',
+            'amount' => 100000,
+            'fee_category_id' => $category->id,
+            'recurrence_type' => 'MONTHLY',
+            'is_active' => true,
+        ]);
+
+        $billing = \App\Models\Billing::create([
+            'student_id' => $student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Awal',
+            'original_amount' => 100000,
+            'discount_applied' => 0,
+            'final_amount' => 100000,
+            'status' => 'UNPAID',
+            'due_date' => now()->format('Y-m-d'),
+            'version' => 1,
+            'visible_to_wali' => true,
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(FeeMasterForm::class, ['feeMaster' => $feeMaster])
+            ->set('amount', 150000)
+            ->set('update_policy', 'none')
+            ->call('processSave')
+            ->assertHasNoErrors();
+
+        $newFeeMaster = FeeMaster::where('amount', 150000)->first();
+        $this->assertNotNull($newFeeMaster);
+
+        // Billing remains unchanged and linked to old fee master
+        $billing->refresh();
+        $this->assertEquals(100000, $billing->original_amount);
+        $this->assertEquals($feeMaster->id, $billing->fee_master_id);
+
+        // No billing exists under new fee master
+        $this->assertFalse(\App\Models\Billing::where('fee_master_id', $newFeeMaster->id)->exists());
+    }
+
+    public function test_edit_fee_master_copies_discounts_to_new_fee_master()
+    {
+        $category = FeeCategory::create(['name' => 'Bulanan', 'type' => 'bulanan', 'code' => 'SPP']);
+        $feeMaster = FeeMaster::create([
+            'item_name' => 'SPP Awal',
+            'amount' => 100000,
+            'fee_category_id' => $category->id,
+            'recurrence_type' => 'MONTHLY',
+            'is_active' => true,
+        ]);
+
+        // Create a discount for the old fee master
+        $discount = \App\Models\Discount::create([
+            'fee_master_id' => $feeMaster->id,
+            'target_status' => 'YATIM',
+            'discount_amount' => 15000,
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(FeeMasterForm::class, ['feeMaster' => $feeMaster])
+            ->set('amount', 120000)
+            ->call('processSave')
+            ->assertHasNoErrors();
+
+        $newFeeMaster = FeeMaster::where('amount', 120000)->first();
+        $this->assertNotNull($newFeeMaster);
+
+        // Assert discount is copied to the new fee master
+        $this->assertDatabaseHas('discounts', [
+            'fee_master_id' => $newFeeMaster->id,
+            'target_status' => 'YATIM',
+            'discount_amount' => 15000,
+        ]);
+    }
 }

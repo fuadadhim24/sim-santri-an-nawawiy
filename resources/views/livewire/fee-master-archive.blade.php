@@ -95,7 +95,7 @@
                                         <button wire:click="restore({{ $fee->id }})" wire:swal="Apakah Anda yakin ingin me-restore master biaya ini?" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                             Restore
                                         </button>
-                                        <button wire:click="forceDelete({{ $fee->id }})" wire:swal="Apakah Anda yakin ingin menghapus permanen master biaya ini? Tindakan ini tidak dapat dibatalkan." class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                        <button wire:click="forceDelete({{ $fee->id }})" wire:swal="Tindakan ini akan menghapus Master Biaya secara permanen dari database. Semua riwayat tagihan santri terkait akan tetap disimpan, namun hubungan relasinya dengan Master Biaya ini akan terputus (menjadi null). Tindakan ini tidak dapat dibatalkan. Lanjutkan?" class="text-red-600 hover:text-red-800 text-sm font-medium">
                                             Hapus Permanen
                                         </button>
                                     </div>

@@ -32,7 +32,7 @@
                     <div>
                         <label for="item_name" class="block text-sm font-medium text-foreground mb-1">Nama Item
                             Biaya <span class="text-red-500">*</span></label>
-                        <input wire:model="item_name" type="text" id="item_name" placeholder="contoh: SPP 2026"
+                        <input wire:model.live.debounce.500ms="item_name" type="text" id="item_name" placeholder="contoh: SPP 2026"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('item_name')
                             <span class="text-destructive text-sm">{{ $message }}</span>
@@ -54,7 +54,7 @@
                             <span class="text-muted-foreground sm:text-sm font-medium">Rp</span>
                         </div>
                         <input type="text" x-bind:value="displayValue"
-                            x-on:input="$wire.amount = $event.target.value.replace(/\D/g, '')" placeholder="500.000"
+                            x-on:input.debounce.500ms="$wire.amount = $event.target.value.replace(/\D/g, ''); $wire.$refresh();" placeholder="500.000"
                             class="block w-full pl-10 pr-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-ring focus:border-ring sm:text-sm font-mono">
                     </div>
                     @error('amount')
@@ -159,13 +159,117 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 pt-6 border-t border-border">
+                <!-- Recalculation Policy (Only shown in Edit mode) -->
+                @if($isEdit)
+                    <div class="p-4 bg-muted/30 border border-border rounded-lg space-y-3 pt-4 mt-6">
+                        <label class="block text-xs font-semibold text-gray-700 uppercase">Kebijakan Pembaruan Tagihan Terkait:</label>
+                        <div class="space-y-2">
+                            <label class="flex items-start text-xs text-foreground cursor-pointer select-none">
+                                <input type="radio" wire:model.live="update_policy" value="all" class="mt-0.5 text-primary focus:ring-primary border-gray-300 mr-2">
+                                <div>
+                                    <span class="font-semibold text-slate-800">Ubah Semua Tagihan Belum Lunas</span>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">Semua tagihan belum lunas (termasuk tagihan lama yang sudah terlambat/jatuh tempo) akan diperbarui menggunakan nominal/nama baru.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start text-xs text-foreground cursor-pointer select-none mt-2">
+                                <input type="radio" wire:model.live="update_policy" value="except_current" class="mt-0.5 text-primary focus:ring-primary border-gray-300 mr-2">
+                                <div>
+                                    <span class="font-semibold text-slate-800">Ubah Tagihan Terkait Kecuali Bulan Ini</span>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">Tagihan belum lunas untuk bulan berjalan ini dan bulan sebelumnya tidak akan diubah. Perubahan hanya berlaku untuk tagihan bulan depan dst.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start text-xs text-foreground cursor-pointer select-none mt-2">
+                                <input type="radio" wire:model.live="update_policy" value="none" class="mt-0.5 text-primary focus:ring-primary border-gray-300 mr-2">
+                                <div>
+                                    <span class="font-semibold text-slate-800">Jangan Ubah Tagihan Terkait (Hanya Tagihan Baru ke Depan)</span>
+                                    <p class="text-[10px] text-muted-foreground mt-0.5">Sama sekali tidak mengubah tagihan belum lunas yang sudah diterbitkan. Perubahan tarif/nama hanya akan berlaku untuk tagihan baru ke depan.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Affected Billings Preview Section -->
+                @if($isEdit)
+                    <div class="mt-6 border-t border-border pt-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-foreground flex items-center gap-2">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Pratinjau Dampak Perubahan Tagihan (Belum Lunas)
+                            </h4>
+                            @if(count($this->affectedBillings) > 0)
+                                <span wire:loading.remove wire:target="amount, item_name, update_policy" class="text-xs px-2.5 py-1 bg-primary/10 text-primary rounded-full font-semibold">
+                                    {{ count($this->affectedBillings) }} Tagihan
+                                </span>
+                            @endif
+                        </div>
+
+                        <!-- Loading state -->
+                        <div wire:loading wire:target="amount, item_name, update_policy" class="w-full animate-pulse">
+                            <div class="flex items-center gap-3 p-3 bg-blue-50/50 border border-blue-200 rounded-lg text-xs text-blue-800">
+                                <svg class="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <div class="flex-1">
+                                    <span class="font-bold block">Menganalisis Dampak Perubahan...</span>
+                                    <span class="text-[10px] text-blue-600 block mt-0.5">Menghitung ulang rincian tagihan santri terdampak berdasarkan kebijakan baru...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content state -->
+                        <div wire:loading.remove wire:target="amount, item_name, update_policy">
+                            @if(count($this->affectedBillings) > 0)
+                                <div class="border rounded-lg overflow-hidden max-h-[250px] overflow-y-auto">
+                                    <table class="min-w-full divide-y divide-border text-xs">
+                                        <thead class="bg-muted sticky top-0 z-10">
+                                            <tr>
+                                                <th class="px-4 py-2.5 text-left font-semibold text-muted-foreground uppercase">Santri</th>
+                                                <th class="px-4 py-2.5 text-left font-semibold text-muted-foreground uppercase">Judul Tagihan</th>
+                                                <th class="px-4 py-2.5 text-center font-semibold text-muted-foreground uppercase">Jatuh Tempo</th>
+                                                <th class="px-4 py-2.5 text-right font-semibold text-red-600 uppercase bg-red-50/30">Sisa Lama</th>
+                                                <th class="px-4 py-2.5 text-right font-semibold text-emerald-600 uppercase bg-emerald-50/30">Sisa Baru</th>
+                                                <th class="px-4 py-2.5 text-right font-semibold text-muted-foreground uppercase">Selisih</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-border bg-background font-medium">
+                                            @foreach($this->affectedBillings as $b)
+                                                <tr class="hover:bg-muted/30 transition-colors">
+                                                    <td class="px-4 py-2.5">
+                                                        <span class="font-semibold block text-foreground">{{ $b['student_name'] }}</span>
+                                                        <span class="text-[10px] text-muted-foreground block">{{ $b['student_nis'] }}</span>
+                                                    </td>
+                                                    <td class="px-4 py-2.5 text-muted-foreground">{{ $b['billing_title'] }}</td>
+                                                    <td class="px-4 py-2.5 text-center text-muted-foreground">{{ $b['due_date'] }}</td>
+                                                    <td class="px-4 py-2.5 text-right font-mono text-red-600 bg-red-50/10">Rp {{ number_format($b['current_final'], 0, ',', '.') }}</td>
+                                                    <td class="px-4 py-2.5 text-right font-mono font-bold text-emerald-600 bg-emerald-50/10">Rp {{ number_format($b['new_final'], 0, ',', '.') }}</td>
+                                                    <td class="px-4 py-2.5 text-right font-mono {{ $b['difference'] > 0 ? 'text-red-500' : ($b['difference'] < 0 ? 'text-emerald-500' : 'text-muted-foreground') }}">
+                                                        {{ $b['difference'] > 0 ? '+' : '' }}Rp {{ number_format($b['difference'], 0, ',', '.') }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="p-4 bg-muted/20 border border-border border-dashed rounded-lg text-center text-xs text-muted-foreground">
+                                    Tidak ada tagihan belum lunas yang terdampak oleh perubahan nominal/nama ini.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                <div class="flex justify-center items-center space-x-3 pt-4 border-t border-border mt-6">
                     <a href="{{ route('admin.fee-masters') }}"
-                        class="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
+                        class="inline-flex items-center justify-center px-4 py-1.5 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
                         Batal
                     </a>
                     <button type="submit" wire:loading.attr="disabled" wire:target="save"
-                        class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="inline-flex items-center justify-center px-4 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg wire:loading wire:target="save" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

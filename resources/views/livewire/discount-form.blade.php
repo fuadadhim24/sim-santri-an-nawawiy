@@ -44,13 +44,25 @@
 
                 <!-- Discount Amount -->
                 <div>
-                    <label for="discount_amount" class="block text-sm font-medium text-foreground">Jumlah Diskon
+                    <label for="discount_amount" class="block text-sm font-medium text-foreground mb-1">Jumlah Diskon
                         (Rp) <span class="text-red-500">*</span></label>
-                    <input wire:model.live="discount_amount" type="number" id="discount_amount" placeholder="e.g. 50000"
-                        class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                    <div class="relative rounded-md shadow-sm" x-data="{
+                        get displayValue() {
+                            let val = $wire.discount_amount;
+                            if (!val) return '';
+                            return val.toString().replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                        }
+                    }">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-muted-foreground sm:text-sm font-medium">Rp</span>
+                        </div>
+                        <input type="text" x-bind:value="displayValue"
+                            x-on:input.debounce.500ms="$wire.discount_amount = $event.target.value.replace(/\D/g, ''); $wire.$refresh();" placeholder="50.000"
+                            class="block w-full pl-10 pr-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-ring focus:border-ring sm:text-sm font-mono">
+                    </div>
                     <p class="mt-1 text-xs text-muted-foreground">Jumlah yang akan dipotong dari biaya asli.</p>
                     @error('discount_amount')
-                        <span class="text-destructive text-sm">{{ $message }}</span>
+                        <span class="text-destructive text-sm block mt-1">{{ $message }}</span>
                     @enderror
                 </div>
 
