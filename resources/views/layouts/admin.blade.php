@@ -481,13 +481,10 @@
                                 <p class="text-xs text-muted-foreground leading-relaxed">Saat mengedit diskon, pilihan <strong>Nama Biaya</strong> dan <strong>Status Target</strong> akan otomatis dikunci (disabled) untuk menjaga konsistensi relasi data. Jika ingin mengubahnya, buatlah aturan diskon baru.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Kebijakan Rekalkulasi</span>
-                                <div class="text-xs text-muted-foreground space-y-1.5 mt-1 leading-relaxed">
-                                    <p>Anda dapat memilih jangkauan tagihan unpaid terdampak saat mengubah nominal diskon:</p>
-                                    <li><strong>Ubah Semua:</strong> Menyesuaikan seluruh tagihan belum lunas dari masa lalu hingga masa depan.</li>
-                                    <li><strong>Hanya Masa Depan:</strong> Menyesuaikan tagihan belum lunas yang jatuh temponya mulai hari ini.</li>
-                                    <li><strong>Mulai Bulan Depan:</strong> Mengecualikan bulan berjalan saat ini dan hanya mengubah tagihan mulai tanggal 1 bulan depan.</li>
-                                </div>
+                                <span class="text-xs font-bold text-foreground block mb-1">Kebijakan Tidak Berlaku Surut</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    Perubahan nominal diskon atau penghapusan diskon hanya berlaku untuk tagihan baru di masa mendatang. Tagihan belum lunas (unpaid) yang sudah telanjur terbit tidak akan disesuaikan secara otomatis guna menghindari ketidakcocokan pelaporan keuangan.
+                                </p>
                             </div>
                         </div>
                     </div>
