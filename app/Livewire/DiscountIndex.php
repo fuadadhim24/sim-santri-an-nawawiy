@@ -72,6 +72,9 @@ class DiscountIndex extends Component
     {
         return view('livewire.discount-index', [
             'discounts' => Discount::with('feeMaster')
+                ->whereHas('feeMaster', function ($query) {
+                    $query->whereNull('fee_masters.deleted_at');
+                })
                 ->when($this->search, function ($query) {
                     $query->whereHas('feeMaster', function ($subQuery) {
                         $subQuery->where('item_name', 'like', '%' . $this->search . '%');
