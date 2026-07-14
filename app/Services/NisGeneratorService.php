@@ -8,7 +8,22 @@ class NisGeneratorService
 {
     public function generate(string $unitCode, int $year): string
     {
-        $prefix = sprintf('%d.%s', $year, $unitCode);
+        $currentMonth = (int) date('n');
+        $currentYear = (int) date('Y');
+
+        if ($year === $currentYear) {
+            if ($currentMonth >= 7) {
+                $startYear = $year;
+            } else {
+                $startYear = $year - 1;
+            }
+        } else {
+            $startYear = $year;
+        }
+
+        $endYear = $startYear + 1;
+        $academicPrefix = sprintf('%02d%02d', $startYear % 100, $endYear % 100);
+        $prefix = sprintf('%s.%s', $academicPrefix, $unitCode);
 
         $lastStudent = Student::whereNotNull('nis')
             ->where('nis', 'like', $prefix . '.%')

@@ -703,22 +703,20 @@
         });
     };
 
-    document.addEventListener('livewire:init', () => {
-        Livewire.on('swal:validation-error', (event) => {
-            const errors = event[0].errors || [];
-            let errorHtml = '<ul class="text-left list-disc pl-5 text-sm space-y-1">';
-            errors.forEach(err => {
-                errorHtml += `<li>${err}</li>`;
-            });
-            errorHtml += '</ul>';
+    Livewire.on('swal:validation-error', (event) => {
+        const errors = event[0].errors || [];
+        let errorHtml = '<ul class="text-left list-disc pl-5 text-sm space-y-1">';
+        errors.forEach(err => {
+            errorHtml += `<li>${err}</li>`;
+        });
+        errorHtml += '</ul>';
 
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal Menyimpan Data',
-                html: errorHtml,
-                confirmButtonText: 'Perbaiki',
-                confirmButtonColor: '#3085d6'
-            });
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal Menyimpan Data',
+            html: errorHtml,
+            confirmButtonText: 'Perbaiki',
+            confirmButtonColor: '#3085d6'
         });
     });
 </script>

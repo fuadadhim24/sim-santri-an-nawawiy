@@ -26,7 +26,7 @@ class NisGeneratorServiceTest extends TestCase
     {
         $nis = $this->nisGeneratorService->generate('MTK', 2024);
 
-        $this->assertEquals('2024.MTK.0001', $nis);
+        $this->assertEquals('2425.MTK.0001', $nis);
     }
 
     /**
@@ -34,11 +34,11 @@ class NisGeneratorServiceTest extends TestCase
      */
     public function test_generate_nis_increments_sequence()
     {
-        Student::factory()->create(['nis' => '2024.MTK.0001']);
+        Student::factory()->create(['nis' => '2425.MTK.0001']);
 
         $nis = $this->nisGeneratorService->generate('MTK', 2024);
 
-        $this->assertEquals('2024.MTK.0002', $nis);
+        $this->assertEquals('2425.MTK.0002', $nis);
     }
 
     /**
@@ -46,14 +46,14 @@ class NisGeneratorServiceTest extends TestCase
      */
     public function test_generate_nis_with_different_unit_codes()
     {
-        Student::factory()->create(['nis' => '2024.MTK.0001']);
-        Student::factory()->create(['nis' => '2024.IBTIDAIYAH.0001']);
+        Student::factory()->create(['nis' => '2425.MTK.0001']);
+        Student::factory()->create(['nis' => '2425.IBTIDAIYAH.0001']);
 
         $nisMtk = $this->nisGeneratorService->generate('MTK', 2024);
         $nisIbtidaiyah = $this->nisGeneratorService->generate('IBTIDAIYAH', 2024);
 
-        $this->assertEquals('2024.MTK.0002', $nisMtk);
-        $this->assertEquals('2024.IBTIDAIYAH.0002', $nisIbtidaiyah);
+        $this->assertEquals('2425.MTK.0002', $nisMtk);
+        $this->assertEquals('2425.IBTIDAIYAH.0002', $nisIbtidaiyah);
     }
 
     /**
@@ -61,13 +61,13 @@ class NisGeneratorServiceTest extends TestCase
      */
     public function test_generate_nis_with_different_years()
     {
-        Student::factory()->create(['nis' => '2023.MTK.0001']);
+        Student::factory()->create(['nis' => '2324.MTK.0001']);
 
         $nis2024 = $this->nisGeneratorService->generate('MTK', 2024);
         $nis2025 = $this->nisGeneratorService->generate('MTK', 2025);
 
-        $this->assertEquals('2024.MTK.0001', $nis2024);
-        $this->assertEquals('2025.MTK.0001', $nis2025);
+        $this->assertEquals('2425.MTK.0001', $nis2024);
+        $this->assertEquals('2526.MTK.0001', $nis2025);
     }
 
     /**
@@ -78,8 +78,8 @@ class NisGeneratorServiceTest extends TestCase
         for ($i = 0; $i < 5; $i++) {
             $nis = $this->nisGeneratorService->generate('TEST', 2024);
             
-            // Check format: YYYY.UNIT.XXXX
-            $this->assertMatchesRegularExpression('/^2024\.TEST\.\d{4}$/', $nis);
+            // Check format: YYyy.UNIT.XXXX
+            $this->assertMatchesRegularExpression('/^2425\.TEST\.\d{4}$/', $nis);
         }
     }
 
@@ -89,12 +89,12 @@ class NisGeneratorServiceTest extends TestCase
     public function test_generate_nis_pads_sequence_with_zeros()
     {
         for ($i = 0; $i < 15; $i++) {
-            Student::factory()->create(['nis' => sprintf('2024.MTK.%04d', $i + 1)]);
+            Student::factory()->create(['nis' => sprintf('2425.MTK.%04d', $i + 1)]);
         }
 
         $nis = $this->nisGeneratorService->generate('MTK', 2024);
 
-        $this->assertEquals('2024.MTK.0016', $nis);
+        $this->assertEquals('2425.MTK.0016', $nis);
         // Ensure 4-digit padding
         $this->assertStringContainsString('0016', $nis);
     }
@@ -104,13 +104,13 @@ class NisGeneratorServiceTest extends TestCase
      */
     public function test_generate_nis_uses_highest_sequence()
     {
-        Student::factory()->create(['nis' => '2024.MTK.0001']);
-        Student::factory()->create(['nis' => '2024.MTK.0003']);
-        Student::factory()->create(['nis' => '2024.MTK.0002']);
+        Student::factory()->create(['nis' => '2425.MTK.0001']);
+        Student::factory()->create(['nis' => '2425.MTK.0003']);
+        Student::factory()->create(['nis' => '2425.MTK.0002']);
 
         $nis = $this->nisGeneratorService->generate('MTK', 2024);
 
         // Should use the highest (0003) and increment
-        $this->assertEquals('2024.MTK.0004', $nis);
+        $this->assertEquals('2425.MTK.0004', $nis);
     }
 }

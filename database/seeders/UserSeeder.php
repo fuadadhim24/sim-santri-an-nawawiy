@@ -78,7 +78,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian1->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.01.0001',
+            'nis' => '2627.01.0001',
             'registration_number' => '2026.0001',
             'full_name' => 'Ahmad Santri',
             'unit_code' => '01',
@@ -95,7 +95,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian1->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.02.0001',
+            'nis' => '2627.02.0001',
             'registration_number' => '2026.0002',
             'full_name' => 'Yusuf bin Abdullah',
             'unit_code' => '02',
@@ -129,7 +129,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian2->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.01.0002',
+            'nis' => '2627.01.0002',
             'registration_number' => '2026.0003',
             'full_name' => 'Fatima Binti Usman',
             'unit_code' => '01',
@@ -146,7 +146,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian2->id,
             'spmb_schedule_id' => $secondActiveSchedule?->id,
-            'nis' => '2026.01.0004',
+            'nis' => '2627.01.0004',
             'registration_number' => '2026.0008',
             'full_name' => 'Hana Binti Usman',
             'unit_code' => '01',
@@ -180,7 +180,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian3->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.02.0002',
+            'nis' => '2627.02.0002',
             'registration_number' => '2026.0004',
             'full_name' => 'Muhammad Ridwan Jr',
             'unit_code' => '02',
@@ -197,7 +197,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian3->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.03.0001',
+            'nis' => '2627.03.0001',
             'registration_number' => '2026.0005',
             'full_name' => 'Aisyah binti Ridwan',
             'unit_code' => '03',
@@ -231,7 +231,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian4->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.01.0003',
+            'nis' => '2627.01.0003',
             'registration_number' => '2026.0006',
             'full_name' => 'Zahra binti Rahmah',
             'unit_code' => '01',
@@ -265,7 +265,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian5->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.02.0003',
+            'nis' => '2627.02.0003',
             'registration_number' => '2026.0007',
             'full_name' => 'Ibrahim bin Hasan',
             'unit_code' => '02',
@@ -282,7 +282,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian5->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2023.01.0009',
+            'nis' => '2324.01.0009',
             'registration_number' => '2023.0001',
             'full_name' => 'Fathurrahman (Alumni)',
             'unit_code' => '01',
@@ -316,7 +316,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian6->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.01.0009',
+            'nis' => '2627.01.0009',
             'registration_number' => '2026.0009',
             'full_name' => 'Fathir Syarifuddin',
             'unit_code' => '01',
@@ -333,7 +333,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian6->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.02.0009',
+            'nis' => '2627.02.0009',
             'registration_number' => '2026.0010',
             'full_name' => 'Fania Syarifuddin',
             'unit_code' => '02',
@@ -350,7 +350,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian6->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.03.0009',
+            'nis' => '2627.03.0009',
             'registration_number' => '2026.0011',
             'full_name' => 'Farhan Syarifuddin',
             'unit_code' => '03',
@@ -367,7 +367,7 @@ class UserSeeder extends Seeder
         Student::create([
             'guardian_id' => $guardian6->id,
             'spmb_schedule_id' => $spmbSchedule?->id,
-            'nis' => '2026.01.0010',
+            'nis' => '2627.01.0010',
             'registration_number' => '2026.0012',
             'full_name' => 'Farras Syarifuddin',
             'unit_code' => '01',

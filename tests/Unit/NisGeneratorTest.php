@@ -21,7 +21,7 @@ class NisGeneratorTest extends TestCase
 
         $nis = $service->generate($unitCode, $year);
 
-        $this->assertEquals('2026.01.0001', $nis);
+        $this->assertEquals('2627.01.0001', $nis);
     }
 
     public function test_it_increments_nis_correctly(): void
@@ -39,7 +39,7 @@ class NisGeneratorTest extends TestCase
 
         Student::create([
             'guardian_id' => $guardian->id,
-            'nis' => '2026.02.0005',
+            'nis' => '2627.02.0005',
             'full_name' => 'Student 5',
             'unit_code' => '02',
             'residence_status' => 'NON_MONDOK',
@@ -49,6 +49,6 @@ class NisGeneratorTest extends TestCase
 
         $newNis = $service->generate($unitCode, $year);
 
-        $this->assertEquals('2026.02.0006', $newNis);
+        $this->assertEquals('2627.02.0006', $newNis);
     }
 }
