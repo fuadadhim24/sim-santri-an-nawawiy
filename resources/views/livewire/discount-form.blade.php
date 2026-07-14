@@ -36,6 +36,7 @@
                         <option value="ANAK_GURU">Anak Guru</option>
                         <option value="YATIM">Yatim</option>
                         <option value="PRESTASI">Siswa Berprestasi</option>
+                        <option value="LINGKUNGAN">Lingkungan</option>
                     </select>
                     @error('target_status')
                         <span class="text-destructive text-sm">{{ $message }}</span>
