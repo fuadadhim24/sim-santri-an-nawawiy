@@ -159,13 +159,13 @@
                                 </p>
                             </div>
                             <div>
-                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Nama Lengkap</label>
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Nama Lengkap <span class="text-red-500">*</span></label>
                                 <input type="text" wire:model="full_name" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
                                 @error('full_name') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
-                                 <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NIS</label>
+                                 <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NIS <span class="text-red-500">*</span></label>
                                  <div class="mt-1.5 flex rounded-lg shadow-sm">
                                      <input type="text" wire:model="nis" class="flex-1 block w-full rounded-none rounded-l-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Contoh: 2026.01.0001">
                                      <button type="button" wire:click="checkNis" class="inline-flex items-center px-4 rounded-r-lg border border-l-0 border-input bg-muted hover:bg-secondary text-sm font-semibold transition-colors focus:outline-none">
@@ -187,14 +187,14 @@
                              </div>
 
                              <div>
-                                 <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NISN</label>
+                                 <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NISN <span class="text-muted-foreground font-normal text-[10px]">(Opsional)</span></label>
                                  <input type="text" wire:model="nisn" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="10 digit angka">
                                  @error('nisn') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
                              </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Unit</label>
+                                    <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Unit <span class="text-red-500">*</span></label>
                                     <select wire:model.live="unit_code" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
                                         <option value="01">SMP</option>
                                         <option value="02">SMA</option>
@@ -204,7 +204,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Domisili</label>
+                                    <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Domisili <span class="text-red-500">*</span></label>
                                     <select wire:model.live="residence_status" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
                                         <option value="MONDOK">Mondok</option>
                                         <option value="NON_MONDOK">Non-Mondok</option>
@@ -215,7 +215,7 @@
                             </div>
                             
                             <div>
-                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Tingkat Kelas</label>
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Tingkat Kelas <span class="text-red-500">*</span></label>
                                 <select wire:model.live="class_level_id" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
                                     <option value="">-- Pilih Tingkat Kelas --</option>
                                     @foreach($classLevels as $level)
@@ -226,7 +226,7 @@
                             </div>
 
                             <div>
-                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Jadwal Seleksi SPMB</label>
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Jadwal Seleksi SPMB <span class="text-muted-foreground font-normal text-[10px]">(Opsional)</span></label>
                                 <select wire:model="spmb_schedule_id" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
                                     <option value="">-- Pilih Jadwal --</option>
                                     @foreach($schedules as $schedule)
@@ -702,5 +702,24 @@
             }
         });
     };
+
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('swal:validation-error', (event) => {
+            const errors = event[0].errors || [];
+            let errorHtml = '<ul class="text-left list-disc pl-5 text-sm space-y-1">';
+            errors.forEach(err => {
+                errorHtml += `<li>${err}</li>`;
+            });
+            errorHtml += '</ul>';
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan Data',
+                html: errorHtml,
+                confirmButtonText: 'Perbaiki',
+                confirmButtonColor: '#3085d6'
+            });
+        });
+    });
 </script>
 @endscript

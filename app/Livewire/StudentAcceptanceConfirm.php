@@ -127,15 +127,22 @@ class StudentAcceptanceConfirm extends Component
 
     public function confirmAcceptance(BillingService $billingService)
     {
-        $this->validate([
-            'full_name' => 'required|string|min:3|max:255',
-            'nis' => 'required|string|unique:students,nis,' . $this->student->id,
-            'nisn' => 'nullable|numeric|digits:10',
-            'unit_code' => 'required|in:01,02,03',
-            'residence_status' => 'required|in:MONDOK,NON_MONDOK,NGAJI_ONLY',
-            'spmb_schedule_id' => 'nullable|exists:spmb_schedules,id',
-            'class_level_id' => 'required|exists:class_levels,id',
-        ]);
+        try {
+            $this->validate([
+                'full_name' => 'required|string|min:3|max:255',
+                'nis' => 'required|string|unique:students,nis,' . $this->student->id,
+                'nisn' => 'nullable|numeric|digits:10',
+                'unit_code' => 'required|in:01,02,03',
+                'residence_status' => 'required|in:MONDOK,NON_MONDOK,NGAJI_ONLY',
+                'spmb_schedule_id' => 'nullable|exists:spmb_schedules,id',
+                'class_level_id' => 'required|exists:class_levels,id',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dispatch('swal:validation-error', [
+                'errors' => $e->validator->errors()->all()
+            ]);
+            throw $e;
+        }
 
         try {
             $this->student->update([
