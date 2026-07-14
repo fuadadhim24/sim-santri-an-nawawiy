@@ -43,7 +43,10 @@ class StudentForm extends Component
     #[Rule('nullable|numeric|digits:10')]
     public $nisn = '';
 
-    // File properties
+    public $nis = '';
+    public $nisCheckStatus = null; // 'available', 'taken', 'empty'
+    public $nisCheckMessage = '';
+
     public $kk_file;
     public $foto_file;
     public $akta_file;
@@ -57,12 +60,10 @@ class StudentForm extends Component
     public $is_active = true;
     public $autoGenerateBillings = true;
 
-    // Academic lock and transition properties
     public $isAcademicLocked = false;
     public $showUnlockModal = false;
     public $academicChangesConfirmed = true;
 
-    // Billing transition properties
     public $showTransitionModal = false; // Controls display of Before-After Preview card
     public $oldUnpaidPolicy = 'keep_all'; // 'delete_all', 'delete_except_current_month', 'keep_all', 'delete_selected'
     public $oldBillings = [];
@@ -89,13 +90,11 @@ class StudentForm extends Component
 
         $query = FeeCategory::where('is_active', true);
 
-        // Filter by domicile status
         $query->where(function ($q) {
             $q->where('domicile_target', $this->residence_status)
               ->orWhereNull('domicile_target');
         });
 
-        // Filter by unit code
         $query->where(function ($q) {
             $q->where('unit_target', $this->unit_code)
               ->orWhereNull('unit_target');
@@ -261,7 +260,6 @@ class StudentForm extends Component
         $this->academicChangesConfirmed = true;
         $this->showUnlockModal = false;
         
-        // Load unpaid billings for preview when unlocked
         $this->oldBillings = app(\App\Services\BillingService::class)->getUnpaidBillings($this->student)->toArray();
         $this->checkIfProfileChanged();
     }
@@ -300,6 +298,7 @@ class StudentForm extends Component
             $this->address = $student->address;
             $this->nisn = $student->nisn;
             $this->generatedNis = $student->nis;
+            $this->nis = $student->nis;
             $this->isEdit = true;
             $this->isAcademicLocked = false;
             $this->academicChangesConfirmed = true;
@@ -307,6 +306,10 @@ class StudentForm extends Component
             $this->isAcademicLocked = false;
             $this->academicChangesConfirmed = true;
             $this->loadAvailableBillings();
+
+            $year = date('Y');
+            $nisService = app(\App\Services\NisGeneratorService::class);
+            $this->nis = $nisService->generate($this->unit_code, $year);
         }
     }
 
@@ -314,6 +317,12 @@ class StudentForm extends Component
     {
         if (!$this->isEdit) {
             $this->loadAvailableBillings();
+
+            $year = date('Y');
+            $nisService = app(\App\Services\NisGeneratorService::class);
+            $this->nis = $nisService->generate($this->unit_code, $year);
+            $this->nisCheckStatus = null;
+            $this->nisCheckMessage = '';
         } else {
             $this->checkIfProfileChanged();
         }
@@ -368,6 +377,10 @@ class StudentForm extends Component
     {
         try {
             $this->validate();
+            $nisRule = 'required|string|unique:students,nis' . ($this->isEdit ? ',' . $this->student->id : '');
+            $this->validate([
+                'nis' => $nisRule,
+            ]);
             $kkRule = ($this->isEdit && $this->student && $this->student->kk) ? 'nullable' : 'required';
             $fotoRule = ($this->isEdit && $this->student && $this->student->foto) ? 'nullable' : 'required';
             $aktaRule = ($this->isEdit && $this->student && $this->student->akta) ? 'nullable' : 'required';
@@ -389,6 +402,7 @@ class StudentForm extends Component
         $data = [
             'guardian_id' => $this->guardian_id,
             'full_name' => $this->full_name,
+            'nis' => $this->nis,
             'unit_code' => $this->unit_code,
             'residence_status' => $this->residence_status,
             'special_status' => $this->special_status,
@@ -398,7 +412,6 @@ class StudentForm extends Component
             'is_active' => $this->is_active,
         ];
 
-        // File handling
         if ($this->kk_file) {
             if ($this->isEdit && $this->student->kk) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($this->student->kk);
@@ -439,8 +452,6 @@ class StudentForm extends Component
             session()->flash('message', 'Student updated successfully.');
         } else {
             $year = date('Y');
-            $nis = $nisService->generate($this->unit_code, $year);
-            $data['nis'] = $nis;
             $data['registration_number'] = $nisService->generateRegistrationNumber($year);
             $data['status'] = \App\Enums\StudentStatus::ACCEPTED->value;
             $data['joined_at'] = now();
@@ -451,10 +462,41 @@ class StudentForm extends Component
                 $billingService->generateBillingsForStudentWithCategories($newStudent, $this->selectedBillings);
             }
 
-            session()->flash('message', 'Student created successfully with NIS: ' . $nis);
+            session()->flash('message', 'Student created successfully with NIS: ' . $this->nis);
         }
 
         return redirect()->route('admin.students');
+    }
+
+    public function checkNis()
+    {
+        $this->nis = trim($this->nis);
+        
+        if (empty($this->nis)) {
+            $this->nisCheckStatus = 'empty';
+            $this->nisCheckMessage = 'NIS tidak boleh kosong.';
+            return;
+        }
+
+        $query = Student::where('nis', $this->nis);
+        if ($this->student && $this->student->id) {
+            $query->where('id', '!=', $this->student->id);
+        }
+        $existingStudent = $query->first();
+
+        if ($existingStudent) {
+            $this->nisCheckStatus = 'taken';
+            $this->nisCheckMessage = 'NIS sudah digunakan oleh ' . $existingStudent->full_name . ' (' . ($existingStudent->classLevel?->name ?? 'Kelas tidak diketahui') . ').';
+        } else {
+            $this->nisCheckStatus = 'available';
+            $this->nisCheckMessage = 'NIS tersedia dan belum digunakan.';
+        }
+    }
+
+    public function updatedNis()
+    {
+        $this->nisCheckStatus = null;
+        $this->nisCheckMessage = '';
     }
 
     public function render()

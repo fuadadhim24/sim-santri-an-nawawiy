@@ -23,7 +23,14 @@ class NisGeneratorService
             $sequence = $lastSequence + 1;
         }
 
-        return sprintf('%s.%04d', $prefix, $sequence);
+        $generated = sprintf('%s.%04d', $prefix, $sequence);
+        
+        while (Student::where('nis', $generated)->exists()) {
+            $sequence++;
+            $generated = sprintf('%s.%04d', $prefix, $sequence);
+        }
+
+        return $generated;
     }
 
     public function generateRegistrationNumber(int $year): string
@@ -43,6 +50,13 @@ class NisGeneratorService
             $sequence = $lastSequence + 1;
         }
 
-        return sprintf('%s.%04d', $prefix, $sequence);
+        $generated = sprintf('%s.%04d', $prefix, $sequence);
+
+        while (Student::where('registration_number', $generated)->exists()) {
+            $sequence++;
+            $generated = sprintf('%s.%04d', $prefix, $sequence);
+        }
+
+        return $generated;
     }
 }

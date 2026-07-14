@@ -32,14 +32,41 @@
                     @enderror
                 </div>
 
-                <!-- Full Name & NISN -->
+                <!-- Full Name -->
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-foreground">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input wire:model="full_name" type="text" id="full_name" placeholder="Nama Lengkap Santri"
+                        class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                    @error('full_name')
+                        <span class="text-destructive text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- NIS & NISN -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="full_name" class="block text-sm font-medium text-foreground">Nama Lengkap <span class="text-red-500">*</span></label>
-                        <input wire:model="full_name" type="text" id="full_name" placeholder="Nama Lengkap Santri"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                        @error('full_name')
-                            <span class="text-destructive text-sm">{{ $message }}</span>
+                        <label for="nis" class="block text-sm font-medium text-foreground">NIS <span class="text-red-500">*</span></label>
+                        <div class="mt-1 flex rounded-md shadow-sm">
+                            <input wire:model="nis" type="text" id="nis" placeholder="Contoh: 2026.01.0001"
+                                class="flex-1 block w-full px-3 py-2 rounded-none rounded-l-md border border-input bg-background focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                            <button type="button" wire:click="checkNis"
+                                class="inline-flex items-center px-4 rounded-r-md border border-l-0 border-input bg-muted hover:bg-secondary hover:text-foreground text-sm font-semibold transition-colors focus:outline-none">
+                                Cek NIS
+                            </button>
+                        </div>
+                        @if ($nisCheckStatus === 'available')
+                            <p class="mt-1 text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {{ $nisCheckMessage }}
+                            </p>
+                        @elseif ($nisCheckStatus === 'taken' || $nisCheckStatus === 'empty')
+                            <p class="mt-1 text-xs text-destructive font-semibold flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {{ $nisCheckMessage }}
+                            </p>
+                        @endif
+                        @error('nis')
+                            <span class="text-destructive text-sm mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 

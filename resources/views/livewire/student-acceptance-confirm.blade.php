@@ -75,6 +75,7 @@
                     </div>
                     <div class="p-5 flex-1 overflow-y-auto" x-data="{
                             full_name: @entangle('full_name'),
+                            nis: @entangle('nis'),
                             nisn: @entangle('nisn'),
                             unit_code: @entangle('unit_code'),
                             residence_status: @entangle('residence_status'),
@@ -95,9 +96,15 @@
                                 <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Nama Lengkap</label>
                                 <p class="font-semibold text-foreground text-sm border-b border-dashed border-border pb-1" x-text="full_name || '-'"></p>
                             </div>
-                            <div>
-                                <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">NISN</label>
-                                <p class="font-mono text-foreground text-sm border-b border-dashed border-border pb-1" x-text="nisn || '-'"></p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">NIS</label>
+                                    <p class="font-mono text-foreground text-sm border-b border-dashed border-border pb-1" x-text="nis || '-'"></p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">NISN</label>
+                                    <p class="font-mono text-foreground text-sm border-b border-dashed border-border pb-1" x-text="nisn || '-'"></p>
+                                </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -158,10 +165,32 @@
                             </div>
 
                             <div>
-                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NISN</label>
-                                <input type="text" wire:model="nisn" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="10 digit angka">
-                                @error('nisn') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
-                            </div>
+                                 <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NIS</label>
+                                 <div class="mt-1.5 flex rounded-lg shadow-sm">
+                                     <input type="text" wire:model="nis" class="flex-1 block w-full rounded-none rounded-l-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Contoh: 2026.01.0001">
+                                     <button type="button" wire:click="checkNis" class="inline-flex items-center px-4 rounded-r-lg border border-l-0 border-input bg-muted hover:bg-secondary text-sm font-semibold transition-colors focus:outline-none">
+                                         Cek NIS
+                                     </button>
+                                 </div>
+                                 @if ($nisCheckStatus === 'available')
+                                     <p class="mt-1 text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                         {{ $nisCheckMessage }}
+                                     </p>
+                                 @elseif ($nisCheckStatus === 'taken' || $nisCheckStatus === 'empty')
+                                     <p class="mt-1 text-xs text-destructive font-semibold flex items-center gap-1">
+                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                         {{ $nisCheckMessage }}
+                                     </p>
+                                 @endif
+                                 @error('nis') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
+                             </div>
+
+                             <div>
+                                 <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NISN</label>
+                                 <input type="text" wire:model="nisn" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="mt-1.5 block w-full rounded-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="10 digit angka">
+                                 @error('nisn') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
+                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -538,7 +567,6 @@
                 const editBtn = Swal.getHtmlContainer().querySelector('#edit-wa-btn');
                 const sendBtn = Swal.getHtmlContainer().querySelector('#send-wa-btn');
 
-                // Copy → reject dulu, lalu copy teks
                 copyBtn.addEventListener('click', async () => {
                     if (!_rejected) {
                         copyBtn.disabled = true;
@@ -552,7 +580,6 @@
                     setTimeout(() => { copyBtn.innerText = 'Copy Pesan'; }, 2000);
                 });
 
-                // Edit → TIDAK reject, refresh preview dengan pesan baru
                 editBtn.addEventListener('click', () => {
                     Swal.fire({
                         title: 'Edit Pesan WhatsApp',
@@ -573,7 +600,6 @@
                     });
                 });
 
-                // Kirim → reject dulu, lalu buka WA
                 sendBtn.addEventListener('click', async () => {
                     if (!_rejected) {
                         sendBtn.disabled = true;
@@ -661,12 +687,10 @@
             const { reason, sendWa } = result.value;
 
             if (sendWa && _waLink) {
-                // Tampilkan preview WA — reject BARU terjadi saat Copy atau Kirim diklik
                 const defaultMessage = `*Pemberitahuan Pendaftaran Santri Baru*\n*An-Nawawiy*\n\nAssalamu'alaikum Warahmatullahi Wabarakatuh,\n\nYth. Bapak/Ibu *${_guardianName}*\n(${_guardianPhone})\n\nMohon maaf, berdasarkan hasil verifikasi dokumen pada jadwal:\n*${_spmbName}*\n\nPendaftaran santri atas nama:\n*${_studentName}*\n\n*Belum dapat kami terima* dengan alasan:\n\n_"${reason}"_\n\nSilakan melengkapi berkas atau menghubungi bagian administrasi untuk informasi lebih lanjut.\n\nSyukron, Jazakumullahu Khairan.\n\n---\n_Pesan otomatis dari Sistem Informasi Santri An-Nawawiy_`;
 
                 showWaPreviewAfterReject(_waLink, reason, defaultMessage);
             } else {
-                // Tidak kirim WA → reject langsung di sini
                 $wire.rejectAcceptance(reason).then(() => {
                     Swal.fire({
                         title: 'Berhasil Ditolak!',

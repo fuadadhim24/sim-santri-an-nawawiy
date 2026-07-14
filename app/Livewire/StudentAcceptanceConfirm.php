@@ -13,25 +13,34 @@ class StudentAcceptanceConfirm extends Component
     public $selectedBillings = [];
     public $availableBillings = [];
 
-    // Editable form properties
     public $full_name;
+    public $nis;
     public $nisn;
     public $unit_code;
     public $residence_status;
     public $spmb_schedule_id;
     public $class_level_id;
 
+    public $nisCheckStatus = null; // 'available', 'taken', 'empty'
+    public $nisCheckMessage = '';
+
     public function mount(Student $student)
     {
         $this->student = $student->load(['guardian', 'spmbSchedule']);
         
-        // Populate form fields
         $this->full_name = $student->full_name;
         $this->nisn = $student->nisn;
         $this->unit_code = $student->unit_code;
         $this->residence_status = $student->residence_status;
         $this->spmb_schedule_id = $student->spmb_schedule_id;
         $this->class_level_id = $student->class_level_id;
+
+        $this->nis = $student->nis;
+        if (!$this->nis) {
+            $year = date('Y');
+            $nisService = app(\App\Services\NisGeneratorService::class);
+            $this->nis = $nisService->generate($this->unit_code, $year);
+        }
 
         $this->loadAvailableBillings();
     }
@@ -41,23 +50,33 @@ class StudentAcceptanceConfirm extends Component
         if (in_array($propertyName, ['unit_code', 'residence_status', 'class_level_id'])) {
             $this->loadAvailableBillings();
         }
+
+        if ($propertyName === 'unit_code') {
+            $year = date('Y');
+            $nisService = app(\App\Services\NisGeneratorService::class);
+            $this->nis = $nisService->generate($this->unit_code, $year);
+            $this->nisCheckStatus = null;
+            $this->nisCheckMessage = '';
+        }
+
+        if ($propertyName === 'nis') {
+            $this->nisCheckStatus = null;
+            $this->nisCheckMessage = '';
+        }
     }
 
     private function loadAvailableBillings()
     {
-        // Get fee categories based on dynamically selected unit and domicile
         $query = FeeCategory::query()->where('is_active', true);
 
-        // Filter by residence status (domicile)
         $query->where(function ($q) {
             $q->where('domicile_target', $this->residence_status)
-              ->orWhereNull('domicile_target'); // Include general categories
+              ->orWhereNull('domicile_target'); 
         });
 
-        // Filter by unit code
         $query->where(function ($q) {
             $q->where('unit_target', $this->unit_code)
-              ->orWhereNull('unit_target'); // Include general categories
+              ->orWhereNull('unit_target'); 
         });
 
         $this->availableBillings = $query->where('is_locked', false)
@@ -103,7 +122,6 @@ class StudentAcceptanceConfirm extends Component
             })
             ->toArray();
 
-        // Re-evaluate selected billings to match new available categories
         $this->selectedBillings = array_map(fn($b) => $b['id'], $this->availableBillings);
     }
 
@@ -111,6 +129,7 @@ class StudentAcceptanceConfirm extends Component
     {
         $this->validate([
             'full_name' => 'required|string|min:3|max:255',
+            'nis' => 'required|string|unique:students,nis,' . $this->student->id,
             'nisn' => 'nullable|numeric|digits:10',
             'unit_code' => 'required|in:01,02,03',
             'residence_status' => 'required|in:MONDOK,NON_MONDOK,NGAJI_ONLY',
@@ -119,9 +138,9 @@ class StudentAcceptanceConfirm extends Component
         ]);
 
         try {
-            // Persist the verified/corrected data directly to the database before accepting
             $this->student->update([
                 'full_name' => $this->full_name,
+                'nis' => $this->nis,
                 'nisn' => $this->nisn ?: null,
                 'unit_code' => $this->unit_code,
                 'residence_status' => $this->residence_status,
@@ -133,7 +152,6 @@ class StudentAcceptanceConfirm extends Component
             $this->student->markAsAccepted();
             $this->student->refresh();
 
-            // Generate billings for selected categories
             if (!empty($this->selectedBillings)) {
                 $billingService->generateBillingsForStudentWithCategories(
                     $this->student,
@@ -149,6 +167,31 @@ class StudentAcceptanceConfirm extends Component
                 'studentId' => $this->student->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    public function checkNis()
+    {
+        $this->nis = trim($this->nis);
+        
+        if (empty($this->nis)) {
+            $this->nisCheckStatus = 'empty';
+            $this->nisCheckMessage = 'NIS tidak boleh kosong.';
+            return;
+        }
+
+        $query = Student::where('nis', $this->nis);
+        if ($this->student && $this->student->id) {
+            $query->where('id', '!=', $this->student->id);
+        }
+        $existingStudent = $query->first();
+
+        if ($existingStudent) {
+            $this->nisCheckStatus = 'taken';
+            $this->nisCheckMessage = 'NIS sudah digunakan oleh ' . $existingStudent->full_name . ' (' . ($existingStudent->classLevel?->name ?? 'Kelas tidak diketahui') . ').';
+        } else {
+            $this->nisCheckStatus = 'available';
+            $this->nisCheckMessage = 'NIS tersedia dan belum digunakan.';
         }
     }
 

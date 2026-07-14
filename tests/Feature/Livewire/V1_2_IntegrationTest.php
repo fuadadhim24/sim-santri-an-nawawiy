@@ -265,4 +265,83 @@ class V1_2_IntegrationTest extends TestCase
             ->call('toggleSelectAllFees')
             ->assertSet('selectedBillings', []);
     }
+
+    public function test_manual_nis_entry_and_uniqueness_checking_in_student_form()
+    {
+        $guardian = Guardian::create([
+            'user_id' => User::factory()->create(['role' => 'WALI_SANTRI'])->id,
+            'full_name' => 'Wali Test',
+            'whatsapp' => '628123456789',
+        ]);
+
+        $classLevel = \App\Models\ClassLevel::create(['name' => 'VII SMP', 'level_order' => 1]);
+
+        // Create an existing student with a specific NIS
+        Student::create([
+            'guardian_id' => $guardian->id,
+            'full_name' => 'Student Existing',
+            'nis' => '2026.01.9999',
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
+            'class_level_id' => $classLevel->id,
+            'status' => 'ACCEPTED',
+        ]);
+
+        // Test NIS uniqueness check in StudentForm
+        Livewire::test(\App\Livewire\StudentForm::class)
+            ->set('nis', '2026.01.9999')
+            ->call('checkNis')
+            ->assertSet('nisCheckStatus', 'taken')
+            ->assertSee('NIS sudah digunakan oleh Student Existing')
+            ->set('nis', '2026.01.8888')
+            ->call('checkNis')
+            ->assertSet('nisCheckStatus', 'available');
+    }
+
+    public function test_manual_nis_entry_and_uniqueness_checking_in_student_acceptance_confirm()
+    {
+        $guardian = Guardian::create([
+            'user_id' => User::factory()->create(['role' => 'WALI_SANTRI'])->id,
+            'full_name' => 'Wali Test',
+            'whatsapp' => '628123456789',
+        ]);
+
+        $classLevel = \App\Models\ClassLevel::create(['name' => 'VII SMP', 'level_order' => 1]);
+
+        // Create a pending student (to be accepted)
+        $pendingStudent = Student::create([
+            'guardian_id' => $guardian->id,
+            'full_name' => 'Student Pending',
+            'nis' => null,
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
+            'class_level_id' => $classLevel->id,
+            'status' => 'PENDING',
+        ]);
+
+        // Create an existing student with a specific NIS
+        Student::create([
+            'guardian_id' => $guardian->id,
+            'full_name' => 'Student Existing',
+            'nis' => '2026.01.9999',
+            'unit_code' => '01',
+            'residence_status' => 'MONDOK',
+            'class_level_id' => $classLevel->id,
+            'status' => 'ACCEPTED',
+        ]);
+
+        // Test NIS uniqueness check in StudentAcceptanceConfirm
+        Livewire::test(\App\Livewire\StudentAcceptanceConfirm::class, ['student' => $pendingStudent])
+            ->set('nis', '2026.01.9999')
+            ->call('checkNis')
+            ->assertSet('nisCheckStatus', 'taken')
+            ->assertSee('NIS sudah digunakan oleh Student Existing')
+            ->set('nis', '2026.01.8888')
+            ->call('checkNis')
+            ->assertSet('nisCheckStatus', 'available')
+            ->call('confirmAcceptance')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('2026.01.8888', $pendingStudent->fresh()->nis);
+    }
 }
