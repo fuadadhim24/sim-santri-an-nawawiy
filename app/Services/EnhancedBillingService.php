@@ -66,7 +66,7 @@ class EnhancedBillingService
         }
 
         $query = FeeMaster::where('fee_category_id', $feeCategoryId)
-            ->where('is_active', true)
+            ->activeWithinDates()
             ->where(function ($q) use ($student) {
                 $q->where('unit_target', $student->unit_code)
                   ->orWhereNull('unit_target');

@@ -102,8 +102,17 @@
                     @endif
                 </div>
 
+                <!-- Validity Dates Toggle -->
+                <div class="mb-4">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" wire:model.live="applies_forever" class="rounded border-input text-primary shadow-sm focus:ring-ring mr-2">
+                        <span class="text-sm font-medium text-foreground">Berlaku Selamanya (Tanpa Batas Tanggal)</span>
+                    </label>
+                </div>
+
                 <!-- Validity Dates -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @if(!$applies_forever)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                     <div>
                         <label for="start_date" class="block text-sm font-medium text-foreground">Mulai Berlaku <span class="text-red-500">*</span></label>
                         <input wire:model="start_date" type="date" id="start_date"
@@ -121,6 +130,7 @@
                         @enderror
                     </div>
                 </div>
+                @endif
 
                 <!-- Targets -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-border">

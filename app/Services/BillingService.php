@@ -452,7 +452,7 @@ class BillingService
             foreach ($feeCategories as $category) {
                 // Find all fee masters for this category that match the student's profile
                 $feeMasters = FeeMaster::where('fee_category_id', $category->id)
-                    ->where('is_active', true)
+                    ->activeWithinDates()
                     ->where(function ($q) use ($student) {
                         $q->where('unit_target', $student->unit_code)
                           ->orWhereNull('unit_target');
@@ -516,7 +516,7 @@ class BillingService
             foreach ($feeCategories as $category) {
                 // Find all fee masters for this category that match the student's profile
                 $feeMasters = FeeMaster::where('fee_category_id', $category->id)
-                    ->where('is_active', true)
+                    ->activeWithinDates()
                     ->where(function ($q) use ($student) {
                         $q->where('unit_target', $student->unit_code)
                           ->orWhereNull('unit_target');

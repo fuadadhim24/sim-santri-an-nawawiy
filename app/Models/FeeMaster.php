@@ -95,4 +95,18 @@ class FeeMaster extends Model
         ]);
         $this->delete();
     }
+
+    public function scopeActiveWithinDates($query)
+    {
+        $today = now()->format('Y-m-d');
+        return $query->where('is_active', true)
+            ->where(function ($q) use ($today) {
+                $q->whereNull('start_date')
+                  ->orWhereDate('start_date', '<=', $today);
+            })
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')
+                  ->orWhereDate('end_date', '>=', $today);
+            });
+    }
 }

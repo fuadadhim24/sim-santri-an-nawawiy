@@ -27,6 +27,8 @@ class FeeMasterForm extends Component
 
     public $isEdit = false;
 
+    public $applies_forever = true;
+
     public $recurrence_type = 'ONE_TIME';
     public $due_days = 14;
     public $billing_day = 1;
@@ -45,8 +47,8 @@ class FeeMasterForm extends Component
             'recurrence_type' => 'required|in:ONE_TIME,MONTHLY,EVERY_6_MONTHS,YEARLY',
             'due_days' => 'required|integer|min:0',
             'billing_day' => 'nullable|integer|min:1|max:31',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'start_date' => $this->applies_forever ? 'nullable' : 'required|date',
+            'end_date' => $this->applies_forever ? 'nullable' : 'nullable|date|after_or_equal:start_date',
         ];
     }
 
@@ -65,12 +67,18 @@ class FeeMasterForm extends Component
             $this->billing_day = $feeMaster->billing_day ?? 1;
             $this->start_date = $feeMaster->start_date ? $feeMaster->start_date->format('Y-m-d') : '';
             $this->end_date = $feeMaster->end_date ? $feeMaster->end_date->format('Y-m-d') : '';
+            $this->applies_forever = !$feeMaster->start_date && !$feeMaster->end_date;
             $this->isEdit = true;
         }
     }
 
     public function save()
     {
+        if ($this->applies_forever) {
+            $this->start_date = '';
+            $this->end_date = '';
+        }
+
         $this->validate();
 
         if (!$this->isEdit) {
@@ -114,6 +122,11 @@ class FeeMasterForm extends Component
     #[\Livewire\Attributes\On('confirmedSave')]
     public function processSave()
     {
+        if ($this->applies_forever) {
+            $this->start_date = '';
+            $this->end_date = '';
+        }
+
         $this->validate();
 
         if ($this->isEdit && (!$this->feeMaster || !$this->feeMaster->exists)) {

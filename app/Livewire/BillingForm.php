@@ -166,7 +166,7 @@ class BillingForm extends Component
 
     public function getFeeMastersProperty()
     {
-        $query = FeeMaster::with('category')->where('is_active', true);
+        $query = FeeMaster::with('category')->activeWithinDates();
         
         if ($this->student_id) {
             $student = Student::find($this->student_id);
