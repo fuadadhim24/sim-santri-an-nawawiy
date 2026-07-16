@@ -72,4 +72,22 @@ class Guardian extends Model
         }
         return '62' . $number; // fallback: prepend 62
     }
+
+    public function setWhatsappAttribute($value)
+    {
+        if (empty($value)) {
+            $this->attributes['whatsapp'] = null;
+            return;
+        }
+
+        $number = preg_replace('/\D/', '', $value);
+
+        if (str_starts_with($number, '62')) {
+            $this->attributes['whatsapp'] = $number;
+        } elseif (str_starts_with($number, '0')) {
+            $this->attributes['whatsapp'] = '62' . substr($number, 1);
+        } else {
+            $this->attributes['whatsapp'] = '62' . $number;
+        }
+    }
 }

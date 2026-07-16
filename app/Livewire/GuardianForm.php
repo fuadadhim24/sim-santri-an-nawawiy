@@ -97,6 +97,20 @@ class GuardianForm extends Component
         return redirect()->route('admin.guardians');
     }
 
+    public function updatedWhatsapp($value)
+    {
+        if (!empty($value)) {
+            $number = preg_replace('/\D/', '', $value);
+            if (str_starts_with($number, '0')) {
+                $this->whatsapp = '62' . substr($number, 1);
+            } elseif (!str_starts_with($number, '62')) {
+                $this->whatsapp = '62' . $number;
+            } else {
+                $this->whatsapp = $number;
+            }
+        }
+    }
+
     public function render()
     {
         return view('livewire.guardian-form')->layout('layouts.admin');

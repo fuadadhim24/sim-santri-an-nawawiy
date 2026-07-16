@@ -30,6 +30,18 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($request->has('whatsapp')) {
+            $number = preg_replace('/\D/', '', $request->whatsapp);
+            if (str_starts_with($number, '0')) {
+                $normalized = '62' . substr($number, 1);
+            } elseif (!str_starts_with($number, '62')) {
+                $normalized = '62' . $number;
+            } else {
+                $normalized = $number;
+            }
+            $request->merge(['whatsapp' => $normalized]);
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'whatsapp' => ['required', 'string', 'max:20', 'unique:users,whatsapp'],
