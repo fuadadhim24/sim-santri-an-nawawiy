@@ -102,19 +102,10 @@
                     @endif
                 </div>
 
-                <!-- Validity Dates Toggle -->
-                <div class="mb-4">
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" wire:model.live="applies_forever" class="rounded border-input text-primary shadow-sm focus:ring-ring mr-2">
-                        <span class="text-sm font-medium text-foreground">Berlaku Selamanya (Tanpa Batas Tanggal)</span>
-                    </label>
-                </div>
-
                 <!-- Validity Dates -->
-                @if(!$applies_forever)
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                     <div>
-                        <label for="start_date" class="block text-sm font-medium text-foreground">Mulai Berlaku <span class="text-red-500">*</span></label>
+                        <label for="start_date" class="block text-sm font-medium text-foreground">Mulai Berlaku <span class="text-red-500 {{ $no_end_date ? 'hidden' : '' }}">*</span> <span class="text-muted-foreground font-normal text-[11px] {{ $no_end_date ? '' : 'hidden' }}">(Opsional)</span></label>
                         <input wire:model="start_date" type="date" id="start_date"
                             class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                         @error('start_date')
@@ -122,13 +113,26 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="end_date" class="block text-sm font-medium text-foreground">Berakhir Pada <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
-                        <input wire:model="end_date" type="date" id="end_date"
-                            class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
-                        @error('end_date')
-                            <span class="text-destructive text-sm">{{ $message }}</span>
-                        @enderror
+                        <div class="flex flex-col h-full">
+                            <label class="block text-sm font-medium text-foreground mb-3">Masa Berlaku Akhir</label>
+                            <div class="flex items-center">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model.live="no_end_date" class="rounded border-input text-primary shadow-sm focus:ring-ring mr-2">
+                                    <span class="text-sm font-medium text-foreground">Tanpa Batas Akhir (Berlaku Seterusnya)</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                @if(!$no_end_date)
+                <div class="mb-4">
+                    <label for="end_date" class="block text-sm font-medium text-foreground">Berakhir Pada <span class="text-red-500">*</span></label>
+                    <input wire:model="end_date" type="date" id="end_date"
+                        class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
+                    @error('end_date')
+                        <span class="text-destructive text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
                 @endif
 
