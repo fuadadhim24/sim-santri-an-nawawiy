@@ -32,19 +32,19 @@ class ComprehensiveRoleSecurityTest extends TestCase
     {
         $user = User::factory()->create([
             'role' => 'WALI_SANTRI',
-            'whatsapp' => '081234567890',
+            'whatsapp' => '6281234567890',
         ]);
 
         $guardian = Guardian::create([
             'user_id' => $user->id,
             'full_name' => 'Ahmad Suryanto',
-            'whatsapp' => '087654321098',
+            'whatsapp' => '6287654321098',
         ]);
 
         $this->assertDatabaseHas('guardians', [
             'user_id' => $user->id,
             'full_name' => 'Ahmad Suryanto',
-            'whatsapp' => '087654321098',
+            'whatsapp' => '6287654321098',
         ]);
     }
 
@@ -64,7 +64,7 @@ class ComprehensiveRoleSecurityTest extends TestCase
     {
         $existingGuardian = Guardian::factory()
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
-            ->create(['whatsapp' => '081234567890']);
+            ->create(['whatsapp' => '6281234567890']);
 
         $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
 
@@ -72,7 +72,7 @@ class ComprehensiveRoleSecurityTest extends TestCase
         Livewire::actingAs($admin)
             ->test('GuardianForm')
             ->set('full_name', 'Another Guardian')
-            ->set('whatsapp', '081234567890') // duplicate
+            ->set('whatsapp', '6281234567890') // duplicate
             ->set('email', 'another@example.com')
             ->set('password', 'TestPassword123')
             ->call('save')
@@ -332,7 +332,7 @@ class ComprehensiveRoleSecurityTest extends TestCase
         Livewire::actingAs($admin)
             ->test('GuardianForm')
             ->set('full_name', '')
-            ->set('whatsapp', '087654321098')
+            ->set('whatsapp', '6287654321098')
             ->set('email', 'ahmad@example.com')
             ->set('password', 'TestPassword123')
             ->call('save')
@@ -364,7 +364,7 @@ class ComprehensiveRoleSecurityTest extends TestCase
         Livewire::actingAs($admin)
             ->test('GuardianForm')
             ->set('full_name', 'Ahmad Suryanto')
-            ->set('whatsapp', '087654321098')
+            ->set('whatsapp', '6287654321098')
             ->set('email', 'ahmad@example.com')
             ->set('password', 'TestPassword123')
             ->call('save')
@@ -394,21 +394,21 @@ class ComprehensiveRoleSecurityTest extends TestCase
     {
         $guardian = Guardian::factory()
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
-            ->create(['whatsapp' => '081234567890']);
+            ->create(['whatsapp' => '6281234567890']);
 
         $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         Livewire::actingAs($admin)
             ->test('GuardianForm', ['guardian' => $guardian])
             ->set('full_name', $guardian->full_name)
-            ->set('whatsapp', '089876543210')
+            ->set('whatsapp', '6289876543210')
             ->set('email', $guardian->user->email)
             ->call('save')
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('guardians', [
             'id' => $guardian->id,
-            'whatsapp' => '089876543210',
+            'whatsapp' => '6289876543210',
         ]);
     }
 
@@ -417,18 +417,18 @@ class ComprehensiveRoleSecurityTest extends TestCase
     {
         $guardian1 = Guardian::factory()
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
-            ->create(['whatsapp' => '081234567890']);
+            ->create(['whatsapp' => '6281234567890']);
 
         $guardian2 = Guardian::factory()
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
-            ->create(['whatsapp' => '089876543210']);
+            ->create(['whatsapp' => '6289876543210']);
 
         $admin = User::factory()->create(['role' => 'ADMINISTRASI']);
 
         Livewire::actingAs($admin)
             ->test('GuardianForm', ['guardian' => $guardian2])
             ->set('full_name', $guardian2->full_name)
-            ->set('whatsapp', '081234567890') // guardian1's whatsapp
+            ->set('whatsapp', '6281234567890') // guardian1's whatsapp
             ->set('email', $guardian2->user->email)
             ->call('save')
             ->assertHasErrors('whatsapp');
@@ -472,20 +472,20 @@ class ComprehensiveRoleSecurityTest extends TestCase
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
             ->create([
                 'full_name' => 'Ahmad',
-                'whatsapp' => '081234567890',
+                'whatsapp' => '6281234567890',
                 'address' => 'Jl. Test No. 123'
             ]);
 
         Livewire::actingAs($guardian->user)
             ->test('GuardianProfileEdit')
-            ->set('whatsapp', '089876543210')
+            ->set('whatsapp', '6289876543210')
             ->set('address', 'Jl. Test No. 456')
             ->call('updateProfile')
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('guardians', [
             'id' => $guardian->id,
-            'whatsapp' => '089876543210',
+            'whatsapp' => '6289876543210',
             'address' => 'Jl. Test No. 456',
         ]);
     }
@@ -495,15 +495,15 @@ class ComprehensiveRoleSecurityTest extends TestCase
     {
         $guardian1 = Guardian::factory()
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
-            ->create(['whatsapp' => '081234567890']);
+            ->create(['whatsapp' => '6281234567890']);
 
         $guardian2 = Guardian::factory()
             ->has(User::factory()->state(['role' => 'WALI_SANTRI']))
-            ->create(['whatsapp' => '089876543210']);
+            ->create(['whatsapp' => '6289876543210']);
 
         Livewire::actingAs($guardian2->user)
             ->test('GuardianProfileEdit')
-            ->set('whatsapp', '081234567890') // guardian1's whatsapp
+            ->set('whatsapp', '6281234567890') // guardian1's whatsapp
             ->call('updateProfile')
             ->assertHasErrors('whatsapp');
     }
@@ -538,7 +538,7 @@ class ComprehensiveRoleSecurityTest extends TestCase
         Livewire::actingAs($admin)
             ->test('GuardianForm')
             ->set('full_name', 'Budi Santoso')
-            ->set('whatsapp', '089988776655')
+            ->set('whatsapp', '6289988776655')
             ->set('email', 'budi.santoso@example.com')
             ->set('password', 'password123')
             ->set('address', 'Jalan Raya Kebon Jeruk No 12')
@@ -548,13 +548,13 @@ class ComprehensiveRoleSecurityTest extends TestCase
         $this->assertDatabaseHas('users', [
             'name' => 'Budi Santoso',
             'email' => 'budi.santoso@example.com',
-            'whatsapp' => '089988776655',
+            'whatsapp' => '6289988776655',
             'role' => 'WALI_SANTRI',
         ]);
 
         $this->assertDatabaseHas('guardians', [
             'full_name' => 'Budi Santoso',
-            'whatsapp' => '089988776655',
+            'whatsapp' => '6289988776655',
             'address' => 'Jalan Raya Kebon Jeruk No 12',
         ]);
     }

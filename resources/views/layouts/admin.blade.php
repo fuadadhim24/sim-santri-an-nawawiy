@@ -393,6 +393,14 @@
                                     Saring sasaran tagihan berdasarkan jenjang sekolah (SMP/SMA/PPTQ) atau status domisili (Mondok/Non Mondok).
                                 </p>
                             </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Masa Berlaku Tagihan</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">
+                                    <strong>Mulai Berlaku:</strong> Biaya hanya akan aktif & terbit setelah melewati tanggal ini.<br>
+                                    <strong>Tanpa Batas Akhir:</strong> Centang opsi ini agar biaya terus aktif selamanya.<br>
+                                    <strong>Berakhir Pada:</strong> Masukkan batas akhir jika biaya bersifat temporer. Tagihan otomatis berhenti terbit ketika melewati tanggal tersebut.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 @elseif(request()->routeIs('admin.billings*'))
