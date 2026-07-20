@@ -270,4 +270,26 @@ class RoleBasedAccessTest extends TestCase
             ->get('/admin/billings')
             ->assertSee($student->full_name);
     }
+
+    public function test_super_admin_can_export_database_backup()
+    {
+        $superAdmin = User::where('role', 'SUPER_ADMIN')->first();
+
+        $response = $this->actingAs($superAdmin)
+            ->get(route('admin.backup.export'));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/sql');
+        $this->assertStringContainsString('attachment; filename="backup_database_', $response->headers->get('Content-Disposition'));
+    }
+
+    public function test_non_super_admin_cannot_export_database_backup()
+    {
+        $adminTU = User::where('role', 'ADMINISTRASI')->first();
+
+        $response = $this->actingAs($adminTU)
+            ->get(route('admin.backup.export'));
+
+        $response->assertRedirect(route('admin.dashboard'));
+    }
 }

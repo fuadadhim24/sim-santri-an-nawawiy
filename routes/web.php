@@ -112,7 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/users', \App\Livewire\UserIndex::class)->name('admin.users');
         Route::get('/admin/users/create', \App\Livewire\UserForm::class)->name('admin.users.create');
         Route::get('/admin/users/{user}/edit', \App\Livewire\UserForm::class)->name('admin.users.edit');
-
+        Route::get('/admin/backup/export', [\App\Http\Controllers\Admin\BackupController::class, 'export'])->name('admin.backup.export');
     });
 
 });
