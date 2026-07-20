@@ -141,7 +141,7 @@
                     <div>
                         <label for="unit_target" class="block text-sm font-medium text-foreground mb-1">Target
                             Unit <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
-                        <select wire:model="unit_target" id="unit_target"
+                        <select wire:model.live="unit_target" id="unit_target"
                             class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Semua Unit</option>
                             <option value="01">SMP</option>
@@ -163,7 +163,7 @@
                     <div>
                         <label for="class_level_target_id" class="block text-sm font-medium text-foreground mb-1">Target
                             Kelas <span class="text-muted-foreground font-normal text-[11px]">(Opsional)</span></label>
-                        <select wire:model="class_level_target_id" id="class_level_target_id"
+                        <select wire:model.live="class_level_target_id" id="class_level_target_id"
                             class="mt-1 block w-full pl-3 pr-10 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <option value="">Semua Kelas</option>
                             @foreach($this->classLevels as $level)

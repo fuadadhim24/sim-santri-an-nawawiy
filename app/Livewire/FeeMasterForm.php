@@ -80,6 +80,19 @@ class FeeMasterForm extends Component
 
         $this->validate();
 
+        if ($this->class_level_target_id) {
+            $classLevel = \App\Models\ClassLevel::find($this->class_level_target_id);
+            if ($classLevel && $classLevel->unit_code) {
+                if ($this->unit_target && $this->unit_target !== $classLevel->unit_code) {
+                    $this->addError('class_level_target_id', 'Target kelas tidak sesuai dengan unit target yang dipilih.');
+                    return;
+                }
+                if (empty($this->unit_target)) {
+                    $this->unit_target = $classLevel->unit_code;
+                }
+            }
+        }
+
         if (!$this->isEdit) {
             $query = \App\Models\Student::where('is_active', true)->where('status', 'diterima');
             if ($this->unit_target) {
@@ -126,6 +139,19 @@ class FeeMasterForm extends Component
         }
 
         $this->validate();
+
+        if ($this->class_level_target_id) {
+            $classLevel = \App\Models\ClassLevel::find($this->class_level_target_id);
+            if ($classLevel && $classLevel->unit_code) {
+                if ($this->unit_target && $this->unit_target !== $classLevel->unit_code) {
+                    $this->addError('class_level_target_id', 'Target kelas tidak sesuai dengan unit target yang dipilih.');
+                    return;
+                }
+                if (empty($this->unit_target)) {
+                    $this->unit_target = $classLevel->unit_code;
+                }
+            }
+        }
 
         if ($this->isEdit && (!$this->feeMaster || !$this->feeMaster->exists)) {
             session()->flash('error', 'Invalid fee master data.');
@@ -236,9 +262,26 @@ class FeeMasterForm extends Component
             ->get();
     }
 
+    public function updatedUnitTarget()
+    {
+        $this->class_level_target_id = '';
+    }
+
+    public function updatedClassLevelTargetId($value)
+    {
+        if ($value) {
+            $classLevel = \App\Models\ClassLevel::find($value);
+            if ($classLevel && $classLevel->unit_code) {
+                $this->unit_target = $classLevel->unit_code;
+            }
+        }
+    }
+
     public function getClassLevelsProperty()
     {
-        return \App\Models\ClassLevel::orderBy('level_order')->get();
+        return \App\Models\ClassLevel::when($this->unit_target, function ($query) {
+            $query->where('unit_code', $this->unit_target);
+        })->orderBy('level_order')->get();
     }
 
     public function getAffectedBillingsProperty()

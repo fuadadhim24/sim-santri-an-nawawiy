@@ -78,7 +78,9 @@ class StudentForm extends Component
 
     public function getClassLevelsProperty()
     {
-        return ClassLevel::orderBy('level_order')->get();
+        return ClassLevel::when($this->unit_code, function ($query) {
+            $query->where('unit_code', $this->unit_code);
+        })->orderBy('level_order')->get();
     }
 
     public function loadAvailableBillings()
@@ -315,6 +317,7 @@ class StudentForm extends Component
 
     public function updatedUnitCode()
     {
+        $this->class_level_id = '';
         if (!$this->isEdit) {
             $this->loadAvailableBillings();
 

@@ -116,6 +116,15 @@
                             <input wire:model="classLevelOrder" type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                             @error('classLevelOrder') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Unit Jenjang</label>
+                            <select wire:model="classLevelUnit" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="01">SMP (01)</option>
+                                <option value="02">SMA (02)</option>
+                                <option value="03">PPTQ (03)</option>
+                            </select>
+                            @error('classLevelUnit') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <button type="submit" wire:loading.attr="disabled" wire:target="saveClassLevel" class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">

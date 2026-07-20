@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClassLevel extends Model
 {
-    protected $fillable = ['name', 'level_order'];
+    protected $fillable = ['name', 'level_order', 'unit_code'];
 
     public function studyGroups()
     {

@@ -19,6 +19,7 @@ class RombelManagement extends Component
     public $classLevelId;
     public $classLevelName;
     public $classLevelOrder = 0;
+    public $classLevelUnit = '01';
 
     public $studyGroupId;
     public $targetClassLevelId;
@@ -33,6 +34,7 @@ class RombelManagement extends Component
     protected $rules = [
         'classLevelName' => 'required|string|max:255',
         'classLevelOrder' => 'required|integer',
+        'classLevelUnit' => 'required|in:01,02,03',
         'studyGroupName' => 'required|string|max:255',
         'studyGroupCapacity' => 'required|integer|min:1',
     ];
@@ -45,10 +47,12 @@ class RombelManagement extends Component
             $this->classLevelId = $level->id;
             $this->classLevelName = $level->name;
             $this->classLevelOrder = $level->level_order;
+            $this->classLevelUnit = $level->unit_code ?? '01';
         } else {
             $this->classLevelId = null;
             $this->classLevelName = '';
             $this->classLevelOrder = ClassLevel::max('level_order') + 1;
+            $this->classLevelUnit = '01';
         }
         $this->showClassLevelModal = true;
     }
@@ -58,6 +62,7 @@ class RombelManagement extends Component
         $this->validate([
             'classLevelName' => 'required|string|max:255',
             'classLevelOrder' => 'required|integer',
+            'classLevelUnit' => 'required|in:01,02,03',
         ]);
 
         ClassLevel::updateOrCreate(
@@ -65,6 +70,7 @@ class RombelManagement extends Component
             [
                 'name' => $this->classLevelName,
                 'level_order' => $this->classLevelOrder,
+                'unit_code' => $this->classLevelUnit,
             ]
         );
 
