@@ -31,7 +31,7 @@
                         <th class="px-6 py-3">Kategori</th>
                         <th class="px-6 py-3">Nama Biaya</th>
                         <th class="px-6 py-3">Siklus</th>
-                        <th class="px-6 py-3">Target Unit</th>
+                        <th class="px-6 py-3">Target Unit/Kelas</th>
                         <th class="px-6 py-3">Target Tempat Tinggal</th>
                         <th class="px-6 py-3 text-right">Jumlah</th>
                         <th class="px-6 py-3 text-center">Status</th>
@@ -58,7 +58,12 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-muted-foreground">
-                                {{ $fee->unit_target ? ($fee->unit_target == '01' ? 'SMP' : ($fee->unit_target == '02' ? 'SMA' : 'PPTQ')) : 'Semua Unit' }}
+                                <div>{{ $fee->unit_target ? ($fee->unit_target == '01' ? 'SMP' : ($fee->unit_target == '02' ? 'SMA' : 'PPTQ')) : 'Semua Unit' }}</div>
+                                @if($fee->classLevelTarget)
+                                    <div class="text-xs font-semibold text-primary mt-0.5">
+                                        ({{ $fee->classLevelTarget->name }})
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-muted-foreground">
                                 {{ $fee->residence_target ? str_replace('_', ' ', $fee->residence_target) : 'Semua Tempat Tinggal' }}
@@ -123,7 +128,12 @@
             window.Swal.fire({
                 title: 'Konfirmasi Sync Tagihan',
                 html: `
-                    <p class="mb-4">Anda akan men-generate tagihan <b>${data.itemName}</b></p>
+                    <p class="mb-3">Anda akan men-generate tagihan <b>${data.itemName}</b></p>
+                    <div class="bg-gray-50 p-3 rounded-lg mb-4 text-left text-xs text-gray-600 space-y-1">
+                        <div><b>Target Unit:</b> ${data.unitTarget}</div>
+                        <div><b>Target Kelas:</b> ${data.classTarget}</div>
+                        <div><b>Target Domisili:</b> ${data.residenceTarget}</div>
+                    </div>
                     <div class="bg-blue-50 p-4 rounded-lg mb-4 text-left">
                         <span class="block text-sm text-blue-800">Ditemukan santri yang belum mendapat tagihan ini:</span>
                         <span class="block text-2xl font-bold text-blue-900 mt-1">${data.missingCount} Santri</span>

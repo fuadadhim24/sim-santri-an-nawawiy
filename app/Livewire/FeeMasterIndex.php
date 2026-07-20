@@ -21,7 +21,7 @@ class FeeMasterIndex extends Component
 
     public function render()
     {
-        $query = FeeMaster::with('category');
+        $query = FeeMaster::with(['category', 'classLevelTarget']);
 
         if ($this->search) {
             $query->where('item_name', 'like', '%' . $this->search . '%');
@@ -94,6 +94,9 @@ class FeeMasterIndex extends Component
         if ($feeMaster->residence_target) {
             $query->where('residence_status', $feeMaster->residence_target);
         }
+        if ($feeMaster->class_level_target_id) {
+            $query->where('class_level_id', $feeMaster->class_level_target_id);
+        }
 
         $students = $query->get();
         $missingCount = 0;
@@ -127,7 +130,10 @@ class FeeMasterIndex extends Component
         $this->dispatch('confirm-sync-billings', [
             'id' => $feeMaster->id,
             'itemName' => $feeMaster->item_name . $infoRecurrence,
-            'missingCount' => $missingCount
+            'missingCount' => $missingCount,
+            'unitTarget' => $feeMaster->unit_target ? ($feeMaster->unit_target == '01' ? 'SMP' : ($feeMaster->unit_target == '02' ? 'SMA' : 'PPTQ')) : 'Semua Unit',
+            'classTarget' => $feeMaster->classLevelTarget?->name ?? 'Semua Kelas',
+            'residenceTarget' => $feeMaster->residence_target ? str_replace('_', ' ', $feeMaster->residence_target) : 'Semua Tempat Tinggal',
         ]);
     }
 
@@ -144,6 +150,9 @@ class FeeMasterIndex extends Component
         }
         if ($feeMaster->residence_target) {
             $query->where('residence_status', $feeMaster->residence_target);
+        }
+        if ($feeMaster->class_level_target_id) {
+            $query->where('class_level_id', $feeMaster->class_level_target_id);
         }
 
         $students = $query->get();
