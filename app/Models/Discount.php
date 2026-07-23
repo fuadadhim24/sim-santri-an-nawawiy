@@ -21,4 +21,9 @@ class Discount extends Model
     {
         return $this->belongsTo(FeeMaster::class)->withTrashed();
     }
+
+    public function specialStatus(): BelongsTo
+    {
+        return $this->belongsTo(SpecialStatus::class, 'target_status', 'code');
+    }
 }

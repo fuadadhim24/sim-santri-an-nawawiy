@@ -250,11 +250,9 @@
                                     <label for="special_status" class="block text-sm font-medium text-foreground">Status Khusus <span class="text-red-500">*</span></label>
                                     <select wire:model.live="special_status" id="special_status"
                                         class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm disabled:bg-muted disabled:opacity-60 disabled:cursor-not-allowed">
-                                        <option value="UMUM">Umum</option>
-                                        <option value="ANAK_GURU">Anak Guru</option>
-                                        <option value="YATIM">Yatim</option>
-                                        <option value="PRESTASI">Siswa Berprestasi</option>
-                                        <option value="LINGKUNGAN">Lingkungan</option>
+                                        @foreach($this->specialStatuses as $status)
+                                            <option value="{{ $status->code }}">{{ $status->name }}</option>
+                                        @endforeach
                                     </select>
                                     @error('special_status')
                                         <span class="text-destructive text-sm">{{ $message }}</span>

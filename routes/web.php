@@ -97,6 +97,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/discounts/create', \App\Livewire\DiscountForm::class)->name('admin.discounts.create');
         Route::get('/admin/discounts/{discount}/edit', \App\Livewire\DiscountForm::class)->name('admin.discounts.edit');
 
+        Route::get('/admin/special-statuses', \App\Livewire\SpecialStatusIndex::class)->name('admin.special-statuses');
+
         Route::get('/admin/reports/financial', \App\Livewire\FinancialReport::class)->name('admin.reports.financial');
         Route::get('/admin/reports/financial/print', [\App\Http\Controllers\FinancialReportController::class, 'print'])->name('admin.reports.financial.print');
     });

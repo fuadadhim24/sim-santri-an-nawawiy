@@ -20,7 +20,7 @@ class StudentFactory extends Factory
             'full_name' => $this->faker->name(),
             'unit_code' => $this->faker->randomElement(['01', '02', '03']),
             'residence_status' => $this->faker->randomElement(['MONDOK', 'NON_MONDOK', 'NGAJI_ONLY']),
-            'special_status' => $this->faker->randomElement(['UMUM', 'ANAK_GURU', 'YATIM', 'PRESTASI']),
+            'special_status' => fn () => \App\Models\SpecialStatus::inRandomOrder()->first()?->code ?? 'UMUM',
             'class_level_id' => function () {
                 return \App\Models\ClassLevel::inRandomOrder()->first()?->id;
             },

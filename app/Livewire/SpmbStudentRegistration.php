@@ -30,7 +30,6 @@ class SpmbStudentRegistration extends Component
     #[Rule('required|in:MONDOK,NON_MONDOK,NGAJI_ONLY')]
     public $residence_status = 'MONDOK';
 
-    #[Rule('required|in:UMUM,ANAK_GURU,YATIM,PRESTASI,LINGKUNGAN')]
     public $special_status = 'UMUM';
 
     #[Rule('required|exists:class_levels,id')]
@@ -93,6 +92,10 @@ class SpmbStudentRegistration extends Component
 
     public function save(NisGeneratorService $nisService)
     {
+        $validCodes = \App\Models\SpecialStatus::pluck('code')->toArray();
+        $this->validate([
+            'special_status' => 'required|in:' . implode(',', $validCodes),
+        ]);
         $this->validate();
 
         $guardian = $this->guardian;
@@ -140,6 +143,11 @@ class SpmbStudentRegistration extends Component
         session()->flash('message', 'Pendaftaran santri baru berhasil! No. Pendaftaran: ' . $regNumber . '. Silakan tunggu konfirmasi dari admin.');
 
         return redirect()->route('wali.dashboard');
+    }
+
+    public function getSpecialStatusesProperty()
+    {
+        return \App\Models\SpecialStatus::all();
     }
 
     public function render()

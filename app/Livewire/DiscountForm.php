@@ -14,8 +14,7 @@ class DiscountForm extends Component
     #[Rule('required|exists:fee_masters,id')]
     public $fee_master_id = '';
 
-    #[Rule('required|in:ANAK_GURU,YATIM,PRESTASI,LINGKUNGAN')]
-    public $target_status = 'ANAK_GURU';
+    public $target_status = '';
 
     #[Rule('required|numeric|min:0')]
     public $discount_amount = '';
@@ -42,11 +41,17 @@ class DiscountForm extends Component
             $this->target_status = $discount->target_status;
             $this->discount_amount = $discount->discount_amount;
             $this->isEdit = true;
+        } else {
+            $this->target_status = \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->first()?->code ?? '';
         }
     }
 
     public function save()
     {
+        $validCodes = \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->pluck('code')->toArray();
+        $this->validate([
+            'target_status' => 'required|in:' . implode(',', $validCodes),
+        ]);
         $this->validate();
 
         $data = [
@@ -69,6 +74,11 @@ class DiscountForm extends Component
         }
 
         return redirect()->route('admin.discounts');
+    }
+
+    public function getSpecialStatusesProperty()
+    {
+        return \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->get();
     }
 
     public function render()

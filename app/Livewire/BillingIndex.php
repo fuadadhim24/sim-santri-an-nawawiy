@@ -398,4 +398,9 @@ class BillingIndex extends Component
             session()->flash('error', 'Gagal memecah tagihan: ' . $e->getMessage());
         }
     }
+
+    public function getSpecialStatusesProperty()
+    {
+        return \App\Models\SpecialStatus::all();
+    }
 }

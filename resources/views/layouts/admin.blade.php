@@ -120,6 +120,16 @@
                         </svg>
                         Diskon
                     </a>
+
+                    <a href="{{ route('admin.special-statuses') }}"
+                        class="flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.special-statuses*') ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground' }} group transition-colors">
+                        <svg class="mr-3 h-5 w-5 {{ request()->routeIs('admin.special-statuses*') ? 'text-white' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground' }}"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A11.386 11.386 0 0110.089 20c-2.202 0-4.29-.626-6.07-1.728M21 12a3 3 0 11-6 0 3 3 0 016 0zM6 8a3 3 0 11-6 0 3 3 0 016 0zM5.14 12a3 3 0 11-4.898 0 3 3 0 014.898 0z" />
+                        </svg>
+                        Golongan / Status Khusus
+                    </a>
                 @endif
 
                 <div class="pt-4 pb-2">
@@ -504,6 +514,25 @@
                                 <p class="text-xs text-muted-foreground leading-relaxed">
                                     Perubahan nominal diskon atau penghapusan diskon hanya berlaku untuk tagihan baru di masa mendatang. Tagihan belum lunas (unpaid) yang sudah telanjur terbit tidak akan disesuaikan secara otomatis guna menghindari ketidakcocokan pelaporan keuangan.
                                 </p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif(request()->routeIs('admin.special-statuses*'))
+                    <div>
+                        <h4 class="font-semibold text-primary mb-2">Panduan Golongan / Status Khusus</h4>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Kelola golongan dinamis untuk santri Anda agar pemotongan biaya dapat dikonfigurasi secara fleksibel.</p>
+                        <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Proteksi Keamanan Golongan</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Golongan bawaan sistem seperti <strong>UMUM</strong> dikunci karena logika inti aplikasi bergantung padanya. Golongan kustom lainnya dapat Anda tambah, edit, atau hapus secara bebas.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Perubahan Kode Golongan</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Jika Anda mengubah Kode Database suatu golongan, sistem akan secara otomatis memperbarui seluruh data santri dan aturan diskon yang saat ini terhubung dengan kode lama tersebut.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Penghapusan Golongan</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Golongan tidak dapat dihapus jika masih digunakan oleh santri aktif atau aturan diskon aktif untuk menjaga integritas data keuangan.</p>
                             </div>
                         </div>
                     </div>

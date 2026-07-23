@@ -286,6 +286,11 @@ class Student extends Model
         return $this->belongsTo(Guardian::class);
     }
 
+    public function specialStatus(): BelongsTo
+    {
+        return $this->belongsTo(SpecialStatus::class, 'special_status', 'code');
+    }
+
     public function spmbSchedule(): BelongsTo
     {
         return $this->belongsTo(SpmbSchedule::class);

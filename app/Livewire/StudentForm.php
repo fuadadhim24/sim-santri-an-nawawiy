@@ -31,7 +31,6 @@ class StudentForm extends Component
     #[Rule('required|in:MONDOK,NON_MONDOK,NGAJI_ONLY')]
     public $residence_status = 'MONDOK';
 
-    #[Rule('required|in:UMUM,ANAK_GURU,YATIM,PRESTASI,LINGKUNGAN')]
     public $special_status = 'UMUM';
 
     #[Rule('required|exists:class_levels,id')]
@@ -379,6 +378,10 @@ class StudentForm extends Component
     public function save(NisGeneratorService $nisService, \App\Services\BillingService $billingService)
     {
         try {
+            $validCodes = \App\Models\SpecialStatus::pluck('code')->toArray();
+            $this->validate([
+                'special_status' => 'required|in:' . implode(',', $validCodes),
+            ]);
             $this->validate();
             $nisRule = 'required|string|unique:students,nis' . ($this->isEdit ? ',' . $this->student->id : '');
             $this->validate([
@@ -500,6 +503,11 @@ class StudentForm extends Component
     {
         $this->nisCheckStatus = null;
         $this->nisCheckMessage = '';
+    }
+
+    public function getSpecialStatusesProperty()
+    {
+        return \App\Models\SpecialStatus::all();
     }
 
     public function render()

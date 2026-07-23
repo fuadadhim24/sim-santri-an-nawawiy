@@ -68,11 +68,9 @@
                 <select wire:model.live="specialFilter" id="filter-special"
                     class="py-2 px-3 pr-8 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm">
                     <option value="">Semua Golongan</option>
-                    <option value="UMUM">Umum</option>
-                    <option value="ANAK_GURU">Anak Guru</option>
-                    <option value="YATIM">Yatim</option>
-                    <option value="PRESTASI">Siswa Berprestasi</option>
-                    <option value="LINGKUNGAN">Lingkungan</option>
+                    @foreach($this->specialStatuses as $status)
+                        <option value="{{ $status->code }}">{{ $status->name }}</option>
+                    @endforeach
                 </select>
 
                 <!-- Filter Status -->
