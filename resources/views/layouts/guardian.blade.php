@@ -243,8 +243,8 @@
                         <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mendaftarkan calon santri baru ke pesantren.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Pilih Jadwal Tes</span>
-                                <p class="text-xs text-muted-foreground">Pilih jadwal ujian seleksi yang tersedia. Setiap jadwal memiliki batas kuota peserta — jika penuh, pilih jadwal alternatif.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Pilih Status Khusus / Diskon</span>
+                                <p class="text-xs text-muted-foreground">Jika calon santri memenuhi syarat (seperti Anak Yatim atau Kurang Mampu), silakan centang pilihan yang tersedia. Status ini akan masuk dalam peninjauan admin dan tidak langsung memotong tagihan sampai disetujui resmi.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Isi Formulir Pendaftaran</span>
@@ -252,7 +252,7 @@
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Status Pendaftaran</span>
-                                <p class="text-xs text-muted-foreground">Setelah dikirim, status anak akan <strong>pending</strong> hingga diverifikasi oleh admin. Anda akan melihat hasilnya di dashboard.</p>
+                                <p class="text-xs text-muted-foreground">Setelah dikirim, status pendaftaran anak akan <strong>pending</strong> hingga diverifikasi oleh admin. Hasil verifikasi dapat Anda pantau di dashboard.</p>
                             </div>
                         </div>
                     </div>
@@ -262,12 +262,12 @@
                         <p class="text-xs text-muted-foreground leading-relaxed">Halaman ini menampilkan informasi lengkap tentang santri Anda.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Data Santri</span>
-                                <p class="text-xs text-muted-foreground">Lihat profil lengkap santri, rombel (kelas), jenjang pendidikan, dan status penerimaan.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Status Persetujuan Diskon</span>
+                                <p class="text-xs text-muted-foreground">Status khusus yang Anda ajukan saat pendaftaran akan berlabel <strong>(Menunggu)</strong> sebelum disetujui admin. Begitu disetujui resmi, label tersebut akan hilang dan potongan diskon akan otomatis aktif pada tagihan santri.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Riwayat Tagihan</span>
-                                <p class="text-xs text-muted-foreground">Seluruh riwayat tagihan dan pembayaran santri juga ditampilkan di halaman ini.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Data Santri & Tagihan</span>
+                                <p class="text-xs text-muted-foreground">Anda dapat memantau profil lengkap santri, kelas (rombel), jenjang pendidikan, serta daftar tagihan dan riwayat pembayaran lengkap anak Anda di sini.</p>
                             </div>
                         </div>
                     </div>

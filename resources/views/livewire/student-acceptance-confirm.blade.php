@@ -167,7 +167,7 @@
                             <div>
                                  <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider">NIS <span class="text-red-500">*</span></label>
                                  <div class="mt-1.5 flex rounded-lg shadow-sm">
-                                     <input type="text" wire:model="nis" class="flex-1 block w-full rounded-none rounded-l-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Contoh: 2026.01.0001">
+                                     <input type="text" wire:model="nis" class="flex-1 block w-full rounded-none rounded-l-lg border-input bg-background text-sm font-mono text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Contoh: 2627.01.0001">
                                      <button type="button" wire:click="checkNis" class="inline-flex items-center px-4 rounded-r-lg border border-l-0 border-input bg-muted hover:bg-secondary text-sm font-semibold transition-colors focus:outline-none">
                                          Cek NIS
                                      </button>

@@ -523,16 +523,16 @@
                         <p class="text-xs text-muted-foreground leading-relaxed">Kelola golongan dinamis untuk santri Anda agar pemotongan biaya dapat dikonfigurasi secara fleksibel.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Visibilitas Form Wali Santri</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Anda dapat mengatur apakah suatu status khusus (misal: Anak Yatim, Kurang Mampu) dapat dipilih oleh wali santri saat mendaftar lewat kolom switch <strong>Tampilkan ke Wali Santri?</strong>.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Proteksi Keamanan Golongan</span>
                                 <p class="text-xs text-muted-foreground leading-relaxed">Golongan bawaan sistem seperti <strong>UMUM</strong> dikunci karena logika inti aplikasi bergantung padanya. Golongan kustom lainnya dapat Anda tambah, edit, atau hapus secara bebas.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Perubahan Kode Golongan</span>
                                 <p class="text-xs text-muted-foreground leading-relaxed">Jika Anda mengubah Kode Database suatu golongan, sistem akan secara otomatis memperbarui seluruh data santri dan aturan diskon yang saat ini terhubung dengan kode lama tersebut.</p>
-                            </div>
-                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Penghapusan Golongan</span>
-                                <p class="text-xs text-muted-foreground leading-relaxed">Golongan tidak dapat dihapus jika masih digunakan oleh santri aktif atau aturan diskon aktif untuk menjaga integritas data keuangan.</p>
                             </div>
                         </div>
                     </div>
@@ -541,6 +541,10 @@
                         <h4 class="font-semibold text-primary mb-2">Panduan Penerimaan Santri</h4>
                         <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk memvalidasi dan menerima pendaftaran santri baru.</p>
                         <div class="mt-4 space-y-4">
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Persetujuan Status Khusus / Diskon</span>
+                                <p class="text-xs text-muted-foreground">Pilihan status khusus oleh wali ditandai sebagai <strong>Ajuan Wali (Pending)</strong> dan belum memotong tagihan. Pilihan ini akan berubah menjadi <strong>Disetujui</strong> secara permanen saat Anda menekan tombol <strong>Terima Santri</strong>.</p>
+                            </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Syarat Menekan Tombol Terima</span>
                                 <p class="text-xs text-muted-foreground">Tombol <strong>Terima Santri</strong> akan dalam kondisi redup/terkunci jika proses validasi belum selesai. Anda diwajibkan mengklik tombol <strong>Validasi</strong> pada semua baris dokumen fisik (KK, Akta, dll) di kolom tengah sebelum dapat menerima santri.</p>
@@ -561,8 +565,8 @@
                         <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola data santri pesantren.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Alur Penerimaan Santri</span>
-                                <p class="text-xs text-muted-foreground">Santri baru masuk dengan status <strong>pending</strong>. Setelah diverifikasi, admin mengubah status menjadi <strong>diterima</strong>. Saat diterima, tagihan-tagihan wajib akan otomatis digenerate sesuai konfigurasi kategori biaya.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Sistem Approval Status Khusus</span>
+                                <p class="text-xs text-muted-foreground">Status khusus yang diinput langsung oleh admin pada form tambah santri bersifat <strong>auto-approved</strong> (langsung aktif). Sedangkan status khusus yang diajukan oleh wali santri membutuhkan konfirmasi admin di halaman Penerimaan sebelum diskon memotong tagihan.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Detail Santri & Berkas Fisik</span>
@@ -570,13 +574,7 @@
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Status Khusus & Diskon</span>
-                                <p class="text-xs text-muted-foreground">Santri dengan status khusus (Yatim, Anak Guru, Siswa Berprestasi) akan otomatis mendapat potongan tagihan jika sudah diatur di menu Diskon.</p>
-                            </div>
-                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Santri Pindahan (Masuk Pertengahan)</span>
-                                <p class="text-xs text-muted-foreground leading-relaxed">
-                                    Saat menambah santri baru secara manual, Anda dapat menyeleksi secara spesifik tagihan awal mana saja yang ingin diterbitkan. Untuk tagihan rutin (bulanan/semesteran), sistem scheduler hanya akan menerbitkan tagihan untuk bulan berjalan sejak santri aktif, sehingga santri tidak ditagih bulan-bulan lampau secara otomatis.
-                                </p>
+                                <p class="text-xs text-muted-foreground">Santri dengan status khusus (Yatim, Anak Guru, Siswa Berprestasi) akan otomatis mendapat potongan tagihan jika sudah disetujui (Approved) dan aturannya dikonfigurasi di menu Diskon.</p>
                             </div>
                         </div>
                     </div>

@@ -47,7 +47,7 @@
                     <div>
                         <label for="nis" class="block text-sm font-medium text-foreground">NIS <span class="text-red-500">*</span></label>
                         <div class="mt-1 flex rounded-md shadow-sm">
-                            <input wire:model="nis" type="text" id="nis" placeholder="Contoh: 2026.01.0001"
+                            <input wire:model="nis" type="text" id="nis" placeholder="Contoh: 2627.01.0001"
                                 class="flex-1 block w-full px-3 py-2 rounded-none rounded-l-md border border-input bg-background focus:outline-none focus:ring-ring focus:border-ring sm:text-sm">
                             <button type="button" wire:click="checkNis"
                                 class="inline-flex items-center px-4 rounded-r-md border border-l-0 border-input bg-muted hover:bg-secondary hover:text-foreground text-sm font-semibold transition-colors focus:outline-none">
