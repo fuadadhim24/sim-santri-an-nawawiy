@@ -20,13 +20,14 @@ class StudentAcceptanceConfirm extends Component
     public $residence_status;
     public $spmb_schedule_id;
     public $class_level_id;
+    public array $special_statuses = [];
 
     public $nisCheckStatus = null; // 'available', 'taken', 'empty'
     public $nisCheckMessage = '';
 
     public function mount(Student $student)
     {
-        $this->student = $student->load(['guardian', 'spmbSchedule']);
+        $this->student = $student->load(['guardian', 'spmbSchedule', 'specialStatuses']);
         
         $this->full_name = $student->full_name;
         $this->nisn = $student->nisn;
@@ -34,6 +35,7 @@ class StudentAcceptanceConfirm extends Component
         $this->residence_status = $student->residence_status;
         $this->spmb_schedule_id = $student->spmb_schedule_id;
         $this->class_level_id = $student->class_level_id;
+        $this->special_statuses = $this->student->specialStatuses->pluck('code')->toArray();
 
         $this->nis = $student->nis;
         if (!$this->nis) {
@@ -155,6 +157,12 @@ class StudentAcceptanceConfirm extends Component
                 'class_level_id' => $this->class_level_id,
             ]);
 
+            // Sync status khusus dengan is_approved = true (tanda disetujui admin)
+            $statusCodes = collect($this->special_statuses)->filter(fn($c) => !empty($c))->unique()->toArray();
+            $this->student->specialStatuses()->sync(
+                collect($statusCodes)->mapWithKeys(fn($code) => [$code => ['is_approved' => true]])->toArray()
+            );
+
             $this->student->update(['is_active' => true]);
             $this->student->markAsAccepted();
             $this->student->refresh();
@@ -225,6 +233,11 @@ class StudentAcceptanceConfirm extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menolak santri: ' . $e->getMessage());
         }
+    }
+
+    public function getSpecialStatusesProperty()
+    {
+        return \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->orderBy('name')->get();
     }
 
     public function render()

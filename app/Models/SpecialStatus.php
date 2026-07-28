@@ -13,9 +13,11 @@ class SpecialStatus extends Model
         'name',
         'description',
         'is_system',
+        'is_visible',
     ];
 
     protected $casts = [
         'is_system' => 'boolean',
+        'is_visible' => 'boolean',
     ];
 }

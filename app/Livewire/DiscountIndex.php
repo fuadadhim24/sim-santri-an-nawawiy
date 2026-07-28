@@ -28,7 +28,7 @@ class DiscountIndex extends Component
             $affectedCount = \App\Models\Billing::where('fee_master_id', $feeMaster->id)
                 ->where('status', 'UNPAID')
                 ->whereHas('student', function ($q) use ($discount) {
-                    $q->whereHas('specialStatuses', function ($ssq) use ($discount) {
+                    $q->whereHas('approvedSpecialStatuses', function ($ssq) use ($discount) {
                         $ssq->where('special_statuses.code', $discount->target_status);
                     });
                 })

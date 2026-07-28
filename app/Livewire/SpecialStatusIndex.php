@@ -21,6 +21,7 @@ class SpecialStatusIndex extends Component
     public $name = '';
     public $description = '';
     public $is_system = false;
+    public $is_visible = true;
 
     protected $rules = [
         'code' => 'required|string|max:50',
@@ -42,6 +43,7 @@ class SpecialStatusIndex extends Component
             'name' => '',
             'description' => '',
             'isSystem' => false,
+            'isVisible' => true,
         ]);
     }
 
@@ -55,10 +57,11 @@ class SpecialStatusIndex extends Component
             'name' => $status->name,
             'description' => $status->description,
             'isSystem' => $status->is_system,
+            'isVisible' => $status->is_visible,
         ]);
     }
 
-    public function saveData($id, $code, $name, $description)
+    public function saveData($id, $code, $name, $description, $is_visible = true)
     {
         $originalCodeInput = $code;
         $status = $id ? SpecialStatus::find($id) : null;
@@ -103,6 +106,7 @@ class SpecialStatusIndex extends Component
                 'name' => $name,
                 'description' => $description,
                 'isSystem' => $isSystem,
+                'isVisible' => $is_visible,
             ]);
             return;
         }
@@ -110,6 +114,7 @@ class SpecialStatusIndex extends Component
         if ($id) {
             $updateData = [
                 'description' => $description,
+                'is_visible' => $is_visible,
             ];
 
             if (!$isSystem) {
@@ -146,6 +151,7 @@ class SpecialStatusIndex extends Component
                 'name' => $name,
                 'description' => $description,
                 'is_system' => false,
+                'is_visible' => $is_visible,
             ]);
 
             $this->dispatch('swal:success', [

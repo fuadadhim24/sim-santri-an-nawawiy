@@ -171,8 +171,8 @@ class FeeMasterIndex extends Component
 
             if (!$billingQuery->exists()) {
                 $discountAmount = 0;
-                if ($student->hasAnySpecialStatus()) {
-                    $statusCodes = $student->getSpecialStatusCodes();
+                if ($student->hasAnyApprovedSpecialStatus()) {
+                    $statusCodes = $student->getApprovedSpecialStatusCodes();
                     $discountAmount = \App\Models\Discount::where('fee_master_id', $feeMaster->id)
                         ->whereIn('target_status', $statusCodes)
                         ->sum('discount_amount');

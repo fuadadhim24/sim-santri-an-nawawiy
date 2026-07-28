@@ -106,7 +106,18 @@
                             @if($student->specialStatuses->isNotEmpty())
                                 <span class="flex flex-wrap gap-1">
                                     @foreach($student->specialStatuses as $ss)
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ $ss->name }}</span>
+                                        @if($ss->pivot->is_approved)
+                                            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700"
+                                                  title="Status aktif & disetujui">
+                                                {{ $ss->name }}
+                                            </span>
+                                        @else
+                                            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 border border-amber-300"
+                                                  title="Menunggu persetujuan admin">
+                                                {{ $ss->name }}
+                                                <span class="opacity-75">(Menunggu)</span>
+                                            </span>
+                                        @endif
                                     @endforeach
                                 </span>
                             @else

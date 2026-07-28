@@ -61,8 +61,8 @@ class BillingService
         $totalDiscount = 0;
         $discounts = collect();
 
-        if ($student->hasAnySpecialStatus()) {
-            $statusCodes = $student->getSpecialStatusCodes();
+        if ($student->hasAnyApprovedSpecialStatus()) {
+            $statusCodes = $student->getApprovedSpecialStatusCodes();
             $feeIds = $fees->pluck('id');
             $discounts = Discount::whereIn('fee_master_id', $feeIds)
                 ->whereIn('target_status', $statusCodes)
@@ -74,7 +74,7 @@ class BillingService
             $amount = $fee->amount;
             $discountAmount = 0;
 
-            if ($student->hasAnySpecialStatus()) {
+            if ($student->hasAnyApprovedSpecialStatus()) {
                 $feeDiscounts = $discounts[$fee->id] ?? collect();
                 foreach ($feeDiscounts as $d) {
                     $discountAmount += $d->discount_amount;
@@ -194,11 +194,11 @@ class BillingService
      */
     private function loadDiscountsForFees($fees, Student $student)
     {
-        if (!$student->hasAnySpecialStatus() || $fees->isEmpty()) {
+        if (!$student->hasAnyApprovedSpecialStatus() || $fees->isEmpty()) {
             return collect();
         }
 
-        $statusCodes = $student->getSpecialStatusCodes();
+        $statusCodes = $student->getApprovedSpecialStatusCodes();
         $feeIds = $fees->pluck('id');
         return Discount::whereIn('fee_master_id', $feeIds)
             ->whereIn('target_status', $statusCodes)
@@ -225,7 +225,7 @@ class BillingService
         $amount = $fee->amount;
         $discountAmount = 0;
 
-        if ($student->hasAnySpecialStatus()) {
+        if ($student->hasAnyApprovedSpecialStatus()) {
             if ($discounts !== null) {
                 // discounts is now grouped by fee_master_id
                 $feeDiscounts = $discounts[$fee->id] ?? collect();
@@ -233,7 +233,7 @@ class BillingService
                     $discountAmount += $d->discount_amount;
                 }
             } else {
-                $statusCodes = $student->getSpecialStatusCodes();
+                $statusCodes = $student->getApprovedSpecialStatusCodes();
                 $discountAmount = Discount::where('fee_master_id', $fee->id)
                     ->whereIn('target_status', $statusCodes)
                     ->sum('discount_amount');
@@ -314,8 +314,8 @@ class BillingService
         $totalAmount = $feeMaster->amount;
         $totalDiscount = 0;
 
-        if ($student->hasAnySpecialStatus()) {
-            $statusCodes = $student->getSpecialStatusCodes();
+        if ($student->hasAnyApprovedSpecialStatus()) {
+            $statusCodes = $student->getApprovedSpecialStatusCodes();
             $totalDiscount = Discount::where('fee_master_id', $feeMaster->id)
                 ->whereIn('target_status', $statusCodes)
                 ->sum('discount_amount');

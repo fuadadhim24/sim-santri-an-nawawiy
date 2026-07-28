@@ -43,6 +43,7 @@
                                 <th scope="col" class="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Kode Database</th>
                                 <th scope="col" class="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Nama Golongan</th>
                                 <th scope="col" class="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Deskripsi</th>
+                                <th scope="col" class="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Tampilkan ke Wali?</th>
                                 <th scope="col" class="relative px-6 py-3.5">
                                     <span class="sr-only">Aksi</span>
                                 </th>
@@ -62,6 +63,21 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm text-muted-foreground">
                                         {{ $status->description ?: '-' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                                        @if($status->code === 'UMUM')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-800" title="Selalu disembunyikan">
+                                                -
+                                            </span>
+                                        @elseif($status->is_visible)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">
+                                                Ya
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">
+                                                Tidak
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex justify-end gap-3">
@@ -115,6 +131,7 @@
         const name = data.name || '';
         const description = data.description || '';
         const isSystem = data.isSystem;
+        const isVisible = data.isVisible !== false;
 
         window.Swal.fire({
             title: isEdit ? 'Edit Golongan' : 'Tambah Golongan Baru',
@@ -140,6 +157,10 @@
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm text-black bg-white" 
                             placeholder="Tulis kriteria singkat..." rows="3">${description}</textarea>
                     </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <input id="swal_visible" type="checkbox" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" ${isVisible ? 'checked' : ''}>
+                        <label for="swal_visible" class="text-sm font-semibold text-gray-700 cursor-pointer select-none">Tampilkan opsi ini ke Wali Santri saat registrasi</label>
+                    </div>
                 </div>
             `,
             showCancelButton: true,
@@ -153,6 +174,7 @@
                 const inputCode = document.getElementById('swal_code').value.trim();
                 const inputName = document.getElementById('swal_name').value.trim();
                 const inputDesc = document.getElementById('swal_desc').value.trim();
+                const inputVisible = document.getElementById('swal_visible').checked;
 
                 if (!isSystem) {
                     if (!inputCode) {
@@ -165,11 +187,11 @@
                     }
                 }
 
-                return { code: inputCode, name: inputName, description: inputDesc };
+                return { code: inputCode, name: inputName, description: inputDesc, isVisible: inputVisible };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                $wire.saveData(id, result.value.code, result.value.name, result.value.description);
+                $wire.saveData(id, result.value.code, result.value.name, result.value.description, result.value.isVisible);
             }
         });
     });

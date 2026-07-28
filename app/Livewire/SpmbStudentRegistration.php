@@ -150,11 +150,11 @@ class SpmbStudentRegistration extends Component
 
         $newStudent = Student::create($data);
 
-        // Sync status khusus ke pivot table
+        // Sync status khusus ke pivot table dengan is_approved = false (menunggu persetujuan admin)
         $statusCodes = collect($this->special_statuses)->filter(fn($c) => !empty($c))->unique()->toArray();
         if (!empty($statusCodes)) {
             $newStudent->specialStatuses()->sync(
-                collect($statusCodes)->mapWithKeys(fn($code) => [$code => []])->toArray()
+                collect($statusCodes)->mapWithKeys(fn($code) => [$code => ['is_approved' => false]])->toArray()
             );
         }
 
@@ -168,7 +168,10 @@ class SpmbStudentRegistration extends Component
 
     public function getSpecialStatusesProperty()
     {
-        return \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->orderBy('name')->get();
+        return \App\Models\SpecialStatus::where('code', '!=', 'UMUM')
+            ->where('is_visible', true)
+            ->orderBy('name')
+            ->get();
     }
 
     public function render()

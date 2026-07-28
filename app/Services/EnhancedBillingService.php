@@ -100,8 +100,8 @@ class EnhancedBillingService
                 $totalOriginalAmount += $fee->amount;
             }
 
-            if ($student->hasAnySpecialStatus()) {
-                $statusCodes = $student->getSpecialStatusCodes();
+            if ($student->hasAnyApprovedSpecialStatus()) {
+                $statusCodes = $student->getApprovedSpecialStatusCodes();
                 $feeIds = $fees->pluck('id');
                 $discounts = Discount::whereIn('fee_master_id', $feeIds)
                     ->whereIn('target_status', $statusCodes)

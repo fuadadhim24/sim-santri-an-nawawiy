@@ -480,13 +480,13 @@ class StudentForm extends Component
             // Ambil status LAMA sebelum sync
             $oldCodes = $this->student->specialStatuses->pluck('code')->sort()->values()->toArray();
 
-            // Sync status khusus ke pivot table
+            // Sync status khusus ke pivot table dengan is_approved = true (karena dilakukan oleh Admin)
             $statusCodes = collect($this->special_statuses)
                 ->filter(fn($c) => !empty($c))
                 ->unique()
                 ->toArray();
             $this->student->specialStatuses()->sync(
-                collect($statusCodes)->mapWithKeys(fn($code) => [$code => []])->toArray()
+                collect($statusCodes)->mapWithKeys(fn($code) => [$code => ['is_approved' => true]])->toArray()
             );
 
             // Recalculate tagihan UNPAID hanya jika status benar-benar berubah
@@ -505,14 +505,14 @@ class StudentForm extends Component
 
             $newStudent = Student::create($data);
 
-            // Sync status khusus ke pivot table
+            // Sync status khusus ke pivot table dengan is_approved = true (karena dilakukan oleh Admin)
             $statusCodes = collect($this->special_statuses)
                 ->filter(fn($c) => !empty($c))
                 ->unique()
                 ->toArray();
             if (!empty($statusCodes)) {
                 $newStudent->specialStatuses()->sync(
-                    collect($statusCodes)->mapWithKeys(fn($code) => [$code => []])->toArray()
+                    collect($statusCodes)->mapWithKeys(fn($code) => [$code => ['is_approved' => true]])->toArray()
                 );
             }
 

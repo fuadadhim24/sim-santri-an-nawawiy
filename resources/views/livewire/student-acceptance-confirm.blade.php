@@ -235,6 +235,46 @@
                                 </select>
                                 @error('spmb_schedule_id') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
                             </div>
+
+                            <div class="md:col-span-2 border-t border-border pt-4">
+                                <label class="text-xs text-muted-foreground font-semibold uppercase tracking-wider block mb-2">Status Khusus / Golongan Diskon</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-muted/20 p-4 rounded-lg border border-border">
+                                    @foreach($this->specialStatuses as $status)
+                                        @php
+                                            $originalStatus = $student->specialStatuses->firstWhere('code', $status->code);
+                                            $isPending = $originalStatus && !$originalStatus->pivot->is_approved;
+                                        @endphp
+                                        <label class="flex items-center gap-2.5 cursor-pointer p-2 rounded-md hover:bg-muted/40 transition-colors">
+                                            <input type="checkbox"
+                                                wire:model="special_statuses"
+                                                value="{{ $status->code }}"
+                                                class="w-4 h-4 rounded border-input text-primary focus:ring-ring">
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-medium text-foreground">
+                                                    {{ $status->name }}
+                                                </span>
+                                                <span class="text-xs text-muted-foreground">
+                                                    {{ $status->description }}
+                                                </span>
+                                                @if($isPending)
+                                                    <span class="mt-1 self-start inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                                        Ajuan Wali (Pending)
+                                                    </span>
+                                                @elseif($originalStatus && $originalStatus->pivot->is_approved)
+                                                    <span class="mt-1 self-start inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                        Disetujui
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                    @if(count($this->specialStatuses) === 0)
+                                        <span class="text-xs text-muted-foreground col-span-2">Tidak ada status khusus tersedia</span>
+                                    @endif
+                                </div>
+                                <p class="text-[10px] text-muted-foreground mt-2">Daftar status khusus di atas disinkronisasikan sebagai status yang "Disetujui" (Approved) begitu pendaftaran calon santri diterima. Tagihan awal yang diterbitkan di bawah ini akan otomatis dikurangi diskon yang disetujui.</p>
+                                @error('special_statuses') <span class="text-xs text-destructive mt-1 block">{{ $message }}</span> @enderror
+                            </div>
                         </div>
                     </div>
                 </div>

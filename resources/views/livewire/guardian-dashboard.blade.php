@@ -206,9 +206,18 @@
                             {{ $student->is_active ? 'Aktif' : 'Tidak Aktif' }}
                         </span>
                         @foreach($student->specialStatuses as $ss)
-                            <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">
-                                {{ $ss->name }}
-                            </span>
+                            @if($ss->pivot->is_approved)
+                                <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700"
+                                      title="Status khusus aktif & disetujui">
+                                    {{ $ss->name }}
+                                </span>
+                            @else
+                                <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-700 border border-amber-300"
+                                      title="Menunggu persetujuan admin">
+                                    {{ $ss->name }}
+                                    <span class="opacity-75">(Menunggu)</span>
+                                </span>
+                            @endif
                         @endforeach
                     </div>
                 </div>

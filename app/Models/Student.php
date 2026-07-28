@@ -111,7 +111,7 @@ class Student extends Model
         static::created(function (Student $student) {
             // Backward compatibility fallback for seeders and factories:
             if (!empty($student->special_status) && $student->special_status !== 'UMUM') {
-                $student->specialStatuses()->syncWithoutDetaching([$student->special_status]);
+                $student->specialStatuses()->syncWithoutDetaching([$student->special_status => ['is_approved' => true]]);
             }
         });
 
@@ -121,7 +121,7 @@ class Student extends Model
                 if (empty($student->special_status) || $student->special_status === 'UMUM') {
                     $student->specialStatuses()->detach();
                 } else {
-                    $student->specialStatuses()->sync([$student->special_status]);
+                    $student->specialStatuses()->sync([$student->special_status => ['is_approved' => true]]);
                 }
             }
         });
@@ -318,7 +318,15 @@ class Student extends Model
             'status_code',
             'id',
             'code'
-        )->withTimestamps();
+        )->withPivot('is_approved')->withTimestamps();
+    }
+
+    /**
+     * Relasi helper untuk status khusus yang sudah disetujui saja.
+     */
+    public function approvedSpecialStatuses(): BelongsToMany
+    {
+        return $this->specialStatuses()->wherePivot('is_approved', true);
     }
 
     /**
@@ -335,6 +343,22 @@ class Student extends Model
     public function getSpecialStatusCodes(): \Illuminate\Support\Collection
     {
         return $this->specialStatuses->pluck('code');
+    }
+
+    /**
+     * Cek apakah santri punya setidaknya satu status khusus yang disetujui (is_approved = true).
+     */
+    public function hasAnyApprovedSpecialStatus(): bool
+    {
+        return $this->approvedSpecialStatuses->isNotEmpty();
+    }
+
+    /**
+     * Ambil semua kode status khusus yang disetujui sebagai Collection.
+     */
+    public function getApprovedSpecialStatusCodes(): \Illuminate\Support\Collection
+    {
+        return $this->approvedSpecialStatuses->pluck('code');
     }
 
     public function spmbSchedule(): BelongsTo
