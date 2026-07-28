@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Billing;
+use App\Models\ClassLevel;
 use App\Models\Student;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\Auth;
@@ -63,19 +64,19 @@ class BillingIndex extends Component
 
     /**
      * Get daftar kelas berdasarkan unit yang dipilih.
+     * Menggunakan tabel class_levels agar konsisten dengan Manajemen Rombel.
      */
     public function getClassOptionsProperty(): array
     {
-        $query = Student::query();
+        $query = ClassLevel::query();
 
         if ($this->unitFilter) {
             $query->where('unit_code', $this->unitFilter);
         }
 
-        return $query->whereNotNull('class_name')
-            ->distinct()
-            ->orderBy('class_name')
-            ->pluck('class_name')
+        return $query->orderBy('level_order')
+            ->orderBy('name')
+            ->pluck('name')
             ->toArray();
     }
 
@@ -105,7 +106,9 @@ class BillingIndex extends Component
 
         if ($this->classFilter) {
             $query->whereHas('student', function ($sq) {
-                $sq->where('class_name', $this->classFilter);
+                $sq->whereHas('classLevel', function ($cq) {
+                    $cq->where('name', $this->classFilter);
+                });
             });
         }
 
@@ -208,10 +211,12 @@ class BillingIndex extends Component
             });
         }
 
-        // Filter by kelas
+        // Filter by kelas (menggunakan relasi ClassLevel, bukan class_name legacy)
         if ($this->classFilter) {
             $query->whereHas('student', function ($sq) {
-                $sq->where('class_name', $this->classFilter);
+                $sq->whereHas('classLevel', function ($cq) {
+                    $cq->where('name', $this->classFilter);
+                });
             });
         }
 
@@ -257,7 +262,9 @@ class BillingIndex extends Component
                     $sq->where('unit_code', $this->unitFilter);
                 }
                 if ($this->classFilter) {
-                    $sq->where('class_name', $this->classFilter);
+                    $sq->whereHas('classLevel', function ($cq) {
+                        $cq->where('name', $this->classFilter);
+                    });
                 }
                 if ($this->specialFilter) {
                     $sq->whereHas('specialStatuses', function ($ssq) {
