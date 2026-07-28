@@ -111,7 +111,9 @@ class BillingIndex extends Component
 
         if ($this->specialFilter) {
             $query->whereHas('student', function ($sq) {
-                $sq->where('special_status', $this->specialFilter);
+                $sq->whereHas('specialStatuses', function ($ssq) {
+                    $ssq->where('special_statuses.code', $this->specialFilter);
+                });
             });
         }
 
@@ -216,7 +218,9 @@ class BillingIndex extends Component
         // Filter by golongan (special_status)
         if ($this->specialFilter) {
             $query->whereHas('student', function ($sq) {
-                $sq->where('special_status', $this->specialFilter);
+                $sq->whereHas('specialStatuses', function ($ssq) {
+                    $ssq->where('special_statuses.code', $this->specialFilter);
+                });
             });
         }
 
@@ -256,7 +260,9 @@ class BillingIndex extends Component
                     $sq->where('class_name', $this->classFilter);
                 }
                 if ($this->specialFilter) {
-                    $sq->where('special_status', $this->specialFilter);
+                    $sq->whereHas('specialStatuses', function ($ssq) {
+                        $ssq->where('special_statuses.code', $this->specialFilter);
+                    });
                 }
             });
         }

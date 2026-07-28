@@ -6,6 +6,7 @@ use App\Enums\StudentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -48,7 +49,7 @@ class Student extends Model
         'registration_number',
         'unit_code',
         'residence_status',
-        'special_status',
+        // special_status dihapus dari fillable — sekarang pakai pivot table student_special_statuses
         'kk',
         'foto',
         'nisn',
@@ -105,6 +106,24 @@ class Student extends Model
                 'deleted_at' => now(),
                 'force_delete' => $student->isForceDeleting(),
             ]);
+        });
+
+        static::created(function (Student $student) {
+            // Backward compatibility fallback for seeders and factories:
+            if (!empty($student->special_status) && $student->special_status !== 'UMUM') {
+                $student->specialStatuses()->syncWithoutDetaching([$student->special_status]);
+            }
+        });
+
+        static::updated(function (Student $student) {
+            // Backward compatibility fallback if special_status column is updated directly
+            if ($student->wasChanged('special_status')) {
+                if (empty($student->special_status) || $student->special_status === 'UMUM') {
+                    $student->specialStatuses()->detach();
+                } else {
+                    $student->specialStatuses()->sync([$student->special_status]);
+                }
+            }
         });
     }
 
@@ -286,9 +305,36 @@ class Student extends Model
         return $this->belongsTo(Guardian::class);
     }
 
-    public function specialStatus(): BelongsTo
+    /**
+     * Relasi many-to-many ke SpecialStatus via tabel pivot student_special_statuses.
+     * Satu santri bisa punya lebih dari satu status khusus.
+     */
+    public function specialStatuses(): BelongsToMany
     {
-        return $this->belongsTo(SpecialStatus::class, 'special_status', 'code');
+        return $this->belongsToMany(
+            SpecialStatus::class,
+            'student_special_statuses',
+            'student_id',
+            'status_code',
+            'id',
+            'code'
+        )->withTimestamps();
+    }
+
+    /**
+     * Cek apakah santri punya setidaknya satu status khusus (non-UMUM).
+     */
+    public function hasAnySpecialStatus(): bool
+    {
+        return $this->specialStatuses->isNotEmpty();
+    }
+
+    /**
+     * Ambil semua kode status santri sebagai Collection.
+     */
+    public function getSpecialStatusCodes(): \Illuminate\Support\Collection
+    {
+        return $this->specialStatuses->pluck('code');
     }
 
     public function spmbSchedule(): BelongsTo

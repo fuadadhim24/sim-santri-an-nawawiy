@@ -127,14 +127,20 @@
 
                     <!-- Special Status -->
                     <div>
-                        <label for="special_status" class="block text-sm font-semibold text-foreground mb-1.5">Status Khusus <span class="text-red-500">*</span></label>
-                        <select wire:model="special_status" id="special_status"
-                            class="w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors">
+                        <label class="block text-sm font-semibold text-foreground mb-1.5">Status Khusus</label>
+                        <div class="space-y-2">
                             @foreach($this->specialStatuses as $status)
-                                <option value="{{ $status->code }}">{{ $status->name }}</option>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox"
+                                        wire:model="special_statuses"
+                                        value="{{ $status->code }}"
+                                        id="spmb_status_{{ $status->code }}"
+                                        class="w-4 h-4 rounded border-border text-primary focus:ring-ring transition-colors">
+                                    <span class="text-sm text-foreground">{{ $status->name }}</span>
+                                </label>
                             @endforeach
-                        </select>
-                        @error('special_status')
+                        </div>
+                        @error('special_statuses')
                             <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
                         @enderror
                     </div>

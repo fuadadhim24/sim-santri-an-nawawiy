@@ -102,7 +102,17 @@
                     </div>
                     <div class="grid grid-cols-3">
                         <span class="text-muted-foreground">Status Khusus</span>
-                        <span class="col-span-2 text-foreground">{{ $student->special_status }}</span>
+                        <span class="col-span-2 text-foreground">
+                            @if($student->specialStatuses->isNotEmpty())
+                                <span class="flex flex-wrap gap-1">
+                                    @foreach($student->specialStatuses as $ss)
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{{ $ss->name }}</span>
+                                    @endforeach
+                                </span>
+                            @else
+                                <span class="text-muted-foreground">UMUM</span>
+                            @endif
+                        </span>
                     </div>
                     <div class="grid grid-cols-3">
                         <span class="text-muted-foreground">Alamat</span>

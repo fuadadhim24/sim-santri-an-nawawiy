@@ -247,14 +247,23 @@
                             <!-- Special Status & Class Level -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="special_status" class="block text-sm font-medium text-foreground">Status Khusus <span class="text-red-500">*</span></label>
-                                    <select wire:model.live="special_status" id="special_status"
-                                        class="mt-1 block w-full px-3 py-2 border border-input bg-background rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm disabled:bg-muted disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <label class="block text-sm font-medium text-foreground">Status Khusus</label>
+                                    <div class="mt-2 space-y-2">
                                         @foreach($this->specialStatuses as $status)
-                                            <option value="{{ $status->code }}">{{ $status->name }}</option>
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input type="checkbox"
+                                                    wire:model.live="special_statuses"
+                                                    value="{{ $status->code }}"
+                                                    id="status_{{ $status->code }}"
+                                                    class="w-4 h-4 rounded border-input text-primary focus:ring-ring">
+                                                <span class="text-sm text-foreground">{{ $status->name }}</span>
+                                            </label>
                                         @endforeach
-                                    </select>
-                                    @error('special_status')
+                                        @if($this->specialStatuses->isEmpty())
+                                            <span class="text-sm text-muted-foreground">Tidak ada status khusus tersedia</span>
+                                        @endif
+                                    </div>
+                                    @error('special_statuses')
                                         <span class="text-destructive text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>

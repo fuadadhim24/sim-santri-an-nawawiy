@@ -18,19 +18,9 @@ class StudentObserver
 
     public function updated(Student $student): void
     {
-        if ($student->wasChanged('special_status')) {
-            $oldStatus = $student->getOriginal('special_status');
-            $newStatus = $student->special_status;
-
-            $count = $this->billingService->recalculateStudentBillings($student);
-
-            Log::info('Student special_status changed: recalculated billings', [
-                'student_id' => $student->id,
-                'old_status' => $oldStatus,
-                'new_status' => $newStatus,
-                'billings_updated' => $count,
-            ]);
-        }
+        // Perubahan special statuses kini dihandle langsung oleh StudentForm
+        // via $student->specialStatuses()->sync() setelah save.
+        // Observer ini tidak perlu deteksi perubahan pivot (ManyToMany tidak trigger wasChanged).
 
         if ($student->wasChanged('status')) {
             $oldStatus = $student->getOriginal('status');

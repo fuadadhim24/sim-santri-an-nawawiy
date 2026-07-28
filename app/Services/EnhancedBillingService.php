@@ -100,16 +100,17 @@ class EnhancedBillingService
                 $totalOriginalAmount += $fee->amount;
             }
 
-            if ($student->special_status !== 'UMUM') {
+            if ($student->hasAnySpecialStatus()) {
+                $statusCodes = $student->getSpecialStatusCodes();
                 $feeIds = $fees->pluck('id');
                 $discounts = Discount::whereIn('fee_master_id', $feeIds)
-                    ->where('target_status', $student->special_status)
+                    ->whereIn('target_status', $statusCodes)
                     ->get()
-                    ->keyBy('fee_master_id');
+                    ->groupBy('fee_master_id');
 
                 foreach ($fees as $fee) {
-                    $discount = $discounts[$fee->id] ?? null;
-                    if ($discount) {
+                    $feeDiscounts = $discounts[$fee->id] ?? collect();
+                    foreach ($feeDiscounts as $discount) {
                         $totalDiscount += $discount->discount_amount;
                     }
                 }

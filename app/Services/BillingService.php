@@ -61,22 +61,23 @@ class BillingService
         $totalDiscount = 0;
         $discounts = collect();
 
-        if ($student->special_status !== 'UMUM') {
+        if ($student->hasAnySpecialStatus()) {
+            $statusCodes = $student->getSpecialStatusCodes();
             $feeIds = $fees->pluck('id');
             $discounts = Discount::whereIn('fee_master_id', $feeIds)
-                ->where('target_status', $student->special_status)
+                ->whereIn('target_status', $statusCodes)
                 ->get()
-                ->keyBy('fee_master_id');
+                ->groupBy('fee_master_id');
         }
 
         foreach ($fees as $fee) {
             $amount = $fee->amount;
             $discountAmount = 0;
 
-            if ($student->special_status !== 'UMUM') {
-                $discount = $discounts[$fee->id] ?? null;
-                if ($discount) {
-                    $discountAmount = $discount->discount_amount;
+            if ($student->hasAnySpecialStatus()) {
+                $feeDiscounts = $discounts[$fee->id] ?? collect();
+                foreach ($feeDiscounts as $d) {
+                    $discountAmount += $d->discount_amount;
                 }
             }
 
@@ -193,15 +194,16 @@ class BillingService
      */
     private function loadDiscountsForFees($fees, Student $student)
     {
-        if ($student->special_status === 'UMUM' || $fees->isEmpty()) {
+        if (!$student->hasAnySpecialStatus() || $fees->isEmpty()) {
             return collect();
         }
 
+        $statusCodes = $student->getSpecialStatusCodes();
         $feeIds = $fees->pluck('id');
         return Discount::whereIn('fee_master_id', $feeIds)
-            ->where('target_status', $student->special_status)
+            ->whereIn('target_status', $statusCodes)
             ->get()
-            ->keyBy('fee_master_id');
+            ->groupBy('fee_master_id');
     }
 
     /**
@@ -223,18 +225,23 @@ class BillingService
         $amount = $fee->amount;
         $discountAmount = 0;
 
-        if ($student->special_status !== 'UMUM') {
-            if ($discounts && isset($discounts[$fee->id])) {
-                $discountAmount = $discounts[$fee->id]->discount_amount;
-            } elseif ($discounts === null) {
-                $discount = Discount::where('fee_master_id', $fee->id)
-                    ->where('target_status', $student->special_status)
-                    ->first();
-
-                if ($discount) {
-                    $discountAmount = $discount->discount_amount;
+        if ($student->hasAnySpecialStatus()) {
+            if ($discounts !== null) {
+                // discounts is now grouped by fee_master_id
+                $feeDiscounts = $discounts[$fee->id] ?? collect();
+                foreach ($feeDiscounts as $d) {
+                    $discountAmount += $d->discount_amount;
                 }
+            } else {
+                $statusCodes = $student->getSpecialStatusCodes();
+                $discountAmount = Discount::where('fee_master_id', $fee->id)
+                    ->whereIn('target_status', $statusCodes)
+                    ->sum('discount_amount');
             }
+        }
+
+        if ($discountAmount > $amount) {
+            $discountAmount = $amount;
         }
 
         $finalAmount = max(0, $amount - $discountAmount);
@@ -307,14 +314,15 @@ class BillingService
         $totalAmount = $feeMaster->amount;
         $totalDiscount = 0;
 
-        if ($student->special_status !== 'UMUM') {
-            $discount = Discount::where('fee_master_id', $feeMaster->id)
-                ->where('target_status', $student->special_status)
-                ->first();
+        if ($student->hasAnySpecialStatus()) {
+            $statusCodes = $student->getSpecialStatusCodes();
+            $totalDiscount = Discount::where('fee_master_id', $feeMaster->id)
+                ->whereIn('target_status', $statusCodes)
+                ->sum('discount_amount');
+        }
 
-            if ($discount) {
-                $totalDiscount = $discount->discount_amount;
-            }
+        if ($totalDiscount > $totalAmount) {
+            $totalDiscount = $totalAmount;
         }
 
         $finalAmount = max(0, $totalAmount - $totalDiscount);

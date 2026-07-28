@@ -205,11 +205,11 @@
                         <span class="text-xs px-2 py-0.5 rounded-full font-medium {{ $student->is_active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground' }}">
                             {{ $student->is_active ? 'Aktif' : 'Tidak Aktif' }}
                         </span>
-                        @if ($student->special_status !== 'UMUM')
+                        @foreach($student->specialStatuses as $ss)
                             <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">
-                                {{ $student->specialStatus?->name ?? str_replace('_', ' ', $student->special_status) }}
+                                {{ $ss->name }}
                             </span>
-                        @endif
+                        @endforeach
                     </div>
                 </div>
             @endforeach

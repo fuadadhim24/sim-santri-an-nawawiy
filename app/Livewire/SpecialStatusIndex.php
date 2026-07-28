@@ -119,11 +119,15 @@ class SpecialStatusIndex extends Component
 
                 if ($oldCode !== $newCode) {
                     \Illuminate\Support\Facades\DB::transaction(function () use ($status, $oldCode, $newCode, $updateData) {
+                        // 1. Update legacy column in students table
                         \App\Models\Student::where('special_status', $oldCode)->update(['special_status' => $newCode]);
-                        \App\Models\Discount::where('target_status', $oldCode)->update(['target_status' => $newCode]);
-                        
+
+                        // 2. Update parent record (triggers ON UPDATE CASCADE on pivot table student_special_statuses)
                         $updateData['code'] = $newCode;
                         $status->update($updateData);
+
+                        // 3. Update Discount table manually
+                        \App\Models\Discount::where('target_status', $oldCode)->update(['target_status' => $newCode]);
                     });
                 } else {
                     $status->update($updateData);
@@ -164,7 +168,9 @@ class SpecialStatusIndex extends Component
         }
 
         // Fetch students using this status
-        $students = \App\Models\Student::where('special_status', $status->code)
+        $students = \App\Models\Student::whereHas('specialStatuses', function ($q) use ($status) {
+                $q->where('special_statuses.code', $status->code);
+            })
             ->select('id', 'full_name', 'nis')
             ->get()
             ->map(fn($s) => "{$s->full_name} (" . ($s->nis ?: 'Belum ada NIS') . ")")
@@ -195,7 +201,9 @@ class SpecialStatusIndex extends Component
         if ($status->is_system) return;
 
         // Final safety check
-        $studentCount = \App\Models\Student::where('special_status', $status->code)->count();
+        $studentCount = \App\Models\Student::whereHas('specialStatuses', function ($q) use ($status) {
+            $q->where('special_statuses.code', $status->code);
+        })->count();
         $discountCount = \App\Models\Discount::where('target_status', $status->code)->count();
         if ($studentCount > 0 || $discountCount > 0) return;
 

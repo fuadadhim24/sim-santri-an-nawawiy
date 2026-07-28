@@ -31,7 +31,17 @@ class StudentForm extends Component
     #[Rule('required|in:MONDOK,NON_MONDOK,NGAJI_ONLY')]
     public $residence_status = 'MONDOK';
 
-    public $special_status = 'UMUM';
+    public array $special_statuses = []; // array of status codes
+    public $special_status = 'UMUM'; // fallback for old tests and compatibility
+
+    public function updatedSpecialStatus($value)
+    {
+        if (empty($value) || $value === 'UMUM') {
+            $this->special_statuses = [];
+        } else {
+            $this->special_statuses = [$value];
+        }
+    }
 
     #[Rule('required|exists:class_levels,id')]
     public $class_level_id = '';
@@ -216,8 +226,8 @@ class StudentForm extends Component
         if (empty($this->residence_status)) {
             $incomplete[] = 'Status Domisili';
         }
-        if (empty($this->special_status)) {
-            $incomplete[] = 'Status Khusus';
+        if (empty($this->special_statuses)) {
+            // kosong = UMUM, tidak masalah
         }
         if (empty($this->class_level_id)) {
             $incomplete[] = 'Tingkat Kelas';
@@ -231,12 +241,17 @@ class StudentForm extends Component
             return;
         }
 
+        // Compute old vs new statuses for comparison
+        $oldStatuses = $this->student->specialStatuses->pluck('code')->sort()->values()->toArray();
+        $newStatuses = collect($this->special_statuses)->sort()->values()->toArray();
+
         $isProfileChanged = (
             $this->student->unit_code !== $this->unit_code ||
             $this->student->residence_status !== $this->residence_status ||
             $this->student->class_level_id !== ($this->class_level_id ? (int)$this->class_level_id : null) ||
-            $this->student->special_status !== $this->special_status
+            $oldStatuses !== $newStatuses
         );
+
 
         $incomplete = $this->incompleteAcademicFields;
 
@@ -294,7 +309,8 @@ class StudentForm extends Component
             $this->full_name = $student->full_name;
             $this->unit_code = $student->unit_code;
             $this->residence_status = $student->residence_status;
-            $this->special_status = $student->special_status;
+            $this->special_statuses = $student->specialStatuses->pluck('code')->toArray();
+            $this->special_status = count($this->special_statuses) === 1 ? $this->special_statuses[0] : 'UMUM';
             $this->class_level_id = $student->class_level_id ?? '';
             $this->address = $student->address;
             $this->nisn = $student->nisn;
@@ -348,7 +364,7 @@ class StudentForm extends Component
         }
     }
 
-    public function updatedSpecialStatus()
+    public function updatedSpecialStatuses()
     {
         if ($this->isEdit) {
             $this->checkIfProfileChanged();
@@ -378,10 +394,15 @@ class StudentForm extends Component
     public function save(NisGeneratorService $nisService, \App\Services\BillingService $billingService)
     {
         try {
-            $validCodes = \App\Models\SpecialStatus::pluck('code')->toArray();
-            $this->validate([
-                'special_status' => 'required|in:' . implode(',', $validCodes),
-            ]);
+            $validCodes = \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->pluck('code')->toArray();
+            // Validasi setiap item di array special_statuses
+            foreach ($this->special_statuses as $code) {
+                if (!in_array($code, $validCodes)) {
+                    throw new \Illuminate\Validation\ValidationException(
+                        validator([], [], [])->errors()->add('special_statuses', 'Status khusus tidak valid: ' . $code)
+                    );
+                }
+            }
             $this->validate();
             $nisRule = 'required|string|unique:students,nis' . ($this->isEdit ? ',' . $this->student->id : '');
             $this->validate([
@@ -411,7 +432,7 @@ class StudentForm extends Component
             'nis' => $this->nis,
             'unit_code' => $this->unit_code,
             'residence_status' => $this->residence_status,
-            'special_status' => $this->special_status,
+            // special_statuses disync ke pivot setelah save
             'class_level_id' => $this->class_level_id ?: null,
             'address' => $this->address,
             'nisn' => $this->nisn,
@@ -455,7 +476,27 @@ class StudentForm extends Component
 
         if ($this->isEdit) {
             $this->student->update($data);
+
+            // Ambil status LAMA sebelum sync
+            $oldCodes = $this->student->specialStatuses->pluck('code')->sort()->values()->toArray();
+
+            // Sync status khusus ke pivot table
+            $statusCodes = collect($this->special_statuses)
+                ->filter(fn($c) => !empty($c))
+                ->unique()
+                ->toArray();
+            $this->student->specialStatuses()->sync(
+                collect($statusCodes)->mapWithKeys(fn($code) => [$code => []])->toArray()
+            );
+
+            // Recalculate tagihan UNPAID hanya jika status benar-benar berubah
+            $newCodes = collect($statusCodes)->sort()->values()->toArray();
+            if ($oldCodes !== $newCodes) {
+                app(\App\Services\BillingService::class)->recalculateStudentBillings($this->student->fresh());
+            }
+
             session()->flash('message', 'Student updated successfully.');
+
         } else {
             $year = date('Y');
             $data['registration_number'] = $nisService->generateRegistrationNumber($year);
@@ -463,6 +504,17 @@ class StudentForm extends Component
             $data['joined_at'] = now();
 
             $newStudent = Student::create($data);
+
+            // Sync status khusus ke pivot table
+            $statusCodes = collect($this->special_statuses)
+                ->filter(fn($c) => !empty($c))
+                ->unique()
+                ->toArray();
+            if (!empty($statusCodes)) {
+                $newStudent->specialStatuses()->sync(
+                    collect($statusCodes)->mapWithKeys(fn($code) => [$code => []])->toArray()
+                );
+            }
 
             if ($this->autoGenerateBillings && !empty($this->selectedBillings)) {
                 $billingService->generateBillingsForStudentWithCategories($newStudent, $this->selectedBillings);
@@ -507,7 +559,7 @@ class StudentForm extends Component
 
     public function getSpecialStatusesProperty()
     {
-        return \App\Models\SpecialStatus::all();
+        return \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->orderBy('name')->get();
     }
 
     public function render()

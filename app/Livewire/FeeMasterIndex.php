@@ -171,13 +171,12 @@ class FeeMasterIndex extends Component
 
             if (!$billingQuery->exists()) {
                 $discountAmount = 0;
-                if ($student->special_status !== 'UMUM') {
-                    $discount = \App\Models\Discount::where('fee_master_id', $feeMaster->id)
-                        ->where('target_status', $student->special_status)
-                        ->first();
-                    if ($discount) {
-                        $discountAmount = $discount->discount_amount;
-                    }
+                if ($student->hasAnySpecialStatus()) {
+                    $statusCodes = $student->getSpecialStatusCodes();
+                    $discountAmount = \App\Models\Discount::where('fee_master_id', $feeMaster->id)
+                        ->whereIn('target_status', $statusCodes)
+                        ->sum('discount_amount');
+                    $discountAmount = min($discountAmount, $feeMaster->amount);
                 }
 
                 $finalAmount = max(0, $feeMaster->amount - $discountAmount);
