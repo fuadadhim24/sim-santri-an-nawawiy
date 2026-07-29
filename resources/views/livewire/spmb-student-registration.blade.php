@@ -109,41 +109,19 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Class Level -->
-                    <div>
-                        <label for="class_level_id" class="block text-sm font-semibold text-foreground mb-1.5">Pilihan Kelas <span class="text-red-500">*</span></label>
-                        <select wire:model="class_level_id" id="class_level_id"
-                            class="w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors">
-                            <option value="">Pilih Tingkat Kelas...</option>
-                            @foreach($this->classLevels as $level)
-                                <option value="{{ $level->id }}">{{ $level->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('class_level_id')
-                            <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Special Status -->
-                    <div>
-                        <label class="block text-sm font-semibold text-foreground mb-1.5">Status Khusus</label>
-                        <div class="space-y-2">
-                            @foreach($this->specialStatuses as $status)
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox"
-                                        wire:model="special_statuses"
-                                        value="{{ $status->code }}"
-                                        id="spmb_status_{{ $status->code }}"
-                                        class="w-4 h-4 rounded border-border text-primary focus:ring-ring transition-colors">
-                                    <span class="text-sm text-foreground">{{ $status->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('special_statuses')
-                            <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
-                        @enderror
-                    </div>
+                <!-- Class Level -->
+                <div>
+                    <label for="class_level_id" class="block text-sm font-semibold text-foreground mb-1.5">Pilihan Kelas <span class="text-red-500">*</span></label>
+                    <select wire:model="class_level_id" id="class_level_id"
+                        class="w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors">
+                        <option value="">Pilih Tingkat Kelas...</option>
+                        @foreach($this->classLevels as $level)
+                            <option value="{{ $level->id }}">{{ $level->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('class_level_id')
+                        <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <!-- Info Box -->
@@ -298,6 +276,50 @@
                                     class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
                             @endif
                             @error('nisn_document')
+                                <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Lampiran Pendukung Tambahan (Multiple) -->
+                        <div class="space-y-1.5 md:col-span-2" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                            <label for="supporting_documents" class="block text-xs font-semibold text-foreground">Dokumen Pendukung Tambahan <span class="text-muted-foreground font-normal">(Opsional - bisa pilih beberapa berkas sekaligus, maks 4MB per berkas)</span></label>
+                            <p class="text-[11px] text-muted-foreground/90 leading-relaxed bg-primary/5 p-2 rounded-lg border border-primary/10">
+                                💡 <strong>Tips Potongan Biaya:</strong> Jika Anda ingin mengajukan keringanan biaya/diskon pendidikan kepada yayasan, silakan unggah berkas bukti yang sah di sini (contoh: sertifikat prestasi/piagam santri, surat keterangan kurang mampu, bukti kartu PKH/KPS, slip gaji wali, atau KK untuk diskon saudara kandung).
+                            </p>
+                            
+                            @if(!empty($supporting_documents))
+                                <div class="space-y-2 mt-1.5">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        @foreach($supporting_documents as $index => $doc)
+                                            <div class="p-2.5 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
+                                                <div class="flex items-center min-w-0">
+                                                    <svg class="h-4 w-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    <span class="text-xs text-green-800 font-medium truncate">{{ $doc->getClientOriginalName() }}</span>
+                                                </div>
+                                                <button type="button" wire:click="removeSupportingDoc({{ $index }})" class="text-muted-foreground hover:text-foreground ml-2">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <input type="file" wire:model="supporting_documents" id="supporting_documents_more" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple
+                                            class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
+                                    </div>
+                                </div>
+                            @else
+                                <input type="file" wire:model="supporting_documents" id="supporting_documents" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple
+                                    class="w-full px-3 py-1.5 border border-border bg-background text-foreground rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ring">
+                            @endif
+                            @error('supporting_documents')
+                                <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
+                            @enderror
+                            @error('supporting_documents.*')
                                 <span class="text-destructive text-xs mt-1 block font-medium">{{ $message }}</span>
                             @enderror
                         </div>

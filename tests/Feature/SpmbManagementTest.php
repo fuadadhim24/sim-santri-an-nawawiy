@@ -150,4 +150,45 @@ class SpmbManagementTest extends TestCase
         $this->assertNotNull($newStudent->registration_number);
         $this->assertMatchesRegularExpression('/^\d{4}\.\d{4}$/', $newStudent->registration_number);
     }
+
+    public function test_guardian_can_register_student_with_supporting_documents()
+    {
+        $schedule = SpmbSchedule::factory()->create([
+            'registration_start' => now()->subDays(2),
+            'registration_end' => now()->addDays(2),
+            'is_active' => true,
+        ]);
+
+        $guardianModel = \App\Models\Guardian::factory()->create(['user_id' => $this->guardian->id]);
+        $classLevel = \App\Models\ClassLevel::create(['name' => 'Kelas 7 SMP', 'level_order' => 1]);
+
+        \Illuminate\Support\Facades\Storage::fake('public');
+        $this->withSession(['selected_spmb_schedule_id' => $schedule->id]);
+
+        \Livewire\Livewire::actingAs($this->guardian)
+            ->test(\App\Livewire\SpmbStudentRegistration::class)
+            ->set('full_name', 'Santri Dokumen')
+            ->set('unit_code', '01')
+            ->set('residence_status', 'MONDOK')
+            ->set('class_level_id', $classLevel->id)
+            ->set('address', 'Alamat Santri')
+            ->set('kk', \Illuminate\Http\UploadedFile::fake()->create('kk.pdf', 500))
+            ->set('foto', \Illuminate\Http\UploadedFile::fake()->image('foto.jpg'))
+            ->set('akta', \Illuminate\Http\UploadedFile::fake()->create('akta.pdf', 500))
+            ->set('ijazah', \Illuminate\Http\UploadedFile::fake()->create('ijazah.pdf', 500))
+            ->set('supporting_documents', [
+                \Illuminate\Http\UploadedFile::fake()->create('slip_gaji.pdf', 1000),
+                \Illuminate\Http\UploadedFile::fake()->create('sertifikat.jpg', 800),
+            ])
+            ->call('save')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('wali.dashboard'));
+
+        $newStudent = \App\Models\Student::where('full_name', 'Santri Dokumen')->first();
+        $this->assertNotNull($newStudent);
+        $this->assertNotNull($newStudent->supporting_documents);
+        $this->assertCount(2, $newStudent->supporting_documents);
+        $this->assertEquals('slip_gaji.pdf', $newStudent->supporting_documents[0]['name']);
+        $this->assertEquals('sertifikat.jpg', $newStudent->supporting_documents[1]['name']);
+    }
 }

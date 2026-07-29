@@ -243,16 +243,16 @@
                         <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mendaftarkan calon santri baru ke pesantren.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Pilih Status Khusus / Diskon</span>
-                                <p class="text-xs text-muted-foreground">Jika calon santri memenuhi syarat (seperti Anak Yatim atau Kurang Mampu), silakan centang pilihan yang tersedia. Status ini akan masuk dalam peninjauan admin dan tidak langsung memotong tagihan sampai disetujui resmi.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Unggah Berkas Pendukung</span>
+                                <p class="text-xs text-muted-foreground">Unggah berkas tambahan seperti sertifikat prestasi, piagam penghargaan, bukti slip gaji, atau surat keterangan lainnya. Berkas ini digunakan oleh petugas yayasan untuk memverifikasi kelayakan potongan biaya/diskon secara objektif.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Pemberian Diskon/Potongan</span>
+                                <p class="text-xs text-muted-foreground">Wali santri tidak dapat memilih status khusus secara mandiri. Penentuan dan persetujuan pemberian potongan biaya sepenuhnya merupakan hak prerogatif pihak yayasan/sekolah setelah melakukan audit dokumen fisik pendaftaran.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Isi Formulir Pendaftaran</span>
                                 <p class="text-xs text-muted-foreground">Lengkapi data calon santri: nama lengkap, jenis kelamin, tempat/tanggal lahir, jenjang yang dituju, dan status domisili (mondok/non-mondok).</p>
-                            </div>
-                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Status Pendaftaran</span>
-                                <p class="text-xs text-muted-foreground">Setelah dikirim, status pendaftaran anak akan <strong>pending</strong> hingga diverifikasi oleh admin. Hasil verifikasi dapat Anda pantau di dashboard.</p>
                             </div>
                         </div>
                     </div>

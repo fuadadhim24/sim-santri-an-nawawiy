@@ -30,17 +30,9 @@ class SpmbStudentRegistration extends Component
     #[Rule('required|in:MONDOK,NON_MONDOK,NGAJI_ONLY')]
     public $residence_status = 'MONDOK';
 
-    public array $special_statuses = [];
+    public array $special_statuses = []; // kept empty as wali santri cannot select special status anymore
     public $special_status = 'UMUM'; // fallback for old tests and compatibility
-
-    public function updatedSpecialStatus($value)
-    {
-        if (empty($value) || $value === 'UMUM') {
-            $this->special_statuses = [];
-        } else {
-            $this->special_statuses = [$value];
-        }
-    }
+    public $supporting_documents = []; // multiple supporting documents
 
     #[Rule('required|exists:class_levels,id')]
     public $class_level_id = '';
@@ -100,16 +92,18 @@ class SpmbStudentRegistration extends Component
     }
 
 
+    public function removeSupportingDoc($index)
+    {
+        unset($this->supporting_documents[$index]);
+        $this->supporting_documents = array_values($this->supporting_documents);
+    }
+
     public function save(NisGeneratorService $nisService)
     {
-        $validCodes = \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->pluck('code')->toArray();
-        foreach ($this->special_statuses as $code) {
-            if (!in_array($code, $validCodes)) {
-                $this->addError('special_statuses', 'Status khusus tidak valid: ' . $code);
-                return;
-            }
-        }
         $this->validate();
+        $this->validate([
+            'supporting_documents.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:4096',
+        ]);
 
         $guardian = $this->guardian;
 
@@ -127,13 +121,23 @@ class SpmbStudentRegistration extends Component
         $aktaPath = $this->akta ? $this->akta->store('student-documents/akta', 'public') : null;
         $ijazahPath = $this->ijazah ? $this->ijazah->store('student-documents/ijazah', 'public') : null;
 
+        $supportingDocsPaths = [];
+        if (!empty($this->supporting_documents)) {
+            foreach ($this->supporting_documents as $doc) {
+                $path = $doc->store('student-documents/supporting', 'public');
+                $supportingDocsPaths[] = [
+                    'path' => $path,
+                    'name' => $doc->getClientOriginalName()
+                ];
+            }
+        }
+
         $data = [
             'guardian_id' => $guardian->id,
             'spmb_schedule_id' => $this->scheduleId,
             'full_name' => $this->full_name,
             'unit_code' => $this->unit_code,
             'residence_status' => $this->residence_status,
-            // special_statuses disync ke pivot setelah create
             'class_level_id' => $this->class_level_id,
             'address'           => $this->address,
             'nisn'              => $this->nisn ?: null,
@@ -146,17 +150,10 @@ class SpmbStudentRegistration extends Component
             'nisn_document' => $nisnDocPath,
             'akta' => $aktaPath,
             'ijazah' => $ijazahPath,
+            'supporting_documents' => !empty($supportingDocsPaths) ? $supportingDocsPaths : null,
         ];
 
         $newStudent = Student::create($data);
-
-        // Sync status khusus ke pivot table dengan is_approved = false (menunggu persetujuan admin)
-        $statusCodes = collect($this->special_statuses)->filter(fn($c) => !empty($c))->unique()->toArray();
-        if (!empty($statusCodes)) {
-            $newStudent->specialStatuses()->sync(
-                collect($statusCodes)->mapWithKeys(fn($code) => [$code => ['is_approved' => false]])->toArray()
-            );
-        }
 
         session()->forget('selected_spmb_schedule_id');
         session()->forget('selected_spmb_schedule_name');
@@ -164,14 +161,6 @@ class SpmbStudentRegistration extends Component
         session()->flash('message', 'Pendaftaran santri baru berhasil! No. Pendaftaran: ' . $regNumber . '. Silakan tunggu konfirmasi dari admin.');
 
         return redirect()->route('wali.dashboard');
-    }
-
-    public function getSpecialStatusesProperty()
-    {
-        return \App\Models\SpecialStatus::where('code', '!=', 'UMUM')
-            ->where('is_visible', true)
-            ->orderBy('name')
-            ->get();
     }
 
     public function render()

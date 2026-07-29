@@ -523,8 +523,8 @@
                         <p class="text-xs text-muted-foreground leading-relaxed">Kelola golongan dinamis untuk santri Anda agar pemotongan biaya dapat dikonfigurasi secara fleksibel.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Visibilitas Form Wali Santri</span>
-                                <p class="text-xs text-muted-foreground leading-relaxed">Anda dapat mengatur apakah suatu status khusus (misal: Anak Yatim, Kurang Mampu) dapat dipilih oleh wali santri saat mendaftar lewat kolom switch <strong>Tampilkan ke Wali Santri?</strong>.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Visibilitas Status Khusus</span>
+                                <p class="text-xs text-muted-foreground leading-relaxed">Anda dapat mengatur apakah suatu status khusus (misal: Anak Yatim, Kurang Mampu) aktif di sistem dan dapat dikelola oleh yayasan/petugas sekolah.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Proteksi Keamanan Golongan</span>
@@ -539,15 +539,15 @@
                 @elseif(request()->routeIs('admin.student-acceptance*'))
                     <div>
                         <h4 class="font-semibold text-primary mb-2">Panduan Penerimaan Santri</h4>
-                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk memvalidasi dan menerima pendaftaran santri baru.</p>
+                        <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk memvalidasi berkas pendukung dan menerima pendaftaran santri baru.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Persetujuan Status Khusus / Diskon</span>
-                                <p class="text-xs text-muted-foreground">Pilihan status khusus oleh wali ditandai sebagai <strong>Ajuan Wali (Pending)</strong> dan belum memotong tagihan. Pilihan ini akan berubah menjadi <strong>Disetujui</strong> secara permanen saat Anda menekan tombol <strong>Terima Santri</strong>.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Peninjauan Berkas & Status Khusus</span>
+                                <p class="text-xs text-muted-foreground">Admin/Yayasan wajib meninjau "Dokumen Pendukung Tambahan" yang diunggah wali (sertifikat, slip gaji, piagam) di kolom tengah. Status khusus dan diskon santri ditentukan sepenuhnya oleh admin di halaman ini saat proses penerimaan santri.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Syarat Menekan Tombol Terima</span>
-                                <p class="text-xs text-muted-foreground">Tombol <strong>Terima Santri</strong> akan dalam kondisi redup/terkunci jika proses validasi belum selesai. Anda diwajibkan mengklik tombol <strong>Validasi</strong> pada semua baris dokumen fisik (KK, Akta, dll) di kolom tengah sebelum dapat menerima santri.</p>
+                                <p class="text-xs text-muted-foreground">Tombol <strong>Terima Santri</strong> akan dalam kondisi redup/terkunci jika proses validasi berkas utama belum selesai. Anda diwajibkan mengklik tombol <strong>Validasi</strong> pada semua baris dokumen fisik (KK, Akta, dll) di kolom tengah sebelum dapat menerima santri.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Edit Data Santri</span>
@@ -565,8 +565,8 @@
                         <p class="text-xs text-muted-foreground leading-relaxed">Menu ini digunakan untuk mengelola data santri pesantren.</p>
                         <div class="mt-4 space-y-4">
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
-                                <span class="text-xs font-bold text-foreground block mb-1">Sistem Approval Status Khusus</span>
-                                <p class="text-xs text-muted-foreground">Status khusus yang diinput langsung oleh admin pada form tambah santri bersifat <strong>auto-approved</strong> (langsung aktif). Sedangkan status khusus yang diajukan oleh wali santri membutuhkan konfirmasi admin di halaman Penerimaan sebelum diskon memotong tagihan.</p>
+                                <span class="text-xs font-bold text-foreground block mb-1">Sistem Penentuan Status Khusus</span>
+                                <p class="text-xs text-muted-foreground">Wali santri tidak dapat mengajukan status khusus/diskon secara langsung saat mendaftar. Wali hanya melampirkan bukti berkas fisik pendukung. Penentuan status khusus dan pemberian diskon santri sepenuhnya dikelola secara terpusat oleh Admin/Yayasan pada saat penerimaan santri atau pengeditan data santri.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Detail Santri & Berkas Fisik</span>

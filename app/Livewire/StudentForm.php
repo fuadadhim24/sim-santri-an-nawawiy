@@ -61,6 +61,8 @@ class StudentForm extends Component
     public $akta_file;
     public $ijazah_file;
     public $nisn_document_file;
+    public $supporting_documents = []; // new uploads (temporary files)
+    public array $existing_supporting_documents = []; // existing uploaded files
 
     public $availableBillings = [];
     public $selectedBillings = [];
@@ -316,6 +318,7 @@ class StudentForm extends Component
             $this->nisn = $student->nisn;
             $this->generatedNis = $student->nis;
             $this->nis = $student->nis;
+            $this->existing_supporting_documents = $student->supporting_documents ?: [];
             $this->isEdit = true;
             $this->isAcademicLocked = false;
             $this->academicChangesConfirmed = true;
@@ -418,6 +421,7 @@ class StudentForm extends Component
                 'akta_file' => "$aktaRule|file|mimes:jpg,jpeg,png,webp,pdf|max:2048",
                 'ijazah_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
                 'nisn_document_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+                'supporting_documents.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:4096',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->dispatch('swal:validation-error', [
@@ -426,17 +430,28 @@ class StudentForm extends Component
             throw $e;
         }
 
+        $supportingDocsPaths = $this->existing_supporting_documents;
+        if (!empty($this->supporting_documents)) {
+            foreach ($this->supporting_documents as $doc) {
+                $path = $doc->store('student-documents/supporting', 'public');
+                $supportingDocsPaths[] = [
+                    'path' => $path,
+                    'name' => $doc->getClientOriginalName()
+                ];
+            }
+        }
+
         $data = [
             'guardian_id' => $this->guardian_id,
             'full_name' => $this->full_name,
             'nis' => $this->nis,
             'unit_code' => $this->unit_code,
             'residence_status' => $this->residence_status,
-            // special_statuses disync ke pivot setelah save
             'class_level_id' => $this->class_level_id ?: null,
             'address' => $this->address,
             'nisn' => $this->nisn,
             'is_active' => $this->is_active,
+            'supporting_documents' => !empty($supportingDocsPaths) ? $supportingDocsPaths : null,
         ];
 
         if ($this->kk_file) {
@@ -560,6 +575,30 @@ class StudentForm extends Component
     public function getSpecialStatusesProperty()
     {
         return \App\Models\SpecialStatus::where('code', '!=', 'UMUM')->orderBy('name')->get();
+    }
+
+    public function removeExistingSupportingDoc($index)
+    {
+        if (isset($this->existing_supporting_documents[$index])) {
+            $doc = $this->existing_supporting_documents[$index];
+            if (isset($doc['path']) && \Illuminate\Support\Facades\Storage::disk('public')->exists($doc['path'])) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($doc['path']);
+            }
+            unset($this->existing_supporting_documents[$index]);
+            $this->existing_supporting_documents = array_values($this->existing_supporting_documents);
+            
+            if ($this->isEdit && $this->student) {
+                $this->student->update([
+                    'supporting_documents' => !empty($this->existing_supporting_documents) ? $this->existing_supporting_documents : null
+                ]);
+            }
+        }
+    }
+
+    public function removeNewSupportingDoc($index)
+    {
+        unset($this->supporting_documents[$index]);
+        $this->supporting_documents = array_values($this->supporting_documents);
     }
 
     public function render()

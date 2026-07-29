@@ -193,6 +193,49 @@
                                 </div>
                             @endif
                         </div>
+
+                        <!-- Supporting Documents File (Multiple) -->
+                        <div class="p-4 border border-dashed border-border rounded-lg bg-muted/40 flex flex-col justify-between min-h-[120px] md:col-span-2">
+                            <div>
+                                <label class="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Dokumen Pendukung Tambahan (PDF/Gambar - Max 4MB - Opsional)</label>
+                                
+                                <!-- Upload baru -->
+                                <input type="file" wire:model="supporting_documents" class="text-xs w-full mb-3" multiple>
+                                @error('supporting_documents.*') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+                                @error('supporting_documents') <span class="text-destructive text-xs block mt-1">{{ $message }}</span> @enderror
+
+                                <!-- Temp files list -->
+                                @if(!empty($supporting_documents))
+                                    <div class="space-y-1 mt-2">
+                                        <p class="text-[10px] font-bold text-foreground">Berkas baru yang akan diunggah:</p>
+                                        @foreach($supporting_documents as $index => $doc)
+                                            <div class="flex items-center justify-between bg-background border border-border p-1.5 rounded text-xs">
+                                                <span class="truncate pr-2">{{ $doc->getClientOriginalName() }}</span>
+                                                <button type="button" wire:click="removeNewSupportingDoc({{ $index }})" class="text-destructive hover:text-destructive/80 font-bold ml-2">Hapus</button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- Existing files list -->
+                                @if(!empty($existing_supporting_documents))
+                                    <div class="space-y-1.5 mt-4 border-t border-border/60 pt-3">
+                                        <p class="text-[10px] font-bold text-foreground">Berkas pendukung saat ini:</p>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            @foreach($existing_supporting_documents as $index => $doc)
+                                                <div class="flex items-center justify-between bg-muted border border-border p-1.5 rounded text-xs min-w-0">
+                                                    <span class="truncate pr-2 font-medium" title="{{ $doc['name'] }}">{{ $doc['name'] }}</span>
+                                                    <div class="flex items-center gap-2 flex-shrink-0">
+                                                        <a href="{{ Storage::url($doc['path']) }}" target="_blank" class="text-primary hover:underline font-semibold">Lihat</a>
+                                                        <button type="button" wire:click="removeExistingSupportingDoc({{ $index }})" class="text-destructive hover:text-destructive/80 font-semibold">Hapus</button>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
 

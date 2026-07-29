@@ -49,13 +49,13 @@ class Student extends Model
         'registration_number',
         'unit_code',
         'residence_status',
-        // special_status dihapus dari fillable — sekarang pakai pivot table student_special_statuses
         'kk',
         'foto',
         'nisn',
         'nisn_document',
         'akta',
         'ijazah',
+        'supporting_documents',
         'class_level_id',
         'study_group_id',
         'rejection_note',
@@ -66,6 +66,7 @@ class Student extends Model
         'is_active' => 'boolean',
         'joined_at' => 'datetime',
         'left_at' => 'datetime',
+        'supporting_documents' => 'array',
     ];
 
     public function classLevel(): BelongsTo
@@ -280,9 +281,6 @@ class Student extends Model
         return null;
     }
 
-    /**
-     * Delete all student files
-     */
     public function deleteFiles()
     {
         $files = [
@@ -296,6 +294,14 @@ class Student extends Model
         foreach ($files as $file) {
             if ($file && Storage::disk('public')->exists($file)) {
                 Storage::disk('public')->delete($file);
+            }
+        }
+
+        if ($this->supporting_documents && is_array($this->supporting_documents)) {
+            foreach ($this->supporting_documents as $doc) {
+                if (isset($doc['path']) && Storage::disk('public')->exists($doc['path'])) {
+                    Storage::disk('public')->delete($doc['path']);
+                }
             }
         }
     }

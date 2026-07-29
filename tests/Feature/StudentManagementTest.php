@@ -89,6 +89,86 @@ class StudentManagementTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_admin_can_process_cash_payment_from_student_detail()
+    {
+        $student = Student::factory()->create();
+        $feeMaster = \App\Models\FeeMaster::factory()->create(['amount' => 50000]);
+        $billing = \App\Models\Billing::create([
+            'student_id' => $student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Test',
+            'original_amount' => 50000,
+            'final_amount' => 50000,
+            'status' => 'UNPAID',
+            'visible_to_wali' => true,
+        ]);
+
+        \Livewire\Livewire::actingAs($this->admin)
+            ->test(\App\Livewire\StudentDetail::class, ['student' => $student])
+            ->call('processCashPayment', $billing->id)
+            ->assertHasNoErrors();
+
+        $billing->refresh();
+        $this->assertEquals('PAID', $billing->status);
+        $this->assertDatabaseHas('payments', [
+            'billing_id' => $billing->id,
+            'status' => 'paid',
+            'method' => 'cash',
+        ]);
+    }
+
+    public function test_admin_can_delete_billing_from_student_detail()
+    {
+        $student = Student::factory()->create();
+        $feeMaster = \App\Models\FeeMaster::factory()->create(['amount' => 50000]);
+        $billing = \App\Models\Billing::create([
+            'student_id' => $student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Test',
+            'original_amount' => 50000,
+            'final_amount' => 50000,
+            'status' => 'UNPAID',
+            'visible_to_wali' => true,
+        ]);
+
+        \Livewire\Livewire::actingAs($this->admin)
+            ->test(\App\Livewire\StudentDetail::class, ['student' => $student])
+            ->call('delete', $billing->id)
+            ->assertHasNoErrors();
+
+        $this->assertSoftDeleted('billings', ['id' => $billing->id]);
+    }
+
+    public function test_admin_can_split_billing_from_student_detail()
+    {
+        $student = Student::factory()->create();
+        $feeMaster = \App\Models\FeeMaster::factory()->create(['amount' => 50000]);
+        $billing = \App\Models\Billing::create([
+            'student_id' => $student->id,
+            'fee_master_id' => $feeMaster->id,
+            'title' => 'SPP Test',
+            'original_amount' => 50000,
+            'final_amount' => 50000,
+            'status' => 'UNPAID',
+            'visible_to_wali' => true,
+        ]);
+
+        \Livewire\Livewire::actingAs($this->admin)
+            ->test(\App\Livewire\StudentDetail::class, ['student' => $student])
+            ->call('openSplitModal', $billing->id)
+            ->set('splitCount', 2)
+            ->call('processSplit')
+            ->assertHasNoErrors();
+
+        $billing->refresh();
+        $this->assertEquals('VOID', $billing->status);
+        $this->assertDatabaseHas('billings', [
+            'student_id' => $student->id,
+            'status' => 'UNPAID',
+            'final_amount' => 25000,
+        ]);
+    }
+
     /**
      * Test unauthenticated user cannot access student pages
      */

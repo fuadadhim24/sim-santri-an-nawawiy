@@ -207,6 +207,15 @@
                     <p class="text-[10px] text-muted-foreground">Scan kartu/bukti NISN jika ada</p>
                 </div>
             </div>
+            <div class="p-3 bg-muted rounded-lg border border-border/40 flex items-start space-x-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <p class="text-xs font-semibold text-foreground">Dokumen Pendukung Tambahan <span class="text-muted-foreground font-normal">(Opsional)</span></p>
+                    <p class="text-[10px] text-muted-foreground">Sertifikat prestasi, piagam, bukti slip gaji, KK untuk diskon saudara kandung, dll.</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

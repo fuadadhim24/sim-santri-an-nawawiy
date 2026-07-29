@@ -431,6 +431,28 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Dokumen Pendukung Tambahan (Jika Ada) -->
+                        @if($student->supporting_documents && count($student->supporting_documents) > 0)
+                            <div class="mt-4 pt-4 border-t border-border space-y-2">
+                                <h4 class="text-xs font-semibold text-foreground uppercase tracking-wider">Dokumen Pendukung Tambahan:</h4>
+                                <div class="space-y-2">
+                                    @foreach($student->supporting_documents as $doc)
+                                        <div class="p-2.5 bg-muted/40 border border-border rounded-lg flex items-center justify-between hover:bg-muted/80 transition-all">
+                                            <div class="flex items-center min-w-0">
+                                                <svg class="h-4 w-4 text-primary mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                </svg>
+                                                <span class="text-xs text-muted-foreground truncate" title="{{ $doc['name'] }}">{{ $doc['name'] }}</span>
+                                            </div>
+                                            <a href="{{ Storage::url($doc['path']) }}" target="_blank" class="px-2.5 py-1.5 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors whitespace-nowrap ml-2">
+                                                Lihat
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

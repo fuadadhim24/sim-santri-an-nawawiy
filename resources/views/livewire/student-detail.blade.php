@@ -4,6 +4,35 @@
     </x-slot>
 
     <div class="space-y-6">
+        @if (session()->has('message'))
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg shadow-sm">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-700 font-medium">{{ session('message') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+        @if (session()->has('error'))
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg shadow-sm">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Status Notification Banner -->
         @if ($student->status === 'menunggu')
             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg shadow-sm">
@@ -292,6 +321,29 @@
                     @endif
                 </div>
             </div>
+
+            @if ($student->supporting_documents && count($student->supporting_documents) > 0)
+                <div class="mt-6 pt-6 border-t border-border">
+                    <h4 class="text-sm font-semibold text-foreground mb-3">Berkas Pendukung Tambahan</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        @foreach ($student->supporting_documents as $doc)
+                            <div class="border border-border rounded-lg p-4 flex flex-col justify-between items-center text-center bg-muted/20 hover:bg-muted/50 transition-colors">
+                                <div class="mb-3">
+                                    <svg class="w-10 h-10 text-primary mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="min-w-0 w-full">
+                                    <h4 class="font-medium text-foreground text-xs truncate" title="{{ $doc['name'] }}">{{ $doc['name'] }}</h4>
+                                </div>
+                                <a href="{{ Storage::url($doc['path']) }}" target="_blank" class="mt-4 w-full text-center py-1.5 px-3 bg-secondary text-secondary-foreground text-xs font-medium rounded hover:bg-secondary/80 transition-colors">
+                                    Lihat Dokumen
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Billing History -->
@@ -307,6 +359,7 @@
                             <th class="px-6 py-3">Jumlah</th>
                             <th class="px-6 py-3">Status</th>
                             <th class="px-6 py-3">Dibuat Pada</th>
+                            <th class="px-6 py-3">Tenggat Waktu</th>
                             <th class="px-6 py-3">Aksi</th>
                         </tr>
                     </thead>
@@ -314,8 +367,14 @@
                         @forelse ($student->billings as $billing)
                             <tr class="hover:bg-muted/50 transition-colors">
                                 <td class="px-6 py-4 font-medium text-foreground">{{ $billing->title }}</td>
-                                <td class="px-6 py-4 text-foreground">Rp
-                                    {{ number_format($billing->final_amount, 0, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-foreground font-mono">
+                                    Rp {{ number_format($billing->final_amount, 0, ',', '.') }}
+                                    @if ($billing->discount_applied > 0)
+                                        <span class="block text-xs text-green-600 line-through">
+                                            Rp {{ number_format($billing->original_amount, 0, ',', '.') }}
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4">
                                     <span
                                         class="px-2 py-1 rounded-full text-xs font-medium
@@ -325,6 +384,9 @@
                                 </td>
                                 <td class="px-6 py-4 text-muted-foreground">
                                     {{ $billing->created_at->locale('id')->isoFormat('D MMMM Y') }}
+                                </td>
+                                <td class="px-6 py-4 text-muted-foreground font-semibold">
+                                    {{ $billing->due_date ? $billing->due_date->locale('id')->isoFormat('D MMMM Y') : $billing->created_at->addDays(14)->locale('id')->isoFormat('D MMMM Y') }}
                                 </td>
                                 <td class="px-6 py-4">
                                     @if ($billing->status === 'PAID')
@@ -340,12 +402,37 @@
                                             $dueDate = $billing->due_date ?? $billing->created_at->addDays(14);
                                             $isOverdue = $dueDate->isPast();
                                         @endphp
-                                        <a href="{{ route('duitku.pay', [$billing->id, 'force' => 1]) }}"
-                                            onclick="event.preventDefault(); Swal.fire({title:'Konfirmasi Pembayaran', text:'Apakah Anda yakin ingin membayar {{ $billing->title }} sebesar Rp {{ number_format($billing->final_amount, 0, ',', '.') }}?', icon:'question', showCancelButton:true, confirmButtonText:'Ya, Bayar', cancelButtonText:'Batal', confirmButtonColor:'{{ $isOverdue ? '#c62828' : '#2e7d32' }}'}).then((r)=>{ if(r.isConfirmed) window.location.href=this.href; })"
-                                            style="background-color: {{ $isOverdue ? '#c62828' : '#2e7d32' }}; color: #ffffff;"
-                                            class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-lg transition shadow-sm hover:opacity-90">
-                                            Bayar
-                                        </a>
+                                        @if (Auth::user()->role === 'WALI_SANTRI')
+                                            <a href="{{ route('duitku.pay', [$billing->id, 'force' => 1]) }}"
+                                                onclick="event.preventDefault(); Swal.fire({title:'Konfirmasi Pembayaran', text:'Apakah Anda yakin ingin membayar {{ $billing->title }} sebesar Rp {{ number_format($billing->final_amount, 0, ',', '.') }}?', icon:'question', showCancelButton:true, confirmButtonText:'Ya, Bayar', cancelButtonText:'Batal', confirmButtonColor:'{{ $isOverdue ? '#c62828' : '#2e7d32' }}'}).then((r)=>{ if(r.isConfirmed) window.location.href=this.href; })"
+                                                style="background-color: {{ $isOverdue ? '#c62828' : '#2e7d32' }}; color: #ffffff;"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-lg transition shadow-sm hover:opacity-90">
+                                                Bayar Online
+                                            </a>
+                                        @else
+                                            <div class="flex items-center gap-2">
+                                                <button wire:click="processCashPayment({{ $billing->id }})"
+                                                    wire:swal="Apakah Anda yakin ingin memproses pembayaran ini secara Cash? Status tagihan akan langsung menjadi LUNAS."
+                                                    class="inline-flex items-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded shadow-sm transition">
+                                                    Bayar Cash
+                                                </button>
+                                                <a href="{{ route('duitku.pay', [$billing->id, 'force' => 1]) }}"
+                                                    onclick="event.preventDefault(); Swal.fire({title:'Konfirmasi Pembayaran Cashless', text:'Anda akan diarahkan ke checkout Duitku. Lanjutkan?', icon:'question', showCancelButton:true, confirmButtonText:'Ya, Lanjut', cancelButtonText:'Batal'}).then((r)=>{ if(r.isConfirmed) window.location.href=this.href; })"
+                                                    class="inline-flex items-center px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded shadow-sm transition">
+                                                    Bayar Cashless
+                                                </a>
+                                                <button wire:click="openSplitModal({{ $billing->id }})"
+                                                    class="inline-flex items-center px-2 py-1 text-white rounded hover:brightness-90 text-xs font-bold transition-all"
+                                                    style="background-color: #d97706;">
+                                                    Pecah Cicilan
+                                                </button>
+                                                <button wire:click="delete({{ $billing->id }})"
+                                                    wire:swal="Yakin ingin menghapus / mengarsipkan tagihan ini?"
+                                                    class="inline-flex items-center px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-xs font-bold transition">
+                                                    Hapus / Arsip
+                                                </button>
+                                            </div>
+                                        @endif
                                     @else
                                         <span class="text-muted-foreground text-xs">—</span>
                                     @endif
@@ -353,7 +440,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-muted-foreground">
+                                <td colspan="6" class="px-6 py-8 text-center text-muted-foreground">
                                     Tidak ada riwayat tagihan.
                                 </td>
                             </tr>
@@ -363,4 +450,98 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Pecah Cicilan -->
+    @if($showSplitModal && $billingToSplit)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" wire:click="$set('showSplitModal', false)"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-card border border-border rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form wire:submit.prevent="processSplit">
+                    <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4 space-y-4">
+                        <div class="flex justify-between items-center pb-3 border-b border-border">
+                            <h3 class="text-lg font-bold text-foreground" id="modal-title">
+                                Pecah Tagihan Menjadi Cicilan
+                            </h3>
+                            <button type="button" wire:click="$set('showSplitModal', false)" class="text-muted-foreground hover:text-foreground">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Billing Details -->
+                        <div class="p-3 bg-muted rounded-md text-sm text-foreground space-y-1">
+                            <p><strong>Santri:</strong> {{ $billingToSplit->student->full_name }}</p>
+                            <p><strong>Tagihan:</strong> {{ $billingToSplit->title }}</p>
+                            <p><strong>Total Nominal:</strong> Rp {{ number_format($billingToSplit->final_amount, 0, ',', '.') }}</p>
+                        </div>
+
+                        <!-- Split Count -->
+                        <div>
+                            <label class="block text-sm font-semibold text-foreground mb-1">Jumlah Cicilan</label>
+                            <select wire:model.live="splitCount" class="w-full py-2 px-3 border border-input bg-background rounded-md text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                                <option value="2">2 Kali</option>
+                                <option value="3">3 Kali</option>
+                                <option value="4">4 Kali</option>
+                                <option value="5">5 Kali</option>
+                                <option value="6">6 Kali</option>
+                                <option value="12">12 Kali</option>
+                            </select>
+                        </div>
+
+                        <!-- Installment Details -->
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                            <h4 class="text-sm font-semibold text-foreground border-b border-border pb-1">Detail Rencana Cicilan</h4>
+                            @for ($i = 0; $i < $splitCount; $i++)
+                                <div class="grid grid-cols-3 gap-2 items-center">
+                                    <div class="col-span-2">
+                                        <label class="block text-xs text-muted-foreground">Judul Cicilan {{ $i + 1 }}</label>
+                                        <input type="text" wire:model="splitTitles.{{ $i }}" class="w-full py-1 px-2 border border-input bg-background rounded text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-muted-foreground">Nominal (Rp)</label>
+                                        <input type="number" wire:model.live="splitAmounts.{{ $i }}" class="w-full py-1 px-2 border border-input bg-background rounded text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring">
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
+
+                        <!-- Verification Summary -->
+                        @php
+                            $totalActual = array_sum(array_map('floatval', $splitAmounts));
+                            $totalExpected = (float)$billingToSplit->final_amount;
+                            $diff = $totalExpected - $totalActual;
+                        @endphp
+                        <div class="pt-2 border-t border-border flex justify-between items-center text-xs">
+                            <span class="text-muted-foreground">Total Input: <strong class="text-foreground">Rp {{ number_format($totalActual, 0, ',', '.') }}</strong></span>
+                            @if (abs($diff) > 0.01)
+                                <span class="text-red-500 font-semibold">Selisih: Rp {{ number_format($diff, 0, ',', '.') }}</span>
+                            @else
+                                <span class="text-green-600 font-semibold">✓ Jumlah Sesuai</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="bg-muted px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-border">
+                        <button type="submit" wire:loading.attr="disabled" class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                            @if (abs($diff) > 0.01) disabled @endif>
+                            <svg wire:loading class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Pecah Tagihan</span>
+                        </button>
+                        <button type="button" wire:click="$set('showSplitModal', false)" class="mt-3 w-full inline-flex justify-center rounded-md border border-input shadow-sm px-4 py-2 bg-background text-foreground hover:bg-muted focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
+
