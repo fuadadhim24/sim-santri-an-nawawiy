@@ -81,6 +81,8 @@ class StudentForm extends Component
     public $oldBillingsToDelete = [];
     public $newCategoriesToGenerate = [];
     public $availableNewBillings = [];
+    public $beforeBillings = [];
+    public $afterBillings = [];
 
     public function getGuardiansProperty()
     {
@@ -101,60 +103,12 @@ class StudentForm extends Component
             return;
         }
 
-        $query = FeeCategory::where('is_active', true);
-
-        $query->where(function ($q) {
-            $q->where('domicile_target', $this->residence_status)
-              ->orWhereNull('domicile_target');
-        });
-
-        $query->where(function ($q) {
-            $q->where('unit_target', $this->unit_code)
-              ->orWhereNull('unit_target');
-        });
-
-        $this->availableBillings = $query->where('is_locked', false)
-            ->with(['fees' => function ($q) {
-                $q->with('classLevelTarget')
-                  ->where('is_active', true)
-                  ->where(function ($sq) {
-                      $sq->whereNull('unit_target')
-                         ->orWhere('unit_target', $this->unit_code);
-                  })
-                  ->where(function ($sq) {
-                      $sq->whereNull('residence_target')
-                         ->orWhere('residence_target', $this->residence_status);
-                  })
-                  ->where(function ($sq) {
-                      $sq->whereNull('class_level_target_id')
-                         ->orWhere('class_level_target_id', $this->class_level_id ?: null);
-                  });
-            }])
-            ->orderBy('name')
-            ->get()
-            ->map(function ($category) {
-                return [
-                    'id' => (string) $category->id,
-                    'name' => $category->name,
-                    'description' => $category->description,
-                    'unit' => $category->unit_target,
-                    'domicile' => $category->domicile_target,
-                    'fees' => $category->fees->map(function ($fee) {
-                        return [
-                            'item_name' => $fee->item_name,
-                            'amount' => $fee->amount,
-                            'recurrence_type' => $fee->recurrence_type,
-                            'due_days' => $fee->due_days,
-                            'unit' => $fee->unit_target,
-                            'domicile' => $fee->residence_target,
-                            'class_level_target_id' => $fee->class_level_target_id,
-                            'class_level_target_name' => $fee->classLevelTarget?->name ?? 'SEMUA',
-                        ];
-                    })->toArray(),
-                    'total_amount' => $category->fees->sum('amount')
-                ];
-            })
-            ->toArray();
+        $this->availableBillings = $this->getFutureBillingsForProfile(
+            $this->unit_code,
+            $this->residence_status,
+            $this->class_level_id,
+            $this->special_statuses ?: []
+        );
 
         $this->selectedBillings = array_map(fn($b) => $b['id'], $this->availableBillings);
     }
@@ -322,6 +276,13 @@ class StudentForm extends Component
             $this->isEdit = true;
             $this->isAcademicLocked = false;
             $this->academicChangesConfirmed = true;
+            $this->beforeBillings = $this->getFutureBillingsForProfile(
+                $this->student->unit_code,
+                $this->student->residence_status,
+                $this->student->class_level_id,
+                $this->student->specialStatuses->pluck('code')->toArray()
+            );
+            $this->loadFutureBillingsPreview();
         } else {
             $this->isAcademicLocked = false;
             $this->academicChangesConfirmed = true;
@@ -346,6 +307,7 @@ class StudentForm extends Component
             $this->nisCheckMessage = '';
         } else {
             $this->checkIfProfileChanged();
+            $this->loadFutureBillingsPreview();
         }
     }
 
@@ -355,6 +317,7 @@ class StudentForm extends Component
             $this->loadAvailableBillings();
         } else {
             $this->checkIfProfileChanged();
+            $this->loadFutureBillingsPreview();
         }
     }
 
@@ -364,6 +327,7 @@ class StudentForm extends Component
             $this->loadAvailableBillings();
         } else {
             $this->checkIfProfileChanged();
+            $this->loadFutureBillingsPreview();
         }
     }
 
@@ -371,6 +335,9 @@ class StudentForm extends Component
     {
         if ($this->isEdit) {
             $this->checkIfProfileChanged();
+            $this->loadFutureBillingsPreview();
+        } else {
+            $this->loadAvailableBillings();
         }
     }
 
@@ -599,6 +566,110 @@ class StudentForm extends Component
     {
         unset($this->supporting_documents[$index]);
         $this->supporting_documents = array_values($this->supporting_documents);
+    }
+
+    public function loadFutureBillingsPreview()
+    {
+        $this->afterBillings = $this->getFutureBillingsForProfile(
+            $this->unit_code,
+            $this->residence_status,
+            $this->class_level_id,
+            $this->special_statuses ?: []
+        );
+    }
+
+    private function getFutureBillingsForProfile($unitCode, $residenceStatus, $classLevelId, array $specialStatuses)
+    {
+        if (empty($unitCode) || empty($residenceStatus)) {
+            return [];
+        }
+
+        $query = FeeCategory::where('is_active', true);
+
+        $query->where(function ($q) use ($residenceStatus) {
+            $q->where('domicile_target', $residenceStatus)
+              ->orWhereNull('domicile_target');
+        });
+
+        $query->where(function ($q) use ($unitCode) {
+            $q->where('unit_target', $unitCode)
+              ->orWhereNull('unit_target');
+        });
+
+        return $query->where('is_locked', false)
+            ->with(['fees' => function ($q) use ($unitCode, $residenceStatus, $classLevelId) {
+                $q->with('classLevelTarget')
+                  ->where('is_active', true)
+                  ->where(function ($sq) use ($unitCode) {
+                      $sq->whereNull('unit_target')
+                         ->orWhere('unit_target', $unitCode);
+                  })
+                  ->where(function ($sq) use ($residenceStatus) {
+                      $sq->whereNull('residence_target')
+                         ->orWhere('residence_target', $residenceStatus);
+                  })
+                  ->where(function ($sq) use ($classLevelId) {
+                      $sq->whereNull('class_level_target_id')
+                         ->orWhere('class_level_target_id', $classLevelId ?: null);
+                  });
+            }])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($category) use ($specialStatuses) {
+                $feeIds = $category->fees->pluck('id')->toArray();
+                
+                $discounts = [];
+                if (!empty($specialStatuses) && !empty($feeIds)) {
+                    $discounts = \App\Models\Discount::whereIn('fee_master_id', $feeIds)
+                        ->whereIn('target_status', $specialStatuses)
+                        ->get()
+                        ->groupBy('fee_master_id');
+                }
+
+                $feesWithDiscount = $category->fees->map(function ($fee) use ($discounts) {
+                    $amount = (float)$fee->amount;
+                    $discountAmount = 0;
+                    
+                    if (isset($discounts[$fee->id])) {
+                        foreach ($discounts[$fee->id] as $d) {
+                            $discountAmount += (float)$d->discount_amount;
+                        }
+                    }
+                    
+                    $discountAmount = min($discountAmount, $amount);
+                    $finalAmount = max(0.0, $amount - $discountAmount);
+
+                    return [
+                        'item_name' => $fee->item_name,
+                        'amount' => $amount,
+                        'discount_applied' => $discountAmount,
+                        'final_amount' => $finalAmount,
+                        'recurrence_type' => $fee->recurrence_type,
+                        'due_days' => $fee->due_days,
+                        'unit' => $fee->unit_target,
+                        'domicile' => $fee->residence_target,
+                        'class_level_target_id' => $fee->class_level_target_id,
+                        'class_level_target_name' => $fee->classLevelTarget?->name ?? 'SEMUA',
+                    ];
+                });
+
+                $totalAmount = $feesWithDiscount->sum('final_amount');
+                $totalDiscount = $feesWithDiscount->sum('discount_applied');
+                $totalOriginal = $feesWithDiscount->sum('amount');
+
+                return [
+                    'id' => (string) $category->id,
+                    'name' => $category->name,
+                    'description' => $category->description,
+                    'unit' => $category->unit_target,
+                    'domicile' => $category->domicile_target,
+                    'fees' => $feesWithDiscount->toArray(),
+                    'total_amount' => $totalAmount,
+                    'total_discount' => $totalDiscount,
+                    'total_original' => $totalOriginal,
+                ];
+            })
+            ->toArray();
     }
 
     public function render()

@@ -49,7 +49,7 @@ class StudentAcceptanceConfirm extends Component
 
     public function updated($propertyName)
     {
-        if (in_array($propertyName, ['unit_code', 'residence_status', 'class_level_id'])) {
+        if (in_array($propertyName, ['unit_code', 'residence_status', 'class_level_id', 'special_statuses'])) {
             $this->loadAvailableBillings();
         }
 
@@ -101,25 +101,58 @@ class StudentAcceptanceConfirm extends Component
             ->orderBy('name')
             ->get()
             ->map(function ($category) {
+                $statusCodes = $this->special_statuses ?: [];
+                $feeIds = $category->fees->pluck('id')->toArray();
+                
+                $discounts = [];
+                if (!empty($statusCodes) && !empty($feeIds)) {
+                    $discounts = \App\Models\Discount::whereIn('fee_master_id', $feeIds)
+                        ->whereIn('target_status', $statusCodes)
+                        ->get()
+                        ->groupBy('fee_master_id');
+                }
+
+                $feesWithDiscount = $category->fees->map(function ($fee) use ($discounts) {
+                    $amount = (float)$fee->amount;
+                    $discountAmount = 0;
+                    
+                    if (isset($discounts[$fee->id])) {
+                        foreach ($discounts[$fee->id] as $d) {
+                            $discountAmount += (float)$d->discount_amount;
+                        }
+                    }
+                    
+                    $discountAmount = min($discountAmount, $amount);
+                    $finalAmount = max(0.0, $amount - $discountAmount);
+
+                    return [
+                        'item_name' => $fee->item_name,
+                        'amount' => $amount,
+                        'discount_applied' => $discountAmount,
+                        'final_amount' => $finalAmount,
+                        'recurrence_type' => $fee->recurrence_type,
+                        'due_days' => $fee->due_days,
+                        'unit' => $fee->unit_target,
+                        'domicile' => $fee->residence_target,
+                        'class_level_target_id' => $fee->class_level_target_id,
+                        'class_level_target_name' => $fee->classLevelTarget?->name ?? 'SEMUA',
+                    ];
+                });
+
+                $totalAmount = $feesWithDiscount->sum('final_amount');
+                $totalDiscount = $feesWithDiscount->sum('discount_applied');
+                $totalOriginal = $feesWithDiscount->sum('amount');
+
                 return [
                     'id' => (string) $category->id,
                     'name' => $category->name,
                     'description' => $category->description,
                     'unit' => $category->unit_target,
                     'domicile' => $category->domicile_target,
-                    'fees' => $category->fees->map(function ($fee) {
-                        return [
-                            'item_name' => $fee->item_name,
-                            'amount' => $fee->amount,
-                            'recurrence_type' => $fee->recurrence_type,
-                            'due_days' => $fee->due_days,
-                            'unit' => $fee->unit_target,
-                            'domicile' => $fee->residence_target,
-                            'class_level_target_id' => $fee->class_level_target_id,
-                            'class_level_target_name' => $fee->classLevelTarget?->name ?? 'SEMUA',
-                        ];
-                    })->toArray(),
-                    'total_amount' => $category->fees->sum('amount')
+                    'fees' => $feesWithDiscount->toArray(),
+                    'total_amount' => $totalAmount,
+                    'total_discount' => $totalDiscount,
+                    'total_original' => $totalOriginal,
                 ];
             })
             ->toArray();

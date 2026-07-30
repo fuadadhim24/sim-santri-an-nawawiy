@@ -527,6 +527,11 @@
                                                     
                                                     <div class="text-xs font-medium text-foreground mt-2 font-mono">
                                                         Total: Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}
+                                                        @if (isset($billing['total_discount']) && $billing['total_discount'] > 0)
+                                                            <span class="text-green-600 line-through text-[11px] ml-1.5 font-normal">
+                                                                Rp {{ number_format($billing['total_original'], 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -574,7 +579,12 @@
                                                                 </div>
                                                             </div>
                                                             <span class="font-mono font-semibold text-muted-foreground whitespace-nowrap mt-0.5">
-                                                                Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
+                                                                @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
+                                                                    <span class="text-green-600 line-through text-[10px] ml-1 font-normal">
+                                                                        Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                    </span>
+                                                                @endif
                                                             </span>
                                                         </li>
                                                     @endforeach

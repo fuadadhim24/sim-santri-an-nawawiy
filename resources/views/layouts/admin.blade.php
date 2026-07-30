@@ -555,7 +555,7 @@
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Generate Tagihan Otomatis</span>
-                                <p class="text-xs text-muted-foreground">Kategori tagihan yang tampil di kolom kanan telah difilter otomatis oleh sistem sesuai dengan Unit (SMP/SMA/PPTQ) dan Domisili santri tersebut. Tagihan yang dicentang akan langsung diterbitkan saat Anda menekan tombol Terima Santri.</p>
+                                <p class="text-xs text-muted-foreground">Kategori tagihan yang tampil di kolom kanan telah difilter otomatis oleh sistem sesuai dengan Unit (SMP/SMA/PPTQ), Domisili, dan Tingkat Kelas santri tersebut. Tampilan nominal preview akan secara dinamis memotong diskon jika status khusus diubah. Tagihan yang dicentang akan langsung diterbitkan saat Anda menekan tombol Terima Santri.</p>
                             </div>
                         </div>
                     </div>
@@ -571,6 +571,10 @@
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Detail Santri & Berkas Fisik</span>
                                 <p class="text-xs text-muted-foreground leading-relaxed">Klik nama santri untuk melihat profil lengkap. Pada form edit, berkas fisik yang sudah diunggah sebelumnya akan ditandai dengan badge hijau <strong>✓ Sudah Ada</strong> beserta tombol preview berikon mata untuk memudahkan pengecekan berkas lama.</p>
+                            </div>
+                            <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
+                                <span class="text-xs font-bold text-foreground block mb-1">Preview Perbandingan Sebelum/Sesudah (Before vs After)</span>
+                                <p class="text-xs text-muted-foreground">Pada form edit santri lama, mengubah data akademik (Unit, Domisili, Kelas) atau Status Khusus akan memicu panel <strong>Sebelum vs Setelah Perubahan</strong> di bagian bawah. Panel ini hanya memberikan simulasi/gambaran tagihan otomatis rutin masa depan santri, tanpa memodifikasi tagihan historis yang sudah diterbitkan sebelumnya.</p>
                             </div>
                             <div class="bg-muted/50 rounded-lg p-3 border border-border/50">
                                 <span class="text-xs font-bold text-foreground block mb-1">Status Khusus & Diskon</span>

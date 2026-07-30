@@ -374,6 +374,11 @@
                                                     </div>
                                                     <div class="text-xs font-medium text-foreground mt-1 font-mono">
                                                         Total: Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}
+                                                        @if (isset($billing['total_discount']) && $billing['total_discount'] > 0)
+                                                            <span class="text-green-600 line-through text-[11px] ml-1.5 font-normal">
+                                                                Rp {{ number_format($billing['total_original'], 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -416,7 +421,14 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <span class="font-mono text-muted-foreground mt-0.5">Rp {{ number_format($fee['amount'], 0, ',', '.') }}</span>
+                                                            <span class="font-mono text-muted-foreground mt-0.5">
+                                                                Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
+                                                                @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
+                                                                    <span class="text-green-600 line-through text-[10px] ml-1">
+                                                                        Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                    </span>
+                                                                @endif
+                                                            </span>
                                                         </li>
                                                     @endforeach
                                                 </ul>
@@ -426,6 +438,154 @@
                                 </div>
                             </div>
                         @endif
+                    </div>
+                @endif
+
+                <!-- BILLINGS PREVIEW FOR EDIT MODE (BEFORE VS AFTER FUTURE BILLINGS PREVIEW) -->
+                @if ($isEdit)
+                    <div class="border-t border-border pt-6 space-y-4">
+                        <div>
+                            <h4 class="text-sm font-semibold text-foreground">Preview Perubahan Tagihan Otomatis Masa Depan</h4>
+                            <p class="text-xs text-muted-foreground mt-0.5">
+                                Menampilkan perbandingan jenis tagihan rutin bulanan/tahunan yang akan otomatis diterbitkan sistem untuk santri ini di kemudian hari berdasarkan perubahan profil akademik atau status khusus. <strong class="text-primary">(Perubahan ini tidak akan mengubah atau menimpa tagihan lama yang sudah diterbitkan)</strong>.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- SEBELUM PERUBAHAN (PROFIL LAMA) -->
+                            <div class="border border-border rounded-lg p-4 bg-muted/10">
+                                <div class="flex items-center justify-between border-b border-border pb-2 mb-3">
+                                    <span class="text-xs font-bold text-muted-foreground uppercase tracking-wider">Sebelum Perubahan (Profil Database)</span>
+                                    <span class="text-[10px] bg-muted px-2 py-0.5 rounded font-semibold text-muted-foreground">LAMA</span>
+                                </div>
+                                <div class="text-xs space-y-1 mb-4 bg-background p-2 rounded border border-border/50">
+                                    <div><span class="text-muted-foreground">Unit:</span> <span class="font-medium text-foreground">{{ $student->unit_code == '01' ? 'SMP' : ($student->unit_code == '02' ? 'SMA' : 'PPTQ') }}</span></div>
+                                    <div><span class="text-muted-foreground">Domisili:</span> <span class="font-medium text-foreground">{{ $student->residence_status }}</span></div>
+                                    <div><span class="text-muted-foreground">Kelas:</span> <span class="font-medium text-foreground">{{ $student->classLevel?->name ?? 'Belum Ditentukan' }}</span></div>
+                                    <div>
+                                        <span class="text-muted-foreground">Status Khusus:</span>
+                                        <span class="font-medium text-foreground">
+                                            @if($student->specialStatuses->isEmpty())
+                                                UMUM (Tanpa Status Khusus)
+                                            @else
+                                                {{ implode(', ', $student->specialStatuses->pluck('name')->toArray()) }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @if (empty($beforeBillings))
+                                    <div class="py-6 text-center text-xs text-muted-foreground border border-dashed rounded bg-background">
+                                        Tidak ada tagihan otomatis terdaftar untuk profil lama.
+                                    </div>
+                                @else
+                                    <div class="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+                                        @foreach ($beforeBillings as $billing)
+                                            <div class="border border-border rounded-lg bg-background p-3">
+                                                <div class="flex justify-between items-start">
+                                                    <span class="font-semibold text-xs text-foreground leading-tight">{{ $billing['name'] }}</span>
+                                                    <div class="text-right">
+                                                        <span class="font-mono text-xs font-bold text-foreground">
+                                                            Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}
+                                                        </span>
+                                                        @if (isset($billing['total_discount']) && $billing['total_discount'] > 0)
+                                                            <span class="block text-[10px] text-green-600 line-through font-normal mt-0.5">
+                                                                Rp {{ number_format($billing['total_original'], 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 pt-1.5 border-t border-border/40 space-y-1">
+                                                    @foreach ($billing['fees'] as $fee)
+                                                        <div class="flex justify-between text-[11px]">
+                                                            <span class="text-muted-foreground">{{ $fee['item_name'] }}</span>
+                                                            <span class="font-mono text-foreground/80">
+                                                                Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
+                                                                @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
+                                                                    <span class="text-green-600 line-through text-[9px] ml-1">
+                                                                        Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                    </span>
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- SETELAH PERUBAHAN (PROFIL BARU) -->
+                            <div class="border border-primary/30 rounded-lg p-4 bg-primary/5">
+                                <div class="flex items-center justify-between border-b border-primary/20 pb-2 mb-3">
+                                    <span class="text-xs font-bold text-primary uppercase tracking-wider">Setelah Perubahan (Profil Baru)</span>
+                                    <span class="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded font-semibold">BARU</span>
+                                </div>
+                                <div class="text-xs space-y-1 mb-4 bg-background p-2 rounded border border-primary/20">
+                                    @php
+                                        $currentClassLevel = \App\Models\ClassLevel::find($class_level_id);
+                                    @endphp
+                                    <div><span class="text-muted-foreground">Unit:</span> <span class="font-medium text-foreground">{{ $unit_code == '01' ? 'SMP' : ($unit_code == '02' ? 'SMA' : 'PPTQ') }}</span></div>
+                                    <div><span class="text-muted-foreground">Domisili:</span> <span class="font-medium text-foreground">{{ $residence_status }}</span></div>
+                                    <div><span class="text-muted-foreground">Kelas:</span> <span class="font-medium text-foreground">{{ $currentClassLevel?->name ?? 'Belum Ditentukan' }}</span></div>
+                                    <div>
+                                        <span class="text-muted-foreground">Status Khusus:</span>
+                                        <span class="font-medium text-foreground">
+                                            @if(empty($special_statuses))
+                                                UMUM (Tanpa Status Khusus)
+                                            @else
+                                                @php
+                                                    $statusNames = \App\Models\SpecialStatus::whereIn('code', $special_statuses)->pluck('name')->toArray();
+                                                @endphp
+                                                {{ implode(', ', $statusNames) }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @if (empty($afterBillings))
+                                    <div class="py-6 text-center text-xs text-muted-foreground border border-dashed rounded bg-background">
+                                        Tidak ada tagihan otomatis terdaftar untuk profil baru ini.
+                                    </div>
+                                @else
+                                    <div class="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+                                        @foreach ($afterBillings as $billing)
+                                            <div class="border border-primary/20 rounded-lg bg-background p-3">
+                                                <div class="flex justify-between items-start">
+                                                    <span class="font-semibold text-xs text-foreground leading-tight">{{ $billing['name'] }}</span>
+                                                    <div class="text-right">
+                                                        <span class="font-mono text-xs font-bold text-foreground">
+                                                            Rp {{ number_format($billing['total_amount'], 0, ',', '.') }}
+                                                        </span>
+                                                        @if (isset($billing['total_discount']) && $billing['total_discount'] > 0)
+                                                            <span class="block text-[10px] text-green-600 line-through font-normal mt-0.5">
+                                                                Rp {{ number_format($billing['total_original'], 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 pt-1.5 border-t border-border/40 space-y-1">
+                                                    @foreach ($billing['fees'] as $fee)
+                                                        <div class="flex justify-between text-[11px]">
+                                                            <span class="text-muted-foreground">{{ $fee['item_name'] }}</span>
+                                                            <span class="font-mono text-foreground/80">
+                                                                Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
+                                                                @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
+                                                                    <span class="text-green-600 line-through text-[9px] ml-1">
+                                                                        Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                    </span>
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 @endif
 
