@@ -418,6 +418,13 @@
                                                                                 KELAS: {{ $fee['class_level_target_name'] }}
                                                                             </span>
                                                                         @endif
+                                                                        @if (!empty($fee['discount_sources']))
+                                                                            @foreach ($fee['discount_sources'] as $source)
+                                                                                <span class="inline-flex px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold border border-green-200 animate-pulse" style="font-size: 8px; line-height: 1.2;">
+                                                                                    POTONGAN: {{ strtoupper($source) }}
+                                                                                </span>
+                                                                            @endforeach
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -495,18 +502,40 @@
                                                         @endif
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 pt-1.5 border-t border-border/40 space-y-1">
+                                                <div class="mt-2 pt-1.5 border-t border-border/40 space-y-2">
                                                     @foreach ($billing['fees'] as $fee)
-                                                        <div class="flex justify-between text-[11px]">
-                                                            <span class="text-muted-foreground">{{ $fee['item_name'] }}</span>
-                                                            <span class="font-mono text-foreground/80">
-                                                                Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
-                                                                @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
-                                                                    <span class="text-green-600 line-through text-[9px] ml-1">
-                                                                        Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                        <div class="flex flex-col py-1 border-b border-border/20 last:border-0">
+                                                            <div class="flex justify-between text-[11px]">
+                                                                <span class="font-medium text-foreground">{{ $fee['item_name'] }}</span>
+                                                                <span class="font-mono text-foreground/80">
+                                                                    Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
+                                                                    @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
+                                                                        <span class="text-green-600 line-through text-[9px] ml-1 font-normal">
+                                                                            Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                        </span>
+                                                                    @endif
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex flex-wrap gap-1 mt-0.5">
+                                                                <span class="inline-flex px-1 py-0.2 bg-blue-50 text-blue-600 rounded border border-blue-100" style="font-size: 7.5px;">
+                                                                    {{ $fee['unit'] == '01' ? 'SMP' : ($fee['unit'] == '02' ? 'SMA' : ($fee['unit'] == '03' ? 'PPTQ' : 'SEMUA UNIT')) }}
+                                                                </span>
+                                                                <span class="inline-flex px-1 py-0.2 bg-purple-50 text-purple-600 rounded border border-purple-100" style="font-size: 7.5px;">
+                                                                    {{ $fee['domicile'] ?: 'SEMUA DOMISILI' }}
+                                                                </span>
+                                                                @if (isset($fee['class_level_target_name']))
+                                                                    <span class="inline-flex px-1 py-0.2 bg-amber-50 text-amber-600 rounded border border-amber-100" style="font-size: 7.5px;">
+                                                                        {{ $fee['class_level_target_name'] }}
                                                                     </span>
                                                                 @endif
-                                                            </span>
+                                                                @if (!empty($fee['discount_sources']))
+                                                                    @foreach ($fee['discount_sources'] as $source)
+                                                                        <span class="inline-flex px-1 py-0.2 bg-green-50 text-green-600 rounded border border-green-100 font-semibold" style="font-size: 7.5px;">
+                                                                            {{ strtoupper($source) }}
+                                                                        </span>
+                                                                    @endforeach
+                                                                @endif
+                                                            </div>
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -565,18 +594,40 @@
                                                         @endif
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 pt-1.5 border-t border-border/40 space-y-1">
+                                                <div class="mt-2 pt-1.5 border-t border-border/40 space-y-2">
                                                     @foreach ($billing['fees'] as $fee)
-                                                        <div class="flex justify-between text-[11px]">
-                                                            <span class="text-muted-foreground">{{ $fee['item_name'] }}</span>
-                                                            <span class="font-mono text-foreground/80">
-                                                                Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
-                                                                @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
-                                                                    <span class="text-green-600 line-through text-[9px] ml-1">
-                                                                        Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                        <div class="flex flex-col py-1 border-b border-border/20 last:border-0">
+                                                            <div class="flex justify-between text-[11px]">
+                                                                <span class="font-medium text-foreground">{{ $fee['item_name'] }}</span>
+                                                                <span class="font-mono text-foreground/80">
+                                                                    Rp {{ number_format($fee['final_amount'] ?? $fee['amount'], 0, ',', '.') }}
+                                                                    @if (isset($fee['discount_applied']) && $fee['discount_applied'] > 0)
+                                                                        <span class="text-green-600 line-through text-[9px] ml-1 font-normal">
+                                                                            Rp {{ number_format($fee['amount'], 0, ',', '.') }}
+                                                                        </span>
+                                                                    @endif
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex flex-wrap gap-1 mt-0.5">
+                                                                <span class="inline-flex px-1 py-0.2 bg-blue-50 text-blue-600 rounded border border-blue-100" style="font-size: 7.5px;">
+                                                                    {{ $fee['unit'] == '01' ? 'SMP' : ($fee['unit'] == '02' ? 'SMA' : ($fee['unit'] == '03' ? 'PPTQ' : 'SEMUA UNIT')) }}
+                                                                </span>
+                                                                <span class="inline-flex px-1 py-0.2 bg-purple-50 text-purple-600 rounded border border-purple-100" style="font-size: 7.5px;">
+                                                                    {{ $fee['domicile'] ?: 'SEMUA DOMISILI' }}
+                                                                </span>
+                                                                @if (isset($fee['class_level_target_name']))
+                                                                    <span class="inline-flex px-1 py-0.2 bg-amber-50 text-amber-600 rounded border border-amber-100" style="font-size: 7.5px;">
+                                                                        {{ $fee['class_level_target_name'] }}
                                                                     </span>
                                                                 @endif
-                                                            </span>
+                                                                @if (!empty($fee['discount_sources']))
+                                                                    @foreach ($fee['discount_sources'] as $source)
+                                                                        <span class="inline-flex px-1 py-0.2 bg-green-50 text-green-600 rounded border border-green-100 font-semibold animate-pulse" style="font-size: 7.5px;">
+                                                                            {{ strtoupper($source) }}
+                                                                        </span>
+                                                                    @endforeach
+                                                                @endif
+                                                            </div>
                                                         </div>
                                                     @endforeach
                                                 </div>

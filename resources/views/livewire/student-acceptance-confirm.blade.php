@@ -575,6 +575,13 @@
                                                                                 KELAS: {{ $fee['class_level_target_name'] }}
                                                                             </span>
                                                                         @endif
+                                                                        @if (!empty($fee['discount_sources']))
+                                                                            @foreach ($fee['discount_sources'] as $source)
+                                                                                <span class="inline-flex px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold border border-green-200 animate-pulse" style="font-size: 8px; line-height: 1.2;">
+                                                                                    POTONGAN: {{ strtoupper($source) }}
+                                                                                </span>
+                                                                            @endforeach
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                             </div>

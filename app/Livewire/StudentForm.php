@@ -626,13 +626,17 @@ class StudentForm extends Component
                         ->groupBy('fee_master_id');
                 }
 
-                $feesWithDiscount = $category->fees->map(function ($fee) use ($discounts) {
+                $statusNames = \App\Models\SpecialStatus::pluck('name', 'code')->toArray();
+
+                $feesWithDiscount = $category->fees->map(function ($fee) use ($discounts, $statusNames) {
                     $amount = (float)$fee->amount;
                     $discountAmount = 0;
+                    $discountSources = [];
                     
                     if (isset($discounts[$fee->id])) {
                         foreach ($discounts[$fee->id] as $d) {
                             $discountAmount += (float)$d->discount_amount;
+                            $discountSources[] = $statusNames[$d->target_status] ?? $d->target_status;
                         }
                     }
                     
@@ -650,6 +654,7 @@ class StudentForm extends Component
                         'domicile' => $fee->residence_target,
                         'class_level_target_id' => $fee->class_level_target_id,
                         'class_level_target_name' => $fee->classLevelTarget?->name ?? 'SEMUA',
+                        'discount_sources' => $discountSources,
                     ];
                 });
 
