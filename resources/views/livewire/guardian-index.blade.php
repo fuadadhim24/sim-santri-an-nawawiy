@@ -79,14 +79,14 @@
                             <td class="px-6 py-4 text-muted-foreground">{{ $guardian->user->email ?? 'N/A' }}</td>
                             <td class="px-6 py-4">
                                 <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs">
-                                    {{ $guardian->students->whereIn('status', ['diterima', 'lulus'])->count() }} Santri
+                                    {{ $guardian->students->where('status', '!=', \App\Enums\StudentStatus::REJECTED->value)->count() }} Santri
                                 </span>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-3">
                                     <a href="{{ route('admin.guardians.edit', $guardian) }}"
                                         class="text-primary hover:text-primary/80 font-medium">Ubah</a>
-                                    @if ($guardian->students->count() === 0)
+                                    @if (!$guardian->students->contains(fn($s) => $s->status !== \App\Enums\StudentStatus::REJECTED->value))
                                         <button wire:click="deleteSingle({{ $guardian->id }})"
                                             wire:swal="Apakah Anda yakin ingin menghapus akun wali '{{ $guardian->full_name }}' beserta akun pengguna mereka? Tindakan ini tidak dapat dibatalkan."
                                             class="text-destructive hover:text-destructive/80 font-medium">Hapus</button>

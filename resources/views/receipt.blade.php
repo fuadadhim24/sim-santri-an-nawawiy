@@ -163,7 +163,7 @@
             <div class="mt-16 pt-8 border-t border-border text-center text-muted-foreground text-sm">
                 <p class="font-bold text-foreground mb-1 font-sans">Terima Kasih Atas Pembayaran Anda</p>
                 <p>Kwitansi ini adalah bukti pembayaran yang sah yang dihasilkan secara elektronik oleh sistem.</p>
-                <p class="mt-4">Jl. Pesantren No. 123 | admin@an-nawawiy.sch.id | +62 812-3456-7890</p>
+                <p class="mt-4">Jl. KH. M. Masrur Yusuf 51 | tatausaha@annawawiy.or.id | +6285746644232</p>
             </div>
         </div>
     </div>

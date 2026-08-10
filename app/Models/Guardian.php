@@ -27,6 +27,7 @@ class Guardian extends Model
             if ($guardian->isForceDeleting()) {
                 $hasStudents = Student::withTrashed()
                     ->where('guardian_id', $guardian->id)
+                    ->where('status', '!=', \App\Enums\StudentStatus::REJECTED->value)
                     ->exists();
 
                 if ($hasStudents) {
