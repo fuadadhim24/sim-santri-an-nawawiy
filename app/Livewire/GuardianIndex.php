@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Guardian;
+use App\Enums\StudentStatus;
 use Livewire\Component;
 use Livewire\WithPagination;
 use SweetAlert2\Laravel\Swal;
@@ -27,7 +28,11 @@ class GuardianIndex extends Component
     public function deleteSingle($id)
     {
         $guardian = Guardian::with('students')->findOrFail($id);
-        if ($guardian->students()->count() === 0) {
+        $hasActiveOrPendingStudents = $guardian->students()
+            ->where('status', '!=', StudentStatus::REJECTED->value)
+            ->exists();
+
+        if (!$hasActiveOrPendingStudents) {
             $user = $guardian->user;
             $guardian->forceDelete();
             if ($user) {
@@ -47,7 +52,9 @@ class GuardianIndex extends Component
 
     public function deleteAllWithoutStudents()
     {
-        $guardians = Guardian::doesntHave('students')->get();
+        $guardians = Guardian::whereDoesntHave('students', function ($q) {
+            $q->where('status', '!=', StudentStatus::REJECTED->value);
+        })->get();
         $deletedCount = 0;
         foreach ($guardians as $guardian) {
             $user = $guardian->user;
@@ -66,7 +73,9 @@ class GuardianIndex extends Component
 
     public function getHasGuardiansWithoutStudentsProperty()
     {
-        return Guardian::doesntHave('students')->exists();
+        return Guardian::whereDoesntHave('students', function ($q) {
+            $q->where('status', '!=', StudentStatus::REJECTED->value);
+        })->exists();
     }
 
     public function render()
@@ -74,7 +83,9 @@ class GuardianIndex extends Component
         $query = Guardian::with(['user', 'students']);
 
         if ($this->filterNoStudents) {
-            $query->doesntHave('students');
+            $query->whereDoesntHave('students', function ($q) {
+                $q->where('status', '!=', StudentStatus::REJECTED->value);
+            });
         }
 
         if (!empty($this->search)) {
