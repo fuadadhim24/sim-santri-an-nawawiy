@@ -69,13 +69,13 @@
 <body class="p-4 md:p-10">
     <div id="receipt-card" class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden print-border">
         <!-- Header -->
-        <div class="bg-primary p-8 text-white flex justify-between items-center">
+        <div class="bg-primary p-8 text-white flex flex-col items-center text-center gap-1 md:flex-row md:items-center md:justify-between md:text-left">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight">KWITANSI PEMBAYARAN</h1>
                 <p class="text-white/70 mt-1">Nomor: #{{ str_pad($billing->id, 6, '0', STR_PAD_LEFT) }}</p>
             </div>
-            <div class="text-right">
-                <h2 class="text-xl font-bold text-white leading-tight">PP. AN-NAWAWIY</h2>
+            <div class="md:text-right">
+                <h2 class="text-xl font-bold text-white leading-tight tracking-wide">YPSPPTQ AN-NAWAWIY</h2>
                 <p class="text-sm text-white/70">Sistem Informasi Manajemen Santri</p>
             </div>
         </div>
