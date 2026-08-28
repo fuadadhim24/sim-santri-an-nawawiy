@@ -108,24 +108,6 @@ class Student extends Model
                 'force_delete' => $student->isForceDeleting(),
             ]);
         });
-
-        static::created(function (Student $student) {
-            // Backward compatibility fallback for seeders and factories:
-            if (!empty($student->special_status) && $student->special_status !== 'UMUM') {
-                $student->specialStatuses()->syncWithoutDetaching([$student->special_status => ['is_approved' => true]]);
-            }
-        });
-
-        static::updated(function (Student $student) {
-            // Backward compatibility fallback if special_status column is updated directly
-            if ($student->wasChanged('special_status')) {
-                if (empty($student->special_status) || $student->special_status === 'UMUM') {
-                    $student->specialStatuses()->detach();
-                } else {
-                    $student->specialStatuses()->sync([$student->special_status => ['is_approved' => true]]);
-                }
-            }
-        });
     }
 
     /**

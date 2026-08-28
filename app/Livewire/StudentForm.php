@@ -32,16 +32,6 @@ class StudentForm extends Component
     public $residence_status = 'MONDOK';
 
     public array $special_statuses = []; // array of status codes
-    public $special_status = 'UMUM'; // fallback for old tests and compatibility
-
-    public function updatedSpecialStatus($value)
-    {
-        if (empty($value) || $value === 'UMUM') {
-            $this->special_statuses = [];
-        } else {
-            $this->special_statuses = [$value];
-        }
-    }
 
     #[Rule('required|exists:class_levels,id')]
     public $class_level_id = '';
@@ -266,7 +256,6 @@ class StudentForm extends Component
             $this->unit_code = $student->unit_code;
             $this->residence_status = $student->residence_status;
             $this->special_statuses = $student->specialStatuses->pluck('code')->toArray();
-            $this->special_status = count($this->special_statuses) === 1 ? $this->special_statuses[0] : 'UMUM';
             $this->class_level_id = $student->class_level_id ?? '';
             $this->address = $student->address;
             $this->nisn = $student->nisn;

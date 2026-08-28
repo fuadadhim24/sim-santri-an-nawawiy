@@ -124,10 +124,7 @@ class SpecialStatusIndex extends Component
 
                 if ($oldCode !== $newCode) {
                     \Illuminate\Support\Facades\DB::transaction(function () use ($status, $oldCode, $newCode, $updateData) {
-                        // 1. Update legacy column in students table
-                        \App\Models\Student::where('special_status', $oldCode)->update(['special_status' => $newCode]);
-
-                        // 2. Update parent record (triggers ON UPDATE CASCADE on pivot table student_special_statuses)
+                        // 1. Update parent record (triggers ON UPDATE CASCADE on pivot table student_special_statuses)
                         $updateData['code'] = $newCode;
                         $status->update($updateData);
 
